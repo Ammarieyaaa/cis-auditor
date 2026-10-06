@@ -1,0 +1,208 @@
+{% extends "base.html" %}
+
+{% block title %}Nouvel audit - RAM Security Audit{% endblock %}
+
+{% block content %}
+  <section class="section-head compact">
+    <div>
+      <p class="eyebrow">Audit</p>
+      <h1>Lancer un contrôle CIS</h1>
+    </div>
+  </section>
+
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% for category, message in messages %}
+      <div class="flash {{ 'flash-success' if category == 'success' else 'flash-error' }}">
+        <p>{{ message }}</p>
+      </div>
+    {% endfor %}
+  {% endwith %}
+
+  <form class="panel form-panel" method="post" id="audit-form">
+    <label class="field">
+      <span>Système à auditer</span>
+      <select name="os_type" id="os-select">
+        {% for item in rule_sets %}
+          <option value="{{ item.id }}">{{ item.label }}</option>
+        {% endfor %}
+      </select>
+    </label>
+
+    {# Le transport distant depend du systeme : SSH pour Linux/Unix, WinRM pour Windows. #}
+    <div class="remote-toggle-group" id="remote-group">
+      <input type="checkbox" name="mode" id="remote-toggle" value="remote" class="checkbox-input">
+      <label class="checkbox-label" for="remote-toggle" id="remote-toggle-label">Audit distant via SSH</label>
+
+      <div class="remote-fields">
+        <label class="field">
+          <span>Adresse (IP ou nom d'hôte)</span>
+          <input type="text" name="host" placeholder="192.168.1.10">
+        </label>
+        <label class="field">
+          <span id="remote-user-label">Utilisateur SSH</span>
+          <input type="text" name="remote_user" placeholder="ubuntu">
+        </label>
+        <label class="field">
+          <span id="remote-password-label">Mot de passe SSH</span>
+          <input type="password" name="remote_password" autocomplete="off">
+        </label>
+      </div>
+    </div>
+
+    <fieldset class="category-picker">
+      <legend>Profil CIS</legend>
+      <div class="profile-options">
+        <span>
+          <input type="radio" name="level" value="1" id="level-1" class="checkbox-input">
+          <label class="checkbox-label" for="level-1">Level 1 — socle essentiel</label>
+        </span>
+        <span>
+          <input type="radio" name="level" value="2" id="level-2" class="checkbox-input" checked>
+          <label class="checkbox-label" for="level-2">Level 2 — durcissement renforcé (inclut Level 1)</label>
+        </span>
+        <span id="extra-group" hidden>
+          <input type="checkbox" name="include_extra" value="1" id="include-extra" class="checkbox-input" checked>
+          <label class="checkbox-label" for="include-extra" id="extra-label"></label>
+        </span>
+      </div>
+    </fieldset>
+
+    <fieldset class="category-picker">
+      <legend>Catégories à auditer</legend>
+      <div class="category-actions">
+        <button type="button" class="button" id="select-all">Tout cocher</button>
+        <button type="button" class="button" id="select-none">Tout décocher</button>
+        <span class="muted" id="category-summary"></span>
+      </div>
+      <div class="category-grid" id="category-grid"></div>
+    </fieldset>
+
+    <button class="button primary" type="submit">Démarrer l'audit</button>
+  </form>
+
+  <script>
+    (function () {
+      const CATEGORIES = {{ categories | tojson }};
+      const EXTRAS = {{ extras | tojson }};
+      const osSelect = document.getElementById("os-select");
+      const grid = document.getElementById("category-grid");
+      const summary = document.getElementById("category-summary");
+      const remoteToggleLabel = document.getElementById("remote-toggle-label");
+      const remoteUserLabel = document.getElementById("remote-user-label");
+      const remotePasswordLabel = document.getElementById("remote-password-label");
+      const extraGroup = document.getElementById("extra-group");
+      const extraBox = document.getElementById("include-extra");
+      const extraLabel = document.getElementById("extra-label");
+
+      function selectedLevel() {
+        return document.getElementById("level-1").checked ? 1 : 2;
+      }
+
+      function countFor(levels) {
+        return levels["1"]
+          + (selectedLevel() === 2 ? levels["2"] : 0)
+          + (extraBox.checked && !extraGroup.hidden ? levels["extra"] : 0);
+      }
+
+      function updateSummary() {
+        const boxes = grid.querySelectorAll("input[type=checkbox]");
+        let checked = 0;
+        let rules = 0;
+        boxes.forEach(function (box) {
+          if (box.checked) {
+            checked += 1;
+            rules += Number(box.dataset.count);
+          }
+        });
+        summary.textContent = checked === 0
+          ? "Aucune catégorie sélectionnée"
+          : checked + " catégorie" + (checked > 1 ? "s" : "") + " · " + rules + " règles";
+      }
+
+      // Une categorie sans regle dans le profil choisi (ex. BitLocker en
+      // Level 1 sans le profil BL) est grisee plutot que cochee pour rien.
+      function updateCounts() {
+        grid.querySelectorAll("input[type=checkbox]").forEach(function (box) {
+          const count = countFor(JSON.parse(box.dataset.levels));
+          const wrapper = box.closest(".category-item");
+          box.dataset.count = count;
+          wrapper.querySelector(".category-count").textContent = count;
+          if (count === 0) {
+            box.checked = false;
+            box.disabled = true;
+          } else if (box.disabled) {
+            box.disabled = false;
+            box.checked = true;
+          }
+          wrapper.classList.toggle("is-empty", count === 0);
+        });
+        updateSummary();
+      }
+
+      function renderCategories() {
+        const osType = osSelect.value;
+        const extras = EXTRAS[osType] || [];
+        extraGroup.hidden = extras.length === 0;
+        extraLabel.textContent = "Inclure le profil " + extras.join(", ");
+
+        grid.innerHTML = "";
+        (CATEGORIES[osType] || []).forEach(function (category, position) {
+          const id = "cat-" + position;
+          const wrapper = document.createElement("label");
+          wrapper.className = "category-item";
+          wrapper.htmlFor = id;
+
+          const box = document.createElement("input");
+          box.type = "checkbox";
+          box.name = "categories";
+          box.value = category.name;
+          box.id = id;
+          box.checked = true;
+          box.dataset.levels = JSON.stringify(category.levels);
+          box.addEventListener("change", updateSummary);
+
+          const text = document.createElement("span");
+          text.className = "category-name";
+          text.textContent = category.name;
+
+          const count = document.createElement("span");
+          count.className = "category-count";
+
+          wrapper.appendChild(box);
+          wrapper.appendChild(text);
+          wrapper.appendChild(count);
+          grid.appendChild(wrapper);
+        });
+        updateCounts();
+      }
+
+      function syncRemote() {
+        const isLinux = osSelect.value === "linux";
+        const transport = isLinux ? "SSH" : "WinRM";
+        remoteToggleLabel.textContent = "Audit distant via " + transport;
+        remoteUserLabel.textContent = "Utilisateur " + transport;
+        remotePasswordLabel.textContent = "Mot de passe " + transport;
+      }
+
+      function setAll(checked) {
+        grid.querySelectorAll("input[type=checkbox]:not(:disabled)").forEach(function (box) {
+          box.checked = checked;
+        });
+        updateSummary();
+      }
+
+      osSelect.addEventListener("change", function () {
+        renderCategories();
+        syncRemote();
+      });
+      document.getElementById("level-1").addEventListener("change", updateCounts);
+      document.getElementById("level-2").addEventListener("change", updateCounts);
+      extraBox.addEventListener("change", updateCounts);
+      document.getElementById("select-all").addEventListener("click", function () { setAll(true); });
+      document.getElementById("select-none").addEventListener("click", function () { setAll(false); });
+
+      renderCategories();
+      syncRemote();
+    })();
+  </script>
+{% endblock %}

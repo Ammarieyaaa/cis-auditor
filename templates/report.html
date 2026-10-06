@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8">
+    <title>Rapport audit {{ run.id }}</title>
+    <style>
+      {% if pdf %}
+      @page { size: A4 landscape; margin: 1.5cm; }
+      body { color: #18212f; font-family: Helvetica, sans-serif; font-size: 9pt; }
+      th, td { border: 0.5px solid #c7d0dc; padding: 4px; }
+      {% else %}
+      body { color: #18212f; font-family: Arial, sans-serif; margin: 32px; }
+      th, td { border: 1px solid #d8dee8; padding: 10px; }
+      pre { white-space: pre-wrap; }
+      {% endif %}
+      h1 { margin-bottom: 4px; }
+      h2 { border-bottom: 2px solid #d8dee8; margin-top: 24px; padding-bottom: 4px; }
+      h2 small { color: #64748b; font-weight: normal; }
+      table { border-collapse: collapse; margin-top: 12px; width: 100%; }
+      th, td { text-align: left; vertical-align: top; }
+      th { background: #f1f5f9; }
+      .pass { color: #047857; font-weight: bold; }
+      .fail { color: #b42318; font-weight: bold; }
+      .manual { color: #8a5a00; font-weight: bold; }
+      .error { color: #475569; font-weight: bold; }
+    </style>
+  </head>
+  <body>
+    <h1>Rapport d'audit RAM Security</h1>
+    <p>
+      Audit #{{ run.id }} · {{ 'Windows' if run.os_type == 'windows' else 'Linux/Unix' }}
+      · Cible : {{ 'Locale' if run.target == 'local' else run.target }}
+      {% if run.profile %}· Profil : {{ run.profile }}{% endif %}
+      · {{ run.started_at | fr_datetime }}
+      · Durée : {{ run.duration_seconds | fr_duration }}
+    </p>
+    <p>
+      Score : <strong>{{ run.score }}%</strong>
+      · Conformes : {{ run.passed }}
+      · Non conformes : {{ run.failed }}
+      {% if run.manual %}· Manuels : {{ run.manual }}{% endif %}
+      {% if run.errors %}· Erreurs d'exécution : {{ run.errors }}{% endif %}
+    </p>
+
+    {% for group in groups %}
+      <h2>
+        {{ group.name }} — {{ '—' if group.score is none else group.score ~ ' %' }}
+        <small>({{ group.failed }} non conforme(s){% if group.errors %}, {{ group.errors }} erreur(s){% endif %}{% if group.manual %}, {{ group.manual }} manuel(s){% endif %} / {{ group.total }})</small>
+      </h2>
+      <table>
+        <thead>
+          <tr>
+            <th style="width: 24%">Règle</th>
+            <th style="width: 10%">Statut</th>
+            <th style="width: 18%">Attendu</th>
+            <th style="width: 22%">Obtenu</th>
+            <th style="width: 26%">Recommandation</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for item in group.rules %}
+            <tr>
+              <td>{{ item.rule_id }} - {{ item.title }}</td>
+              <td class="{{ item.status | status_class }}">{{ item.status | fr_status }}</td>
+              <td>{{ item.expected }}</td>
+              {% if pdf %}
+                {# xhtml2pdf ne gere pas pre-wrap : une sortie brute longue deborderait de la page. #}
+                <td>{{ item.actual | truncate(400) | e | replace('\n', '<br>') | safe }}</td>
+              {% else %}
+                <td><pre>{{ item.actual }}</pre></td>
+              {% endif %}
+              <td>{{ item.recommendation }}</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    {% endfor %}
+
+  </body>
+</html>

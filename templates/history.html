@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+
+{% block title %}Historique - RAM Security Audit{% endblock %}
+
+{% block content %}
+  <section class="section-head compact">
+    <div>
+      <p class="eyebrow">Historique</p>
+      <h1>Audits enregistrés</h1>
+    </div>
+  </section>
+
+  <section class="panel">
+    {% if runs %}
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Date</th>
+              <th>OS</th>
+              <th>Cible</th>
+              <th>Score</th>
+              <th>Résultat</th>
+              <th>Durée</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for run in runs %}
+              <tr>
+                <td>#{{ run.id }}</td>
+                <td>{{ run.started_at | fr_datetime }}</td>
+                <td>{{ 'Windows' if run.os_type == 'windows' else 'Linux/Unix' }}</td>
+                <td>{{ 'Locale' if run.target == 'local' else run.target }}</td>
+                <td>{{ run.score }}%</td>
+                <td>
+                  {{ run.passed }} conforme(s) / {{ run.failed }} non conforme(s)
+                  {%- if run.manual %} / {{ run.manual }} manuel(s){% endif %}
+                  {%- if run.errors %} / {{ run.errors }} erreur(s){% endif %}
+                </td>
+                <td>{{ run.duration_seconds | fr_duration }}</td>
+                <td><a href="{{ url_for('results', run_id=run.id) }}">Voir</a></td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% else %}
+      <div class="empty">
+        <h2>Historique vide</h2>
+        <p>Aucun audit n'a encore été lancé.</p>
+      </div>
+    {% endif %}
+  </section>
+{% endblock %}

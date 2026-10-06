@@ -1,0 +1,169 @@
+{% extends "base.html" %}
+
+{% block title %}Documents de référence - RAM Security{% endblock %}
+
+{% block content %}
+  <section class="section-head compact">
+    <div>
+      <p class="eyebrow">Base de connaissance</p>
+      <h1>Documents de référence</h1>
+    </div>
+  </section>
+
+
+  <div class="panel dropzone" id="dropzone">
+    <p id="dropzone-title"><strong>Glisse un PDF ici</strong> ou clique pour en choisir un.</p>
+    <p class="muted" id="dropzone-hint">PDF avec texte exploitable (pas de scan/image), 20 Mo max.</p>
+    <input type="file" id="file-input" accept="application/pdf" hidden>
+  </div>
+
+  <div class="panel">
+    <table class="table" id="documents-table">
+      <thead>
+        <tr>
+          <th>Document</th>
+          <th>Pages</th>
+          <th>Sections indexées</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody id="documents-body">
+        {% for document in documents %}
+          <tr data-doc-id="{{ document.doc_id }}">
+            <td>{{ document.filename }}</td>
+            <td>{{ document.pages }}</td>
+            <td>{{ document.chunks }}</td>
+            <td><button type="button" class="button document-delete">Supprimer</button></td>
+          </tr>
+        {% else %}
+          <tr class="documents-empty"><td colspan="4" class="muted">Aucun document importé.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <script>
+    (function () {
+      const dropzone = document.getElementById("dropzone");
+      const dropzoneTitle = document.getElementById("dropzone-title");
+      const dropzoneHint = document.getElementById("dropzone-hint");
+      const fileInput = document.getElementById("file-input");
+      const body = document.getElementById("documents-body");
+
+      function resetDropzoneText() {
+        dropzoneTitle.innerHTML = "<strong>Glisse un PDF ici</strong> ou clique pour en choisir un.";
+        dropzoneHint.textContent = "PDF avec texte exploitable (pas de scan/image), 20 Mo max.";
+      }
+
+      function render(documents) {
+        body.innerHTML = "";
+        if (!documents || documents.length === 0) {
+          const row = body.insertRow();
+          row.className = "documents-empty";
+          const cell = row.insertCell();
+          cell.colSpan = 4;
+          cell.className = "muted";
+          cell.textContent = "Aucun document importé.";
+          return;
+        }
+        documents.forEach(function (document_) {
+          const row = body.insertRow();
+          row.dataset.docId = document_.doc_id;
+          row.insertCell().textContent = document_.filename;
+          row.insertCell().textContent = document_.pages;
+          row.insertCell().textContent = document_.chunks;
+          const actions = row.insertCell();
+          const button = document.createElement("button");
+          button.type = "button";
+          button.className = "button document-delete";
+          button.textContent = "Supprimer";
+          actions.appendChild(button);
+        });
+      }
+
+      function uploadFile(file) {
+        if (!file.name.toLowerCase().endsWith(".pdf")) {
+          alert("Seuls les fichiers PDF sont acceptés.");
+          return;
+        }
+        const formData = new FormData();
+        formData.append("file", file);
+        dropzone.classList.add("dropzone-loading");
+        dropzoneTitle.innerHTML = "<strong>Lecture du document en cours…</strong>";
+        dropzoneHint.textContent = "Un benchmark de plusieurs centaines de pages prend une trentaine de secondes.";
+
+        fetch("{{ url_for('documents_upload') }}", { method: "POST", body: formData })
+          .then(function (response) {
+            return response.json().then(function (data) {
+              return { ok: response.ok, data: data };
+            });
+          })
+          .then(function (result) {
+            dropzone.classList.remove("dropzone-loading");
+            resetDropzoneText();
+            if (result.ok) {
+              render(result.data.documents);
+              if (result.data.cached) {
+                dropzoneHint.textContent = "Ce document était déjà en cache, rien à recalculer.";
+              }
+            } else {
+              alert(result.data.error || "Import impossible.");
+            }
+          })
+          .catch(function () {
+            dropzone.classList.remove("dropzone-loading");
+            resetDropzoneText();
+            alert("Impossible de contacter le serveur.");
+          });
+      }
+
+      dropzone.addEventListener("click", function () {
+        fileInput.click();
+      });
+      fileInput.addEventListener("change", function () {
+        if (fileInput.files[0]) {
+          uploadFile(fileInput.files[0]);
+        }
+      });
+
+      ["dragenter", "dragover"].forEach(function (eventName) {
+        dropzone.addEventListener(eventName, function (event) {
+          event.preventDefault();
+          dropzone.classList.add("dragover");
+        });
+      });
+      ["dragleave", "drop"].forEach(function (eventName) {
+        dropzone.addEventListener(eventName, function (event) {
+          event.preventDefault();
+          dropzone.classList.remove("dragover");
+        });
+      });
+      dropzone.addEventListener("drop", function (event) {
+        event.preventDefault();
+        const file = event.dataTransfer.files[0];
+        if (file) {
+          uploadFile(file);
+        }
+      });
+
+      body.addEventListener("click", function (event) {
+        if (!event.target.classList.contains("document-delete")) {
+          return;
+        }
+        const row = event.target.closest("tr");
+        if (!confirm("Supprimer ce document de la base de connaissance ?")) {
+          return;
+        }
+        fetch("/documents/" + row.dataset.docId + "/delete", { method: "POST" })
+          .then(function (response) { return response.json(); })
+          .then(function (data) {
+            if (data.documents) {
+              render(data.documents);
+            } else {
+              alert(data.error || "Suppression impossible.");
+            }
+          });
+      });
+    })();
+  </script>
+{% endblock %}

@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block title %}RAM Security{% endblock %}</title>
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='img/logo-mark.png') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    {% include "_theme_script.html" %}
+  </head>
+  <body>
+    {% set home_endpoint = 'admin_users' if current_user and current_user.role == 'admin' else 'dashboard' %}
+    <header class="topbar">
+      <a class="brand" href="{{ url_for(home_endpoint) }}">
+        <img class="brand-mark" src="{{ url_for('static', filename='img/logo-mark.png') }}" alt="">
+        <span>
+          <strong>RAM Security</strong>
+          <small>Audit de configuration CIS</small>
+        </span>
+      </a>
+      <nav class="nav">
+        <div class="nav-links">
+          {% if current_user and current_user.role != 'admin' %}
+            <a href="{{ url_for('dashboard') }}">Tableau de bord</a>
+            {% if current_user.role in ('technicien', 'rssi') %}
+              <a href="{{ url_for('audit') }}">Nouvel audit</a>
+            {% endif %}
+            <a href="{{ url_for('history') }}">Historique</a>
+            <a href="{{ url_for('rules') }}">Règles</a>
+            <a href="{{ url_for('documents_page') }}">Documents</a>
+            {% if current_user.role == 'rssi' %}
+              <a href="{{ url_for('rssi_scope') }}">Périmètre</a>
+            {% endif %}
+          {% endif %}
+        </div>
+        {% if current_user %}
+          <div class="nav-account">
+            <span class="account-chip role-{{ current_user.role }}">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true">
+                <path d="M12 12a5 5 0 1 0 0-10 5 5 0 0 0 0 10Zm0 2c-4.42 0-8 2.24-8 5v1a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-1c0-2.76-3.58-5-8-5Z"/>
+              </svg>
+              Espace {{ role_labels[current_user.role] }}
+            </span>
+            <button type="button" class="theme-toggle" aria-label="Changer de thème">
+              <svg class="icon-sun" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <circle cx="12" cy="12" r="4"/>
+                <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/>
+              </svg>
+              <svg class="icon-moon" viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true">
+                <path d="M20 14.5A8.5 8.5 0 0 1 9.5 4a8.5 8.5 0 1 0 10.5 10.5Z"/>
+              </svg>
+            </button>
+            <a class="button logout-button" href="{{ url_for('logout') }}">Déconnexion</a>
+          </div>
+        {% endif %}
+      </nav>
+    </header>
+
+    <main class="page">
+      {% block content %}{% endblock %}
+    </main>
+
+    {% block assistant_widget %}
+      {% if current_user and current_user.role in ('technicien', 'dsi', 'rssi') %}
+        {% include "_assistant_widget.html" %}
+      {% endif %}
+    {% endblock %}
+  </body>
+</html>

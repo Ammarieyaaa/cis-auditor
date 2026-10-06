@@ -1,0 +1,218 @@
+{% extends "base.html" %}
+
+{% block title %}Comparaison #{{ before.id }} → #{{ after.id }} - RAM Security{% endblock %}
+
+{% macro status_pill(status) -%}
+  {% if status %}
+    <span class="pill {{ status | status_class }}">{{ status | fr_status }}</span>
+  {% else %}
+    <span class="muted">Absente</span>
+  {% endif %}
+{%- endmacro %}
+
+{% macro signed(delta) -%}
+  {{ '+' if delta > 0 else ('−' if delta < 0 else '') }}{{ delta | abs }}
+{%- endmacro %}
+
+{% block content %}
+  {% set os_label = 'Windows' if after.os_type == 'windows' else 'Linux/Unix' %}
+  {% set score_delta = after.score - before.score %}
+
+  <section class="section-head">
+    <div>
+      <p class="eyebrow">Comparaison</p>
+      <h1>Évolution de l'audit {{ os_label }}</h1>
+      <p class="muted">
+        <a href="{{ url_for('results', run_id=before.id) }}">#{{ before.id }}</a> du {{ before.started_at | fr_datetime }}
+        → <a href="{{ url_for('results', run_id=after.id) }}">#{{ after.id }}</a> du {{ after.started_at | fr_datetime }}
+      </p>
+    </div>
+  </section>
+
+  {% if before.profile != after.profile or before.target != after.target %}
+    <div class="flash flash-error">
+      <p>
+        Les deux audits ne portent pas exactement sur le même périmètre
+        {%- if before.profile != after.profile %} (profil : {{ before.profile or 'non enregistré' }} → {{ after.profile or 'non enregistré' }}){% endif %}
+        {%- if before.target != after.target %} (cible : {{ before.target }} → {{ after.target }}){% endif %}.
+        Les scores ne sont pas directement comparables ; fie-toi plutôt à l'évolution règle par règle.
+      </p>
+    </div>
+  {% endif %}
+
+  <section class="metrics">
+    <article class="metric">
+      <span>Score</span>
+      <strong>{{ after.score }}%</strong>
+      <p class="metric-delta {{ 'delta-up' if score_delta > 0 else ('delta-down' if score_delta < 0 else '') }}">
+        {{ '▲' if score_delta > 0 else ('▼' if score_delta < 0 else '=') }}
+        {{ signed(score_delta) }} pts vs #{{ before.id }} ({{ before.score }}%)
+      </p>
+    </article>
+    <article class="metric">
+      <span>Régressions</span>
+      <strong>{{ transitions.regressions | length }}</strong>
+    </article>
+    <article class="metric">
+      <span>Corrigées</span>
+      <strong>{{ transitions.corrigees | length }}</strong>
+    </article>
+    <article class="metric">
+      <span>Toujours non conformes</span>
+      <strong>{{ transitions.toujours_non_conformes | length }}</strong>
+    </article>
+  </section>
+
+  <section class="panel dumbbell">
+    <div class="panel-head">
+      <h2>Score par catégorie</h2>
+      <ul class="db-legend">
+        <li><span class="db-key before"></span>#{{ before.id }} · avant</li>
+        <li><span class="db-key after"></span>#{{ after.id }} · après</li>
+      </ul>
+    </div>
+
+    <div class="db-row db-axis" aria-hidden="true">
+      <span></span>
+      <div class="db-track">
+        <div class="db-plot db-plot-axis">
+          {% for tick in [0, 25, 50, 75, 100] %}
+            <span class="db-tick" style="left: {{ tick }}%">{{ tick }} %</span>
+          {% endfor %}
+        </div>
+      </div>
+      <span></span>
+    </div>
+
+    <div class="db-rows" id="db-rows">
+      {% for row in categories %}
+        <div class="db-row" tabindex="0"
+             data-name="{{ row.name }}"
+             data-before="{{ '—' if row.before is none else row.before ~ ' %' }}"
+             data-after="{{ '—' if row.after is none else row.after ~ ' %' }}"
+             data-delta="{{ '' if row.delta is none else signed(row.delta) ~ ' pts' }}">
+          <span class="db-label">{{ row.name }}</span>
+          <div class="db-track">
+            <div class="db-plot">
+              {% if row.before is not none and row.after is not none and row.before != row.after %}
+                {% set low = [row.before, row.after] | min %}
+                <span class="db-link" style="left: {{ low }}%; width: {{ (row.after - row.before) | abs }}%"></span>
+              {% endif %}
+              {% if row.before is not none %}<span class="db-dot before" style="left: {{ row.before }}%"></span>{% endif %}
+              {% if row.after is not none %}<span class="db-dot after" style="left: {{ row.after }}%"></span>{% endif %}
+            </div>
+          </div>
+          <span class="db-delta {{ 'delta-up' if row.delta and row.delta > 0 else ('delta-down' if row.delta and row.delta < 0 else '') }}">
+            {%- if row.delta %}{{ '▲' if row.delta > 0 else '▼' }} {{ signed(row.delta) }} pts
+            {%- elif row.delta == 0 %}<span class="muted" title="Score inchangé">=</span>{% endif -%}
+          </span>
+        </div>
+      {% endfor %}
+    </div>
+    <div class="db-tooltip" id="db-tooltip" hidden></div>
+
+    <details class="db-table">
+      <summary>Voir les données</summary>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>Catégorie</th><th>Avant (#{{ before.id }})</th><th>Après (#{{ after.id }})</th><th>Évolution</th></tr>
+          </thead>
+          <tbody>
+            {% for row in categories %}
+              <tr>
+                <td>{{ row.name }}</td>
+                <td>{{ '—' if row.before is none else row.before ~ ' %' }}</td>
+                <td>{{ '—' if row.after is none else row.after ~ ' %' }}</td>
+                <td>{{ '—' if row.delta is none else signed(row.delta) ~ ' pts' }}</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </details>
+  </section>
+
+  {% set sections = [
+    ('regressions', 'Régressions', 'Conformes avant, non conformes maintenant : à traiter en priorité.', true),
+    ('corrigees', 'Corrigées', 'Non conformes avant, conformes maintenant.', true),
+    ('toujours_non_conformes', 'Toujours non conformes', 'Écarts persistants entre les deux audits.', false),
+    ('non_comparables', 'Non comparables', 'Contrôle manuel ou en erreur dans l’un des deux audits.', false),
+    ('ajoutees', 'Ajoutées', 'Présentes seulement dans l’audit le plus récent (profil, catégories ou périmètre différents).', false),
+    ('retirees', 'Retirées', 'Présentes seulement dans l’audit le plus ancien.', false),
+    ('toujours_conformes', 'Toujours conformes', 'Aucun changement.', false),
+  ] %}
+
+  {% for key, title, hint, open_default in sections if transitions[key] %}
+    <section class="panel category-group">
+      <details {{ 'open' if open_default else '' }}>
+        <summary class="category-summary-row">
+          <span class="category-summary-name">{{ title }}</span>
+          <span class="category-summary-counts"><span class="category-count">{{ transitions[key] | length }}</span></span>
+        </summary>
+        <p class="muted compare-hint">{{ hint }}</p>
+        <div class="table-wrap">
+          <table class="table-align-middle">
+            <thead>
+              <tr><th>Règle</th><th>Catégorie</th><th>#{{ before.id }}</th><th>#{{ after.id }}</th></tr>
+            </thead>
+            <tbody>
+              {% for entry in transitions[key] %}
+                <tr>
+                  <td><strong>{{ entry.rule_id }}</strong><span class="row-title">{{ entry.title }}</span></td>
+                  <td>{{ entry.category }}</td>
+                  <td>{{ status_pill(entry.status_before) }}</td>
+                  <td>{{ status_pill(entry.status_after) }}</td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </details>
+    </section>
+  {% endfor %}
+
+  <script>
+    (function () {
+      var rows = document.getElementById("db-rows");
+      var tip = document.getElementById("db-tooltip");
+      if (!rows || !tip) return;
+      var panel = rows.closest(".dumbbell");
+
+      function fill(row) {
+        tip.textContent = "";
+        var value = document.createElement("strong");
+        value.textContent = row.dataset.before + " → " + row.dataset.after;
+        var name = document.createElement("span");
+        name.textContent = row.dataset.name + (row.dataset.delta ? " · " + row.dataset.delta : "");
+        tip.appendChild(value);
+        tip.appendChild(name);
+      }
+
+      function place(x, y) {
+        var box = panel.getBoundingClientRect();
+        var left = Math.min(x - box.left + 14, box.width - tip.offsetWidth - 8);
+        tip.style.left = Math.max(8, left) + "px";
+        tip.style.top = (y - box.top + 14) + "px";
+      }
+
+      rows.addEventListener("pointermove", function (event) {
+        var row = event.target.closest(".db-row");
+        if (!row) { tip.hidden = true; return; }
+        fill(row);
+        tip.hidden = false;
+        place(event.clientX, event.clientY);
+      });
+      rows.addEventListener("pointerleave", function () { tip.hidden = true; });
+      rows.addEventListener("focusin", function (event) {
+        var row = event.target.closest(".db-row");
+        if (!row) return;
+        fill(row);
+        tip.hidden = false;
+        var box = row.getBoundingClientRect();
+        place(box.left + box.width / 2, box.bottom - 6);
+      });
+      rows.addEventListener("focusout", function () { tip.hidden = true; });
+    })();
+  </script>
+{% endblock %}

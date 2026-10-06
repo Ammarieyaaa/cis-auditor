@@ -1,0 +1,2221 @@
+{
+  "os": "linux",
+  "benchmark": "CIS Ubuntu Linux 20.04 LTS STIG Benchmark v2.0.0",
+  "rules": [
+    {
+      "id": "CIS-UBU-1.1.1.1",
+      "cis_rule": "1.1.1.1",
+      "profile": "Level 1/2 - Server, Level 1/2 - Workstation",
+      "category": "Modules noyau",
+      "title": "Module noyau cramfs désactivé",
+      "severity": "medium",
+      "description": "Le systeme de fichiers cramfs est un systeme de fichiers Linux compresse en lecture seule, concu pour les systemes a faible empreinte. Retirer le support des systemes de fichiers non necessaires reduit la surface d'attaque locale du systeme.",
+      "rationale": "Retirer le support des types de systemes de fichiers non necessaires reduit la surface d'attaque locale du systeme. Si ce type de systeme de fichiers n'est pas necessaire, il doit etre desactive.",
+      "audit_reference": "CIS Ubuntu Linux 20.04 LTS STIG Benchmark v2.0.0, section 1.1.1.1.",
+      "audit_procedure": "Verifier via lsmod que le module cramfs n'est pas charge, et via 'modprobe --showconfig' qu'il est deny-liste (blacklist cramfs).",
+      "remediation_path": "/etc/modprobe.d/",
+      "default_value": "Le module cramfs n'est ni deny-liste ni desactive par defaut.",
+      "references": [
+        "NIST SP 800-53 Rev. 5: CM-7"
+      ],
+      "cis_controls": [
+        "CIS Controls v8 4.8 Uninstall or Disable Unnecessary Services on Enterprise Assets and Software",
+        "CIS Controls v7 9.2 Ensure Only Approved Ports, Protocols and Services Are Running"
+      ],
+      "check": {
+        "type": "equals",
+        "command": "if lsmod | grep -q \"^cramfs\"; then echo \"LOADED\"; elif modprobe --showconfig 2>/dev/null | grep -q \"blacklist cramfs\"; then echo \"DISABLED\"; else echo \"NOT_CONFIGURED\"; fi",
+        "expected": "DISABLED"
+      },
+      "recommendation": "Creer un fichier dans /etc/modprobe.d/ contenant 'install cramfs /bin/false' et 'blacklist cramfs', puis decharger le module avec 'modprobe -r cramfs' s'il est charge."
+    },
+    {
+      "id": "CIS-UBU-1.1.1.2",
+      "cis_rule": "1.1.1.2",
+      "profile": "Level 1/2 - Server, Level 1/2 - Workstation",
+      "category": "Modules noyau",
+      "title": "Module noyau freevxfs désactivé",
+      "severity": "medium",
+      "description": "Le systeme de fichiers freevxfs est une version libre du systeme de fichiers Veritas, principalement utilise par les systemes HP-UX. Retirer le support des systemes de fichiers non necessaires reduit la surface d'attaque locale du systeme.",
+      "rationale": "Retirer le support des types de systemes de fichiers non necessaires reduit la surface d'attaque locale du systeme. Si ce type de systeme de fichiers n'est pas necessaire, il doit etre desactive.",
+      "audit_reference": "CIS Ubuntu Linux 20.04 LTS STIG Benchmark v2.0.0, section 1.1.1.2.",
+      "audit_procedure": "Verifier via lsmod que le module freevxfs n'est pas charge, et via 'modprobe --showconfig' qu'il est deny-liste (blacklist freevxfs).",
+      "remediation_path": "/etc/modprobe.d/",
+      "default_value": "Le module freevxfs n'est ni deny-liste ni desactive par defaut.",
+      "references": [
+        "NIST SP 800-53 Rev. 5: CM-7"
+      ],
+      "cis_controls": [
+        "CIS Controls v8 4.8 Uninstall or Disable Unnecessary Services on Enterprise Assets and Software",
+        "CIS Controls v7 9.2 Ensure Only Approved Ports, Protocols and Services Are Running"
+      ],
+      "check": {
+        "type": "equals",
+        "command": "if lsmod | grep -q \"^freevxfs\"; then echo \"LOADED\"; elif modprobe --showconfig 2>/dev/null | grep -q \"blacklist freevxfs\"; then echo \"DISABLED\"; else echo \"NOT_CONFIGURED\"; fi",
+        "expected": "DISABLED"
+      },
+      "recommendation": "Creer un fichier dans /etc/modprobe.d/ contenant 'install freevxfs /bin/false' et 'blacklist freevxfs', puis decharger le module avec 'modprobe -r freevxfs' s'il est charge."
+    },
+    {
+      "id": "CIS-UBU-1.1.1.3",
+      "cis_rule": "1.1.1.3",
+      "profile": "Level 1/2 - Server, Level 1/2 - Workstation",
+      "category": "Modules noyau",
+      "title": "Module noyau hfs désactivé",
+      "severity": "medium",
+      "description": "Le systeme de fichiers hfs est un systeme de fichiers hierarchique permettant de monter des systemes de fichiers Mac OS. Retirer le support des systemes de fichiers non necessaires reduit la surface d'attaque locale du systeme.",
+      "rationale": "Retirer le support des types de systemes de fichiers non necessaires reduit la surface d'attaque locale du systeme. Si ce type de systeme de fichiers n'est pas necessaire, il doit etre desactive.",
+      "audit_reference": "CIS Ubuntu Linux 20.04 LTS STIG Benchmark v2.0.0, section 1.1.1.3.",
+      "audit_procedure": "Verifier via lsmod que le module hfs n'est pas charge, et via 'modprobe --showconfig' qu'il est deny-liste (blacklist hfs).",
+      "remediation_path": "/etc/modprobe.d/",
+      "default_value": "Le module hfs n'est ni deny-liste ni desactive par defaut.",
+      "references": [
+        "NIST SP 800-53 Rev. 5: CM-7"
+      ],
+      "cis_controls": [
+        "CIS Controls v8 4.8 Uninstall or Disable Unnecessary Services on Enterprise Assets and Software",
+        "CIS Controls v7 9.2 Ensure Only Approved Ports, Protocols and Services Are Running"
+      ],
+      "check": {
+        "type": "equals",
+        "command": "if lsmod | grep -q \"^hfs\"; then echo \"LOADED\"; elif modprobe --showconfig 2>/dev/null | grep -q \"blacklist hfs\"; then echo \"DISABLED\"; else echo \"NOT_CONFIGURED\"; fi",
+        "expected": "DISABLED"
+      },
+      "recommendation": "Creer un fichier dans /etc/modprobe.d/ contenant 'install hfs /bin/false' et 'blacklist hfs', puis decharger le module avec 'modprobe -r hfs' s'il est charge."
+    },
+    {
+      "id": "CIS-UBU-1.1.1.4",
+      "cis_rule": "1.1.1.4",
+      "profile": "Level 1/2 - Server, Level 1/2 - Workstation",
+      "category": "Modules noyau",
+      "title": "Module noyau hfsplus désactivé",
+      "severity": "medium",
+      "description": "Le systeme de fichiers hfsplus est une evolution du systeme hfs concue pour monter des systemes de fichiers Mac OS. Retirer le support des systemes de fichiers non necessaires reduit la surface d'attaque locale du systeme.",
+      "rationale": "Retirer le support des types de systemes de fichiers non necessaires reduit la surface d'attaque locale du systeme. Si ce type de systeme de fichiers n'est pas necessaire, il doit etre desactive.",
+      "audit_reference": "CIS Ubuntu Linux 20.04 LTS STIG Benchmark v2.0.0, section 1.1.1.4.",
+      "audit_procedure": "Verifier via lsmod que le module hfsplus n'est pas charge, et via 'modprobe --showconfig' qu'il est deny-liste (blacklist hfsplus).",
+      "remediation_path": "/etc/modprobe.d/",
+      "default_value": "Le module hfsplus n'est ni deny-liste ni desactive par defaut.",
+      "references": [
+        "NIST SP 800-53 Rev. 5: CM-7"
+      ],
+      "cis_controls": [
+        "CIS Controls v8 4.8 Uninstall or Disable Unnecessary Services on Enterprise Assets and Software",
+        "CIS Controls v7 9.2 Ensure Only Approved Ports, Protocols and Services Are Running"
+      ],
+      "check": {
+        "type": "equals",
+        "command": "if lsmod | grep -q \"^hfsplus\"; then echo \"LOADED\"; elif modprobe --showconfig 2>/dev/null | grep -q \"blacklist hfsplus\"; then echo \"DISABLED\"; else echo \"NOT_CONFIGURED\"; fi",
+        "expected": "DISABLED"
+      },
+      "recommendation": "Creer un fichier dans /etc/modprobe.d/ contenant 'install hfsplus /bin/false' et 'blacklist hfsplus', puis decharger le module avec 'modprobe -r hfsplus' s'il est charge."
+    },
+    {
+      "id": "CIS-UBU-1.1.1.5",
+      "cis_rule": "1.1.1.5",
+      "profile": "Level 1/2 - Server, Level 1/2 - Workstation",
+      "category": "Modules noyau",
+      "title": "Module noyau jffs2 désactivé",
+      "severity": "medium",
+      "description": "Le systeme de fichiers jffs2 (journaling flash filesystem 2) est un systeme de fichiers journalise utilise sur les memoires flash. Retirer le support des systemes de fichiers non necessaires reduit la surface d'attaque locale du systeme.",
+      "rationale": "Retirer le support des types de systemes de fichiers non necessaires reduit la surface d'attaque locale du systeme. Si ce type de systeme de fichiers n'est pas necessaire, il doit etre desactive.",
+      "audit_reference": "CIS Ubuntu Linux 20.04 LTS STIG Benchmark v2.0.0, section 1.1.1.5.",
+      "audit_procedure": "Verifier via lsmod que le module jffs2 n'est pas charge, et via 'modprobe --showconfig' qu'il est deny-liste (blacklist jffs2).",
+      "remediation_path": "/etc/modprobe.d/",
+      "default_value": "Le module jffs2 n'est ni deny-liste ni desactive par defaut.",
+      "references": [
+        "NIST SP 800-53 Rev. 5: CM-7"
+      ],
+      "cis_controls": [
+        "CIS Controls v8 4.8 Uninstall or Disable Unnecessary Services on Enterprise Assets and Software",
+        "CIS Controls v7 9.2 Ensure Only Approved Ports, Protocols and Services Are Running"
+      ],
+      "check": {
+        "type": "equals",
+        "command": "if lsmod | grep -q \"^jffs2\"; then echo \"LOADED\"; elif modprobe --showconfig 2>/dev/null | grep -q \"blacklist jffs2\"; then echo \"DISABLED\"; else echo \"NOT_CONFIGURED\"; fi",
+        "expected": "DISABLED"
+      },
+      "recommendation": "Creer un fichier dans /etc/modprobe.d/ contenant 'install jffs2 /bin/false' et 'blacklist jffs2', puis decharger le module avec 'modprobe -r jffs2' s'il est charge."
+    },
+    {
+      "id": "CIS-UBU-6.1.5",
+      "cis_rule": "6.1.5",
+      "profile": "Level 1 - Server, Level 1 - Workstation",
+      "category": "Permissions des fichiers système et comptes dupliqués",
+      "title": "Permissions sur /etc/shadow",
+      "severity": "high",
+      "description": "Vérifie que /etc/shadow est en mode 0640 ou plus restrictif, appartenant à root.",
+      "rationale": "Ce fichier contient les empreintes de mots de passe de tous les comptes ; sa divulgation permettrait une attaque hors ligne par force brute sur les mots de passe.",
+      "audit_reference": "CIS Ubuntu Linux 20.04 LTS STIG Benchmark v2.0.0, section 6.1.5.",
+      "audit_procedure": "Executer : stat -Lc '%a %u' /etc/shadow 2>/dev/null",
+      "remediation_path": "/etc/passwd, /etc/shadow, /etc/group, /bin, /usr/lib",
+      "default_value": "Voir description du benchmark CIS.",
+      "references": [
+        "https://man7.org/linux/man-pages/man5/passwd.5.html"
+      ],
+      "cis_controls": [
+        "CIS Controls v8 3.3 Configure Data Access Control Lists"
+      ],
+      "check": {
+        "type": "regex",
+        "command": "stat -Lc '%a %u' /etc/shadow 2>/dev/null",
+        "expected": "^[0-7]40 0$"
+      },
+      "recommendation": "Configurer le parametre correspondant a la section 6.1.5 (voir description)."
+    },
+    {
+      "id": "CIS-UBU-6.1.6",
+      "cis_rule": "6.1.6",
+      "profile": "Level 1 - Server, Level 1 - Workstation",
+      "category": "Permissions des fichiers système et comptes dupliqués",
+      "title": "Permissions sur /etc/shadow-",
+      "severity": "high",
+      "description": "Vérifie que la sauvegarde /etc/shadow- est en mode 0640 ou plus restrictif, appartenant à root.",
+      "rationale": "Le fichier de sauvegarde contient les mêmes empreintes de mots de passe que /etc/shadow et doit être protégé de la même manière.",
+      "audit_reference": "CIS Ubuntu Linux 20.04 LTS STIG Benchmark v2.0.0, section 6.1.6.",
+      "audit_procedure": "Executer : stat -Lc '%a %u' /etc/shadow- 2>/dev/null",
+      "remediation_path": "/etc/passwd, /etc/shadow, /etc/group, /bin, /usr/lib",
+      "default_value": "Voir description du benchmark CIS.",
+      "references": [
+        "https://man7.org/linux/man-pages/man5/passwd.5.html"
+      ],
+      "cis_controls": [
+        "CIS Controls v8 3.3 Configure Data Access Control Lists"
+      ],
+      "check": {
+        "type": "regex",
+        "command": "stat -Lc '%a %u' /etc/shadow- 2>/dev/null",
+        "expected": "^[0-7]40 0$"
+      },
+      "recommendation": "Configurer le parametre correspondant a la section 6.1.6 (voir description)."
+    },
+    {
+      "id": "CIS-UBU-6.2.1",
+      "cis_rule": "6.2.1",
+      "profile": "Level 1 - Server, Level 1 - Workstation",
+      "category": "Permissions des fichiers système et comptes dupliqués",
+      "title": "Les comptes de /etc/passwd utilisent des mots de passe shadowés",
+      "severity": "high",
+      "description": "Vérifie que le champ mot de passe de tous les comptes dans /etc/passwd vaut 'x' (délégation vers /etc/shadow).",
+      "rationale": "Un mot de passe haché stocké directement dans /etc/passwd, lisible par tous, serait immédiatement exposé à une attaque hors ligne par force brute.",
+      "audit_reference": "CIS Ubuntu Linux 20.04 LTS STIG Benchmark v2.0.0, section 6.2.1.",
+      "audit_procedure": "Executer : awk -F: '($2 != \"x\" ) { print $1 }' /etc/passwd 2>/dev/null",
+      "remediation_path": "/etc/passwd, /etc/shadow, /etc/group, /bin, /usr/lib",
+      "default_value": "Voir description du benchmark CIS.",
+      "references": [
+        "https://man7.org/linux/man-pages/man5/passwd.5.html"
+      ],
+      "cis_controls": [
+        "CIS Controls v8 3.3 Configure Data Access Control Lists"
+      ],
+      "check": {
+        "type": "equals",
+        "command": "awk -F: '($2 != \"x\" ) { print $1 }' /etc/passwd 2>/dev/null",
+        "expected": ""
+      },
+      "recommendation": "Configurer le parametre correspondant a la section 6.2.1 (voir description)."
+    },
+    {
+      "id": "CIS-UBU-6.2.10",
+      "cis_rule": "6.2.10",
+      "profile": "Level 1 - Server, Level 1 - Workstation",
+      "category": "Permissions des fichiers système et comptes dupliqués",
+      "title": "root est le seul compte avec l'UID 0",
+      "severity": "high",
+      "description": "Vérifie qu'aucun compte autre que root n'a l'UID 0 dans /etc/passwd.",
+      "rationale": "Tout compte avec l'UID 0 dispose des privilèges superutilisateur ; un second compte root, même caché sous un autre nom, constituerait une porte dérobée d'administration non tracée.",
+      "audit_reference": "CIS Ubuntu Linux 20.04 LTS STIG Benchmark v2.0.0, section 6.2.10.",
+      "audit_procedure": "Executer : awk -F: '($3 == 0) { print $1 }' /etc/passwd 2>/dev/null",
+      "remediation_path": "/etc/passwd, /etc/shadow, /etc/group, /bin, /usr/lib",
+      "default_value": "Voir description du benchmark CIS.",
+      "references": [
+        "https://man7.org/linux/man-pages/man5/passwd.5.html"
+      ],
+      "cis_controls": [
+        "CIS Controls v8 3.3 Configure Data Access Control Lists"
+      ],
+      "check": {
+        "type": "equals",
+        "command": "awk -F: '($3 == 0) { print $1 }' /etc/passwd 2>/dev/null",
+        "expected": "root"
+      },
+      "recommendation": "Configurer le parametre correspondant a la section 6.2.10 (voir description)."
+    },
+    {
+      "id": "CIS-UBU-6.2.2",
+      "cis_rule": "6.2.2",
+      "profile": "Level 1 - Server, Level 1 - Workstation",
+      "category": "Permissions des fichiers système et comptes dupliqués",
+      "title": "Les champs de mot de passe de /etc/shadow ne sont pas vides",
+      "severity": "high",
+      "description": "Vérifie qu'aucun compte n'a un champ mot de passe vide dans /etc/shadow.",
+      "rationale": "Un champ de mot de passe vide permettrait une connexion sans authentification sur ce compte.",
+      "audit_reference": "CIS Ubuntu Linux 20.04 LTS STIG Benchmark v2.0.0, section 6.2.2. Necessite les privileges root pour lire /etc/shadow.",
+      "audit_procedure": "Executer : awk -F: '($2 == \"\" ) { print $1 }' /etc/shadow 2>/dev/null",
+      "remediation_path": "/etc/passwd, /etc/shadow, /etc/group, /bin, /usr/lib",
+      "default_value": "Voir description du benchmark CIS.",
+      "references": [
+        "https://man7.org/linux/man-pages/man5/passwd.5.html"
+      ],
+      "cis_controls": [
+        "CIS Controls v8 3.3 Configure Data Access Control Lists"
+      ],
+      "check": {
+        "type": "equals",
+        "command": "awk -F: '($2 == \"\" ) { print $1 }' /etc/shadow 2>/dev/null",
+        "expected": ""
+      },
+      "recommendation": "Configurer le parametre correspondant a la section 6.2.2 (voir description)."
+    },
+    {
+      "id": "CIS-UBU-1.1.2.1.3",
+      "cis_rule": "1.1.2.1.3",
+      "profile": "Level 1 - Server, Level 1 - Workstation",
+      "category": "Partitions et options de montage",
+      "title": "Option nosuid pour /tmp",
+      "severity": "high",
+      "description": "Vérifie que l'option 'nosuid' est activée sur le point de montage /tmp (si celui-ci est une partition séparée).",
+      "rationale": "L'option nosuid empêche l'exécution de binaires avec bit setuid/setgid depuis /tmp, bloquant une technique classique d'élévation de privilège via un exécutable déposé dans un répertoire inscriptible par tous.",
+      "audit_reference": "CIS Ubuntu Linux 20.04 LTS STIG Benchmark v2.0.0, section 1.1.2.1.3.",
+      "audit_procedure": "Executer : findmnt -kn /tmp | grep -v nosuid || true",
+      "remediation_path": "/etc/fstab",
+      "default_value": "Varie selon le partitionnement du systeme ; /tmp n'est generalement pas une partition separee par defaut sur une installation standard.",
+      "references": [
+        "https://man7.org/linux/man-pages/man5/fstab.5.html"
+      ],
+      "cis_controls": [
+        "CIS Controls v8 3.3 Configure Data Access Control Lists"
+      ],
+      "check": {
+        "type": "equals",
+        "command": "findmnt -kn /tmp | grep -v nosuid || true",
+        "expected": ""
+      },
+      "recommendation": "Configurer l'entree correspondante dans /etc/fstab pour /tmp avec l'option 'nosuid'"
+    },
+    {
+      "id": "CIS-UBU-1.1.2.1.4",
+      "cis_rule": "1.1.2.1.4",
+      "profile": "Level 1 - Server, Level 1 - Workstation",
+      "category": "Partitions et options de montage",
+      "title": "Option noexec pour /tmp",
+      "severity": "high",
+      "description": "Vérifie que l'option 'noexec' est activée sur le point de montage /tmp (si celui-ci est une partition séparée).",
+      "rationale": "L'option noexec empêche l'exécution de binaires depuis /tmp, réduisant la capacité d'un attaquant à exécuter du code déposé dans ce répertoire souvent inscriptible par tous les utilisateurs.",
+      "audit_reference": "CIS Ubuntu Linux 20.04 LTS STIG Benchmark v2.0.0, section 1.1.2.1.4.",
+      "audit_procedure": "Executer : findmnt -kn /tmp | grep -v noexec || true",
+      "remediation_path": "/etc/fstab",
+      "default_value": "Varie selon le partitionnement du systeme ; /tmp n'est generalement pas une partition separee par defaut sur une installation standard.",
+      "references": [
+        "https://man7.org/linux/man-pages/man5/fstab.5.html"
+      ],
+      "cis_controls": [
+        "CIS Controls v8 3.3 Configure Data Access Control Lists"
+      ],
+      "check": {
+        "type": "equals",
+        "command": "findmnt -kn /tmp | grep -v noexec || true",
+        "expected": ""
+      },
+      "recommendation": "Configurer l'entree correspondante dans /etc/fstab pour /tmp avec l'option 'noexec'"
+    },
+    {
+      "id": "CIS-UBU-1.1.2.2.3",
+      "cis_rule": "1.1.2.2.3",
+      "profile": "Level 1 - Server, Level 1 - Workstation",
+      "category": "Partitions et options de montage",
+      "title": "Option nosuid pour /dev/shm",
+      "severity": "high",
+      "description": "Vérifie que l'option 'nosuid' est activée sur le point de montage /dev/shm (si celui-ci est une partition séparée).",
+      "rationale": "L'option nosuid empêche l'exécution de binaires avec bit setuid/setgid depuis /dev/shm, bloquant une technique classique d'élévation de privilège via un exécutable déposé dans un répertoire inscriptible par tous.",
+      "audit_reference": "CIS Ubuntu Linux 20.04 LTS STIG Benchmark v2.0.0, section 1.1.2.2.3.",
+      "audit_procedure": "Executer : findmnt -kn /dev/shm | grep -v nosuid || true",
+      "remediation_path": "/etc/fstab",
+      "default_value": "Varie selon le partitionnement du systeme ; /dev/shm n'est generalement pas une partition separee par defaut sur une installation standard.",
+      "references": [
+        "https://man7.org/linux/man-pages/man5/fstab.5.html"
+      ],
+      "cis_controls": [
+        "CIS Controls v8 3.3 Configure Data Access Control Lists"
+      ],
+      "check": {
+        "type": "equals",
+        "command": "findmnt -kn /dev/shm | grep -v nosuid || true",
+        "expected": ""
+      },
+      "recommendation": "Configurer l'entree correspondante dans /etc/fstab pour /dev/shm avec l'option 'nosuid'"
+    },
+    {
+      "id": "CIS-UBU-1.1.2.2.4",
+      "cis_rule": "1.1.2.2.4",
+      "profile": "Level 1 - Server, Level 1 - Workstation",
+      "category": "Partitions et options de montage",
+      "title": "Option noexec pour /dev/shm",
+      "severity": "high",
+      "description": "Vérifie que l'option 'noexec' est activée sur le point de montage /dev/shm (si celui-ci est une partition séparée).",
+      "rationale": "L'option noexec empêche l'exécution de binaires depuis /dev/shm, réduisant la capacité d'un attaquant à exécuter du code déposé dans ce répertoire souvent inscriptible par tous les utilisateurs.",
+      "audit_reference": "CIS Ubuntu Linux 20.04 LTS STIG Benchmark v2.0.0, section 1.1.2.2.4.",
+      "audit_procedure": "Executer : findmnt -kn /dev/shm | grep -v noexec || true",
+      "remediation_path": "/etc/fstab",
+      "default_value": "Varie selon le partitionnement du systeme ; /dev/shm n'est generalement pas une partition separee par defaut sur une installation standard.",
+      "references": [
+        "https://man7.org/linux/man-pages/man5/fstab.5.html"
+      ],
+      "cis_controls": [
+        "CIS Controls v8 3.3 Configure Data Access Control Lists"
+      ],
+      "check": {
+        "type": "equals",
+        "command": "findmnt -kn /dev/shm | grep -v noexec || true",
+        "expected": ""
+      },
+      "recommendation": "Configurer l'entree correspondante dans /etc/fstab pour /dev/shm avec l'option 'noexec'"
+    },
+    {
+      "id": "CIS-UBU-1.1.2.3.3",
+      "cis_rule": "1.1.2.3.3",
+      "profile": "Level 1 - Server, Level 1 - Workstation",
+      "category": "Partitions et options de montage",
+      "title": "Option nosuid pour /home",
+      "severity": "high",
+      "description": "Vérifie que l'option 'nosuid' est activée sur le point de montage /home (si celui-ci est une partition séparée).",
+      "rationale": "L'option nosuid empêche l'exécution de binaires avec bit setuid/setgid depuis /home, bloquant une technique classique d'élévation de privilège via un exécutable déposé dans un répertoire inscriptible par tous.",
+      "audit_reference": "CIS Ubuntu Linux 20.04 LTS STIG Benchmark v2.0.0, section 1.1.2.3.3.",
+      "audit_procedure": "Executer : findmnt -kn /home | grep -v nosuid || true",
+      "remediation_path": "/etc/fstab",
+      "default_value": "Varie selon le partitionnement du systeme ; /home n'est generalement pas une partition separee par defaut sur une installation standard.",
+      "references": [
+        "https://man7.org/linux/man-pages/man5/fstab.5.html"
+      ],
+      "cis_controls": [
+        "CIS Controls v8 3.3 Configure Data Access Control Lists"
+      ],
+      "check": {
+        "type": "equals",
+        "command": "findmnt -kn /home | grep -v nosuid || true",
+        "expected": ""
+      },
+      "recommendation": "Configurer l'entree correspondante dans /etc/fstab pour /home avec l'option 'nosuid'"
+    },
+    {
+      "id": "CIS-UBU-4.2.1",
+      "cis_rule": "4.2.1",
+      "profile": "Level 1 - Server, Level 1 - Workstation",
+      "category": "SSH — durcissement complet",
+      "title": "Le service SSH est installé et actif",
+      "severity": "high",
+      "description": "Vérifie que le paquet openssh-server est installé et que le service sshd est actif.",
+      "rationale": "Un service SSH manquant ou arrêté empêche l'administration distante sécurisée ; à l'inverse sa présence doit être volontaire et surveillée.",
+      "audit_reference": "CIS Ubuntu Linux 20.04 LTS STIG Benchmark v2.0.0, section 4.2.1. ",
+      "audit_procedure": "Executer : systemctl is-active sshd.service 2>/dev/null || systemctl is-active ssh.service 2>/dev/null",
+      "remediation_path": "/etc/ssh/sshd_config",
+      "default_value": "Voir description du benchmark CIS.",
+      "references": [
+        "https://man.openbsd.org/sshd_config"
+      ],
+      "cis_controls": [
+        "CIS Controls v8 4.1 Establish and Maintain a Secure Configuration Process"
+      ],
+      "check": {
+        "type": "equals",
+        "command": "systemctl is-active sshd.service 2>/dev/null || systemctl is-active ssh.service 2>/dev/null",
+        "expected": "active"
+      },
+      "recommendation": "Configurer le parametre correspondant a la section 4.2.1 dans /etc/ssh/sshd_config selon la valeur recommandee (voir description), puis : systemctl restart sshd.service"
+    },
+    {
+      "id": "CIS-UBU-4.2.10",
+      "cis_rule": "4.2.10",
+      "profile": "Level 1 - Server, Level 1 - Workstation",
+      "category": "SSH — durcissement complet",
+      "title": "Les mots de passe vides sont interdits en SSH",
+      "severity": "high",
+      "description": "Vérifie que PermitEmptyPasswords est réglé sur 'no'.",
+      "rationale": "Autoriser des mots de passe vides permettrait une connexion sans authentification effective sur tout compte mal configuré.",
+      "audit_reference": "CIS Ubuntu Linux 20.04 LTS STIG Benchmark v2.0.0, section 4.2.10. Necessite les privileges root pour resoudre la configuration effective sshd (sshd -T charge les cles hote privees).",
+      "audit_procedure": "Executer : sshd -T 2>/dev/null | grep -i '^permitemptypasswords '",
+      "remediation_path": "/etc/ssh/sshd_config",
+      "default_value": "Voir description du benchmark CIS.",
+      "references": [
+        "https://man.openbsd.org/sshd_config"
+      ],
+      "cis_controls": [
+        "CIS Controls v8 4.1 Establish and Maintain a Secure Configuration Process"
+      ],
+      "check": {
+        "type": "equals",
+        "command": "sshd -T 2>/dev/null | grep -i '^permitemptypasswords '",
+        "expected": "permitemptypasswords no"
+      },
+      "recommendation": "Configurer le parametre correspondant a la section 4.2.10 dans /etc/ssh/sshd_config selon la valeur recommandee (voir description), puis : systemctl restart sshd.service"
+    },
+    {
+      "id": "CIS-UBU-4.2.14",
+      "cis_rule": "4.2.14",
+      "profile": "Level 1 - Server, Level 1 - Workstation",
+      "category": "SSH — durcissement complet",
+      "title": "Seuls des chiffrements (Ciphers) SSH robustes sont utilisés",
+      "severity": "high",
+      "description": "Vérifie que la liste des chiffrements SSH ne contient aucun chiffrement faible (3des-cbc, aes*-cbc, rijndael-cbc).",
+      "rationale": "Les chiffrements en mode CBC et le 3DES sont vulnérables à des attaques connues (Sweet32, attaques sur le mode CBC) permettant de récupérer du texte en clair.",
+      "audit_reference": "CIS Ubuntu Linux 20.04 LTS STIG Benchmark v2.0.0, section 4.2.14. Necessite les privileges root pour resoudre la configuration effective sshd (sshd -T charge les cles hote privees).",
+      "audit_procedure": "Executer : line=$(sshd -T 2>/dev/null | grep -i '^ciphers '); if echo \"$line\" | grep -qiE '3des-cbc|aes128-cbc|aes192-cbc|aes256-cbc|rijndael-cbc'; then echo WEAK; elif [ -z \"$line\" ]; then echo WEAK; else echo OK; fi",
+      "remediation_path": "/etc/ssh/sshd_config",
+      "default_value": "Voir description du benchmark CIS.",
+      "references": [
+        "https://man.openbsd.org/sshd_config"
+      ],
+      "cis_controls": [
+        "CIS Controls v8 4.1 Establish and Maintain a Secure Configuration Process"
+      ],
+      "check": {
+        "type": "equals",
+        "command": "line=$(sshd -T 2>/dev/null | grep -i '^ciphers '); if echo \"$line\" | grep -qiE '3des-cbc|aes128-cbc|aes192-cbc|aes256-cbc|rijndael-cbc'; then echo WEAK; elif [ -z \"$line\" ]; then echo WEAK; else echo OK; fi",
+        "expected": "OK"
+      },
+      "recommendation": "Configurer le parametre correspondant a la section 4.2.14 dans /etc/ssh/sshd_config selon la valeur recommandee (voir description), puis : systemctl restart sshd.service"
+    },
+    {
+      "id": "CIS-UBU-4.2.15",
+      "cis_rule": "4.2.15",
+      "profile": "Level 1 - Server, Level 1 - Workstation",
+      "category": "SSH — durcissement complet",
+      "title": "Seuls des algorithmes MAC SSH robustes sont utilisés",
+      "severity": "high",
+      "description": "Vérifie que la liste des algorithmes MAC SSH ne contient aucun algorithme faible (MD5, RIPEMD160, SHA1, UMAC-64).",
+      "rationale": "Les algorithmes MAC basés sur MD5 ou tronqués à 96 bits sont considérés faibles et facilitent les attaques de rétrogradation SSH.",
+      "audit_reference": "CIS Ubuntu Linux 20.04 LTS STIG Benchmark v2.0.0, section 4.2.15. Necessite les privileges root pour resoudre la configuration effective sshd (sshd -T charge les cles hote privees).",
+      "audit_procedure": "Executer : line=$(sshd -T 2>/dev/null | grep -i '^macs '); if echo \"$line\" | grep -qiE 'hmac-md5|hmac-ripemd160|hmac-sha1(-96)?(-etm@openssh.com)?\\b|umac-64(-etm)?@openssh.com'; then echo WEAK; elif [ -z \"$line\" ]; then echo WEAK; else echo OK; fi",
+      "remediation_path": "/etc/ssh/sshd_config",
+      "default_value": "Voir description du benchmark CIS.",
+      "references": [
+        "https://man.openbsd.org/sshd_config"
+      ],
+      "cis_controls": [
+        "CIS Controls v8 4.1 Establish and Maintain a Secure Configuration Process"
+      ],
+      "check": {
+        "type": "equals",
+        "command": "line=$(sshd -T 2>/dev/null | grep -i '^macs '); if echo \"$line\" | grep -qiE 'hmac-md5|hmac-ripemd160|hmac-sha1(-96)?(-etm@openssh.com)?\\b|umac-64(-etm)?@openssh.com'; then echo WEAK; elif [ -z \"$line\" ]; then echo WEAK; else echo OK; fi",
+        "expected": "OK"
+      },
+      "recommendation": "Configurer le parametre correspondant a la section 4.2.15 dans /etc/ssh/sshd_config selon la valeur recommandee (voir description), puis : systemctl restart sshd.service"
+    },
+    {
+      "id": "CIS-UBU-4.2.16",
+      "cis_rule": "4.2.16",
+      "profile": "Level 1 - Server, Level 1 - Workstation",
+      "category": "SSH — durcissement complet",
+      "title": "Seuls des algorithmes d'échange de clés SSH robustes sont utilisés",
+      "severity": "high",
+      "description": "Vérifie que la liste des algorithmes d'échange de clés (KexAlgorithms) SSH ne contient aucun algorithme faible basé sur SHA-1.",
+      "rationale": "Les échanges de clés basés sur SHA-1 ou sur des groupes Diffie-Hellman de petite taille sont considérés vulnérables à des attaques de l'homme du milieu.",
+      "audit_reference": "CIS Ubuntu Linux 20.04 LTS STIG Benchmark v2.0.0, section 4.2.16. Necessite les privileges root pour resoudre la configuration effective sshd (sshd -T charge les cles hote privees).",
+      "audit_procedure": "Executer : line=$(sshd -T 2>/dev/null | grep -i '^kexalgorithms '); if echo \"$line\" | grep -qiE 'diffie-hellman-group1-sha1|diffie-hellman-group14-sha1|diffie-hellman-group-exchange-sha1'; then echo WEAK; elif [ -z \"$line\" ]; then echo WEAK; else echo OK; fi",
+      "remediation_path": "/etc/ssh/sshd_config",
+      "default_value": "Voir description du benchmark CIS.",
+      "references": [
+        "https://man.openbsd.org/sshd_config"
+      ],
+      "cis_controls": [
+        "CIS Controls v8 4.1 Establish and Maintain a Secure Configuration Process"
+      ],
+      "check": {
+        "type": "equals",
+        "command": "line=$(sshd -T 2>/dev/null | grep -i '^kexalgorithms '); if echo \"$line\" | grep -qiE 'diffie-hellman-group1-sha1|diffie-hellman-group14-sha1|diffie-hellman-group-exchange-sha1'; then echo WEAK; elif [ -z \"$line\" ]; then echo WEAK; else echo OK; fi",
+        "expected": "OK"
+      },
+      "recommendation": "Configurer le parametre correspondant a la section 4.2.16 dans /etc/ssh/sshd_config selon la valeur recommandee (voir description), puis : systemctl restart sshd.service"
+    },
+    {
+      "id": "CIS-UBU-4.3.1",
+      "cis_rule": "4.3.1",
+      "profile": "Level 1 - Server, Level 1 - Workstation",
+      "category": "Élévation de privilèges (sudo/su)",
+      "title": "sudo est installé",
+      "severity": "high",
+      "description": "Vérifie que le paquet sudo (ou sudo-ldap) est installé sur le système.",
+      "rationale": "sudo fournit un contrôle granulaire et journalisé de l'élévation de privilèges, préférable à un partage direct du mot de passe root.",
+      "audit_reference": "CIS Ubuntu Linux 20.04 LTS STIG Benchmark v2.0.0, section 4.3.1.",
+      "audit_procedure": "Executer : dpkg -s sudo 2>/dev/null | grep -q '^Status: install ok installed' && echo INSTALLED || echo INSTALLED_ABSENT",
+      "remediation_path": "/etc/sudoers (via visudo)",
+      "default_value": "Voir description du benchmark CIS.",
+      "references": [
+        "https://www.sudo.ws/docs/man/sudoers.man/"
+      ],
+      "cis_controls": [
+        "CIS Controls v8 5.4 Restrict Administrator Privileges to Dedicated Administrator Accounts"
+      ],
+      "check": {
+        "type": "equals",
+        "command": "dpkg -s sudo 2>/dev/null | grep -q '^Status: install ok installed' && echo INSTALLED || echo INSTALLED_ABSENT",
+        "expected": "INSTALLED"
+      },
+      "recommendation": "Configurer le parametre correspondant a la section 4.3.1 via 'visudo' (voir description)."
+    },
+    {
+      "id": "CIS-UBU-4.3.5",
+      "cis_rule": "4.3.5",
+      "profile": "Level 1 - Server, Level 1 - Workstation",
+      "category": "Élévation de privilèges (sudo/su)",
+      "title": "Un mot de passe est exigé pour l'élévation de privilèges",
+      "severity": "high",
+      "description": "Vérifie qu'aucune entrée sudoers ne contient la balise NOPASSWD, qui dispenserait de ré-authentification.",
+      "rationale": "Sans (ré)authentification, un utilisateur ayant obtenu un accès temporaire au poste pourrait exécuter des commandes privilégiées sans jamais prouver son identité.",
+      "audit_reference": "CIS Ubuntu Linux 20.04 LTS STIG Benchmark v2.0.0, section 4.3.5.",
+      "audit_procedure": "Executer : grep -r '^[^#].*NOPASSWD' /etc/sudoers /etc/sudoers.d/* 2>/dev/null || true",
+      "remediation_path": "/etc/sudoers (via visudo)",
+      "default_value": "Voir description du benchmark CIS.",
+      "references": [
+        "https://www.sudo.ws/docs/man/sudoers.man/"
+      ],
+      "cis_controls": [
+        "CIS Controls v8 5.4 Restrict Administrator Privileges to Dedicated Administrator Accounts"
+      ],
+      "check": {
+        "type": "equals",
+        "command": "grep -r '^[^#].*NOPASSWD' /etc/sudoers /etc/sudoers.d/* 2>/dev/null || true",
+        "expected": ""
+      },
+      "recommendation": "Configurer le parametre correspondant a la section 4.3.5 via 'visudo' (voir description)."
+    },
+    {
+      "id": "CIS-UBU-4.3.6",
+      "cis_rule": "4.3.6",
+      "profile": "Level 1 - Server, Level 1 - Workstation",
+      "category": "Élévation de privilèges (sudo/su)",
+      "title": "La ré-authentification pour l'élévation de privilèges n'est pas désactivée globalement",
+      "severity": "high",
+      "description": "Vérifie qu'aucune entrée sudoers ne contient la balise '!authenticate', qui désactiverait la ré-authentification.",
+      "rationale": "Sans ré-authentification, un utilisateur ayant obtenu un accès temporaire au poste pourrait exécuter des commandes privilégiées sans jamais prouver son identité.",
+      "audit_reference": "CIS Ubuntu Linux 20.04 LTS STIG Benchmark v2.0.0, section 4.3.6.",
+      "audit_procedure": "Executer : grep -r '^[^#].*!authenticate' /etc/sudoers /etc/sudoers.d/* 2>/dev/null || true",
+      "remediation_path": "/etc/sudoers (via visudo)",
+      "default_value": "Voir description du benchmark CIS.",
+      "references": [
+        "https://www.sudo.ws/docs/man/sudoers.man/"
+      ],
+      "cis_controls": [
+        "CIS Controls v8 5.4 Restrict Administrator Privileges to Dedicated Administrator Accounts"
+      ],
+      "check": {
+        "type": "equals",
+        "command": "grep -r '^[^#].*!authenticate' /etc/sudoers /etc/sudoers.d/* 2>/dev/null || true",
+        "expected": ""
+      },
+      "recommendation": "Configurer le parametre correspondant a la section 4.3.6 via 'visudo' (voir description)."
+    },
+    {
+      "id": "CIS-UBU-4.3.2",
+      "cis_rule": "4.3.2",
+      "profile": "Level 1 - Server, Level 1 - Workstation",
+      "category": "Élévation de privilèges (sudo/su)",
+      "title": "Les commandes sudo utilisent un pseudo-terminal (pty)",
+      "severity": "medium",
+      "description": "Vérifie que la directive 'Defaults use_pty' est configurée, forçant sudo à n'exécuter les commandes que depuis un pseudo-terminal.",
+      "rationale": "Sans cette contrainte, un attaquant pourrait utiliser sudo pour lancer un processus arrière-plan malveillant qui persiste après la fin du programme principal.",
+      "audit_reference": "CIS Ubuntu Linux 20.04 LTS STIG Benchmark v2.0.0, section 4.3.2.",
+      "audit_procedure": "Executer : grep -rPi '^\\s*Defaults\\s+([^#]+,)?use_pty' /etc/sudoers /etc/sudoers.d/* 2>/dev/null || true",
+      "remediation_path": "/etc/sudoers (via visudo)",
+      "default_value": "Voir description du benchmark CIS.",
+      "references": [
+        "https://www.sudo.ws/docs/man/sudoers.man/"
+      ],
+      "cis_controls": [
+        "CIS Controls v8 5.4 Restrict Administrator Privileges to Dedicated Administrator Accounts"
+      ],
+      "check": {
+        "type": "contains",
+        "command": "grep -rPi '^\\s*Defaults\\s+([^#]+,)?use_pty' /etc/sudoers /etc/sudoers.d/* 2>/dev/null || true",
+        "expected": "use_pty"
+      },
+      "recommendation": "Configurer le parametre correspondant a la section 4.3.2 via 'visudo' (voir description)."
+    },
+    {
+      "id": "CIS-UBU-4.3.3",
+      "cis_rule": "4.3.3",
+      "profile": "Level 1 - Server, Level 1 - Workstation",
+      "category": "Élévation de privilèges (sudo/su)",
+      "title": "Un fichier de journalisation sudo dédié est configuré",
+      "severity": "medium",
+      "description": "Vérifie qu'un fichier de log dédié est configuré pour sudo via la directive 'Defaults logfile='.",
+      "rationale": "Un fichier de log sudo dédié simplifie considérablement l'audit et la détection d'utilisations abusives de l'élévation de privilèges.",
+      "audit_reference": "CIS Ubuntu Linux 20.04 LTS STIG Benchmark v2.0.0, section 4.3.3.",
+      "audit_procedure": "Executer : grep -rPsi 'logfile\\s*=' /etc/sudoers /etc/sudoers.d/* 2>/dev/null || true",
+      "remediation_path": "/etc/sudoers (via visudo)",
+      "default_value": "Voir description du benchmark CIS.",
+      "references": [
+        "https://www.sudo.ws/docs/man/sudoers.man/"
+      ],
+      "cis_controls": [
+        "CIS Controls v8 5.4 Restrict Administrator Privileges to Dedicated Administrator Accounts"
+      ],
+      "check": {
+        "type": "contains",
+        "command": "grep -rPsi 'logfile\\s*=' /etc/sudoers /etc/sudoers.d/* 2>/dev/null || true",
+        "expected": "logfile"
+      },
+      "recommendation": "Configurer le parametre correspondant a la section 4.3.3 via 'visudo' (voir description)."
+    },
+    {
+      "id": "CIS-UBU-4.4.1.1",
+      "cis_rule": "4.4.1.1",
+      "profile": "Level 1 - Server, Level 1 - Workstation",
+      "category": "PAM — politique de mots de passe et verrouillage",
+      "title": "Les nouveaux mots de passe utilisent pwquality",
+      "severity": "high",
+      "description": "Vérifie que le module pam_pwquality.so est activé en 'requisite' dans /etc/pam.d/common-password pour tout changement de mot de passe.",
+      "rationale": "Sans pwquality, aucune règle de complexité n'est appliquée lors de la création ou du changement de mot de passe, permettant des mots de passe triviaux.",
+      "audit_reference": "CIS Ubuntu Linux 20.04 LTS STIG Benchmark v2.0.0, section 4.4.1.1. Verifie l'activation du module ; ne verifie pas separement le parametre 'enforcing=1' de pwquality.conf ni le nombre exact de 'retry'.",
+      "audit_procedure": "Executer : grep -Pi '^\\s*password\\s+[^#]+\\s+pam_pwquality\\.so\\b' /etc/pam.d/common-password || true",
+      "remediation_path": "/etc/security/pwquality.conf, /etc/pam.d/common-password",
+      "default_value": "Voir description du benchmark CIS.",
+      "references": [
+        "https://man7.org/linux/man-pages/man5/pwquality.conf.5.html"
+      ],
+      "cis_controls": [
+        "CIS Controls v8 5.2 Use Unique Passwords"
+      ],
+      "check": {
+        "type": "contains",
+        "command": "grep -Pi '^\\s*password\\s+[^#]+\\s+pam_pwquality\\.so\\b' /etc/pam.d/common-password || true",
+        "expected": "pam_pwquality"
+      },
+      "recommendation": "Configurer le parametre correspondant a la section 4.4.1.1 (voir description)."
+    },
+    {
+      "id": "CIS-UBU-4.4.1.11",
+      "cis_rule": "4.4.1.11",
+      "profile": "Level 1 - Server, Level 1 - Workstation",
+      "category": "PAM — politique de mots de passe et verrouillage",
+      "title": "Le mot de passe doit compter au moins 15 caractères (STIG)",
+      "severity": "high",
+      "description": "Vérifie que la longueur minimale de mot de passe (minlen) est d'au moins 15 caractères, exigence STIG plus stricte que la recommandation CIS de base.",
+      "rationale": "Une longueur minimale de 15 caractères ou plus rend une attaque par force brute hors ligne pratiquement impossible avec les capacités de calcul actuelles.",
+      "audit_reference": "CIS Ubuntu Linux 20.04 LTS STIG Benchmark v2.0.0, section 4.4.1.11.",
+      "audit_procedure": "Executer : grep -oP '^\\s*minlen\\s*=\\s*\\K[0-9]+' /etc/security/pwquality.conf 2>/dev/null | head -1",
+      "remediation_path": "/etc/security/pwquality.conf, /etc/pam.d/common-password",
+      "default_value": "Voir description du benchmark CIS.",
+      "references": [
+        "https://man7.org/linux/man-pages/man5/pwquality.conf.5.html"
+      ],
+      "cis_controls": [
+        "CIS Controls v8 5.2 Use Unique Passwords"
+      ],
+      "check": {
+        "type": "numeric_min",
+        "command": "grep -oP '^\\s*minlen\\s*=\\s*\\K[0-9]+' /etc/security/pwquality.conf 2>/dev/null | head -1",
+        "expected": "15"
+      },
+      "recommendation": "Configurer le parametre correspondant a la section 4.4.1.11 (voir description)."
+    },
+    {
+      "id": "CIS-UBU-4.4.1.2",
+      "cis_rule": "4.4.1.2",
+      "profile": "Level 1 - Server, Level 1 - Workstation",
+      "category": "PAM — politique de mots de passe et verrouillage",
+      "title": "Les exigences de création de mot de passe sont configurées",
+      "severity": "high",
+      "description": "Vérifie que la longueur minimale de mot de passe (minlen) est d'au moins 14 caractères dans pwquality.conf.",
+      "rationale": "Une longueur minimale insuffisante réduit considérablement le temps nécessaire pour casser un mot de passe par force brute.",
+      "audit_reference": "CIS Ubuntu Linux 20.04 LTS STIG Benchmark v2.0.0, section 4.4.1.2. Simplifie la regle a la verification de minlen ; les criteres alternatifs de complexite (minclass ou les 4 parametres credit) sont verifies individuellement par les regles 4.4.1.6 a 4.4.1.9.",
+      "audit_procedure": "Executer : grep -oP '^\\s*minlen\\s*=\\s*\\K[0-9]+' /etc/security/pwquality.conf 2>/dev/null | head -1",
+      "remediation_path": "/etc/security/pwquality.conf, /etc/pam.d/common-password",
+      "default_value": "Voir description du benchmark CIS.",
+      "references": [
+        "https://man7.org/linux/man-pages/man5/pwquality.conf.5.html"
+      ],
+      "cis_controls": [
+        "CIS Controls v8 5.2 Use Unique Passwords"
+      ],
+      "check": {
+        "type": "numeric_min",
+        "command": "grep -oP '^\\s*minlen\\s*=\\s*\\K[0-9]+' /etc/security/pwquality.conf 2>/dev/null | head -1",
+        "expected": "14"
+      },
+      "recommendation": "Configurer le parametre correspondant a la section 4.4.1.2 (voir description)."
+    },
+    {
+      "id": "CIS-UBU-4.4.2.1",
+      "cis_rule": "4.4.2.1",
+      "profile": "Level 1 - Server, Level 1 - Workstation",
+      "category": "PAM — politique de mots de passe et verrouillage",
+      "title": "La réutilisation de mot de passe est limitée",
+      "severity": "high",
+      "description": "Vérifie que pam_pwhistory.so est configuré avec 'remember=5' ou plus dans /etc/pam.d/common-password.",
+      "rationale": "Empêcher la réutilisation des derniers mots de passe force un renouvellement réel plutôt qu'une alternance entre un petit nombre de mots de passe connus.",
+      "audit_reference": "CIS Ubuntu Linux 20.04 LTS STIG Benchmark v2.0.0, section 4.4.2.1.",
+      "audit_procedure": "Executer : grep -P '^\\s*password\\s+[^#]+\\s+pam_pwhistory\\.so\\s+([^#]+\\s+)?remember=([5-9]|[1-9][0-9]+)\\b' /etc/pam.d/common-password 2>/dev/null",
+      "remediation_path": "/etc/security/pwquality.conf, /etc/pam.d/common-password",
+      "default_value": "Voir description du benchmark CIS.",
+      "references": [
+        "https://man7.org/linux/man-pages/man5/pwquality.conf.5.html"
+      ],
+      "cis_controls": [
+        "CIS Controls v8 5.2 Use Unique Passwords"
+      ],
+      "check": {
+        "type": "regex",
+        "command": "grep -P '^\\s*password\\s+[^#]+\\s+pam_pwhistory\\.so\\s+([^#]+\\s+)?remember=([5-9]|[1-9][0-9]+)\\b' /etc/pam.d/common-password 2>/dev/null",
+        "expected": "remember=(\\d+)"
+      },
+      "recommendation": "Configurer le parametre correspondant a la section 4.4.2.1 (voir description)."
+    },
+    {
+      "id": "CIS-UBU-4.4.3.1",
+      "cis_rule": "4.4.3.1",
+      "profile": "Level 1 - Server, Level 1 - Workstation",
+      "category": "PAM — politique de mots de passe et verrouillage",
+      "title": "Le verrouillage après échecs de mot de passe est configuré",
+      "severity": "high",
+      "description": "Vérifie que le paramètre 'deny' de faillock.conf limite le nombre de tentatives échouées consécutives à 4 ou moins.",
+      "rationale": "Verrouiller un compte après un nombre limité de tentatives échouées mitige les attaques par force brute contre les mots de passe locaux.",
+      "audit_reference": "CIS Ubuntu Linux 20.04 LTS STIG Benchmark v2.0.0, section 4.4.3.1. Verifie uniquement le parametre 'deny' ; ne verifie pas separement fail_interval ni unlock_time, ni la presence des lignes pam_faillock.so dans common-auth/common-account.",
+      "audit_procedure": "Executer : grep -oP '^\\s*deny\\s*=\\s*\\K[0-9]+' /etc/security/faillock.conf 2>/dev/null | head -1",
+      "remediation_path": "/etc/security/pwquality.conf, /etc/pam.d/common-password",
+      "default_value": "Voir description du benchmark CIS.",
+      "references": [
+        "https://man7.org/linux/man-pages/man5/pwquality.conf.5.html"
+      ],
+      "cis_controls": [
+        "CIS Controls v8 5.2 Use Unique Passwords"
+      ],
+      "check": {
+        "type": "numeric_max",
+        "command": "grep -oP '^\\s*deny\\s*=\\s*\\K[0-9]+' /etc/security/faillock.conf 2>/dev/null | head -1",
+        "expected": "4"
+      },
+      "recommendation": "Configurer le parametre correspondant a la section 4.4.3.1 (voir description)."
+    },
+    {
+      "id": "CIS-UBU-4.5.1.6",
+      "cis_rule": "4.5.1.6",
+      "profile": "Level 1 - Server, Level 1 - Workstation",
+      "category": "Comptes utilisateurs et umask",
+      "title": "ENCRYPT_METHOD est réglé sur SHA512",
+      "severity": "high",
+      "description": "Vérifie que ENCRYPT_METHOD est réglé sur SHA512 dans /etc/login.defs.",
+      "rationale": "SHA512 est un algorithme de hachage de mot de passe robuste et validé FIPS 140-2, contrairement à des algorithmes hérités plus faibles comme DES ou MD5.",
+      "audit_reference": "CIS Ubuntu Linux 20.04 LTS STIG Benchmark v2.0.0, section 4.5.1.6.",
+      "audit_procedure": "Executer : grep -i encrypt_method /etc/login.defs 2>/dev/null || true",
+      "remediation_path": "/etc/login.defs",
+      "default_value": "Voir description du benchmark CIS.",
+      "references": [
+        "https://man7.org/linux/man-pages/man5/login.defs.5.html"
+      ],
+      "cis_controls": [
+        "CIS Controls v8 5.2 Use Unique Passwords"
+      ],
+      "check": {
+        "type": "contains",
+        "command": "grep -i encrypt_method /etc/login.defs 2>/dev/null || true",
+        "expected": "sha512"
+      },
+      "recommendation": "Configurer le parametre correspondant a la section 4.5.1.6 (voir description)."
+    },
+    {
+      "id": "CIS-UBU-4.5.1.8",
+      "cis_rule": "4.5.1.8",
+      "profile": "Level 1 - Server, Level 1 - Workstation",
+      "category": "Comptes utilisateurs et umask",
+      "title": "Le compte root est verrouillé pour la connexion directe",
+      "severity": "high",
+      "description": "Vérifie que le compte root est verrouillé (statut 'L') via passwd -S, empêchant toute connexion directe avec ce compte.",
+      "rationale": "Interdire la connexion directe en root force le passage par un compte nominatif et sudo, garantissant la traçabilité individuelle des actions d'administration.",
+      "audit_reference": "CIS Ubuntu Linux 20.04 LTS STIG Benchmark v2.0.0, section 4.5.1.8. Necessite les privileges root pour interroger le statut du compte root via passwd -S.",
+      "audit_procedure": "Executer : passwd -S root 2>/dev/null | awk '{print $2}'",
+      "remediation_path": "/etc/login.defs",
+      "default_value": "Voir description du benchmark CIS.",
+      "references": [
+        "https://man7.org/linux/man-pages/man5/login.defs.5.html"
+      ],
+      "cis_controls": [
+        "CIS Controls v8 5.2 Use Unique Passwords"
+      ],
+      "check": {
+        "type": "equals",
+        "command": "passwd -S root 2>/dev/null | awk '{print $2}'",
+        "expected": "L"
+      },
+      "recommendation": "Configurer le parametre correspondant a la section 4.5.1.8 (voir description)."
+    },
+    {
+      "id": "CIS-UBU-4.5.1.1",
+      "cis_rule": "4.5.1.1",
+      "profile": "Level 1 - Server, Level 1 - Workstation",
+      "category": "Comptes utilisateurs et umask",
+      "title": "Le délai minimal entre deux changements de mot de passe est configuré",
+      "severity": "medium",
+      "description": "Vérifie qu'aucun compte n'a PASS_MIN_DAYS inférieur à 1 jour dans /etc/shadow.",
+      "rationale": "Sans délai minimal, un utilisateur pourrait changer son mot de passe plusieurs fois rapidement pour épuiser l'historique et réutiliser un ancien mot de passe.",
+      "audit_reference": "CIS Ubuntu Linux 20.04 LTS STIG Benchmark v2.0.0, section 4.5.1.1.",
+      "audit_procedure": "Executer : awk -F: '(/^[^:]+:[^!*]/ && $4 < 1){print $1\" \"$4}' /etc/shadow 2>/dev/null || true",
+      "remediation_path": "/etc/login.defs",
+      "default_value": "Voir description du benchmark CIS.",
+      "references": [
+        "https://man7.org/linux/man-pages/man5/login.defs.5.html"
+      ],
+      "cis_controls": [
+        "CIS Controls v8 5.2 Use Unique Passwords"
+      ],
+      "check": {
+        "type": "equals",
+        "command": "awk -F: '(/^[^:]+:[^!*]/ && $4 < 1){print $1\" \"$4}' /etc/shadow 2>/dev/null || true",
+        "expected": ""
+      },
+      "recommendation": "Configurer le parametre correspondant a la section 4.5.1.1 (voir description)."
+    },
+    {
+      "id": "CIS-UBU-4.5.1.2",
+      "cis_rule": "4.5.1.2",
+      "profile": "Level 1 - Server, Level 1 - Workstation",
+      "category": "Comptes utilisateurs et umask",
+      "title": "L'expiration du mot de passe est fixée à 365 jours ou moins",
+      "severity": "medium",
+      "description": "Vérifie qu'aucun compte n'a PASS_MAX_DAYS supérieur à 365 jours (ou non défini) dans /etc/shadow.",
+      "rationale": "Réduire la durée de vie maximale d'un mot de passe limite la fenêtre d'exploitation d'un identifiant compromis.",
+      "audit_reference": "CIS Ubuntu Linux 20.04 LTS STIG Benchmark v2.0.0, section 4.5.1.2.",
+      "audit_procedure": "Executer : awk -F: '(/^[^:]+:[^!*]/ && ($5>365 || $5~/([0-1]|-1|^[[:space:]]*$)/)){print $1\" \"$5}' /etc/shadow 2>/dev/null || true",
+      "remediation_path": "/etc/login.defs",
+      "default_value": "Voir description du benchmark CIS.",
+      "references": [
+        "https://man7.org/linux/man-pages/man5/login.defs.5.html"
+      ],
+      "cis_controls": [
+        "CIS Controls v8 5.2 Use Unique Passwords"
+      ],
+      "check": {
+        "type": "equals",
+        "command": "awk -F: '(/^[^:]+:[^!*]/ && ($5>365 || $5~/([0-1]|-1|^[[:space:]]*$)/)){print $1\" \"$5}' /etc/shadow 2>/dev/null || true",
+        "expected": ""
+      },
+      "recommendation": "Configurer le parametre correspondant a la section 4.5.1.2 (voir description)."
+    },
+    {
+      "id": "CIS-UBU-4.5.1.4",
+      "cis_rule": "4.5.1.4",
+      "profile": "Level 1 - Server, Level 1 - Workstation",
+      "category": "Comptes utilisateurs et umask",
+      "title": "Le verrouillage pour compte inactif est de 30 jours ou moins",
+      "severity": "medium",
+      "description": "Vérifie qu'aucun compte n'a un champ INACTIVE supérieur à 30 jours (ou non défini) dans /etc/shadow.",
+      "rationale": "Verrouiller automatiquement les comptes inactifs après expiration du mot de passe réduit le risque d'utilisation d'un compte oublié ou abandonné.",
+      "audit_reference": "CIS Ubuntu Linux 20.04 LTS STIG Benchmark v2.0.0, section 4.5.1.4.",
+      "audit_procedure": "Executer : awk -F: '(/^[^:]+:[^!*]/ && ($7~/(^[[:space:]]*$|-1)/ || $7>30)){print $1\" \"$7}' /etc/shadow 2>/dev/null || true",
+      "remediation_path": "/etc/login.defs",
+      "default_value": "Voir description du benchmark CIS.",
+      "references": [
+        "https://man7.org/linux/man-pages/man5/login.defs.5.html"
+      ],
+      "cis_controls": [
+        "CIS Controls v8 5.2 Use Unique Passwords"
+      ],
+      "check": {
+        "type": "equals",
+        "command": "awk -F: '(/^[^:]+:[^!*]/ && ($7~/(^[[:space:]]*$|-1)/ || $7>30)){print $1\" \"$7}' /etc/shadow 2>/dev/null || true",
+        "expected": ""
+      },
+      "recommendation": "Configurer le parametre correspondant a la section 4.5.1.4 (voir description)."
+    },
+    {
+      "id": "CIS-UBU-2.2.11",
+      "cis_rule": "2.2.11",
+      "profile": "Level 1 - Server, Level 1 - Workstation",
+      "category": "Services réseau non essentiels désinstallés",
+      "title": "Samba n'est pas installé",
+      "severity": "high",
+      "description": "Vérifie que le paquet samba n'est pas installé.",
+      "rationale": "Le partage de fichiers SMB non requis expose le système à des vulnérabilités et attaques de type relais SMB.",
+      "audit_reference": "CIS Ubuntu Linux 20.04 LTS STIG Benchmark v2.0.0, section 2.2.11. Paquet(s) : samba.",
+      "audit_procedure": "Executer : ! dpkg -s samba 2>/dev/null | grep -q '^Status: install ok installed' && echo ABSENT || echo PRESENT",
+      "remediation_path": "apt purge samba",
+      "default_value": "Non installe par defaut sur une installation minimale.",
+      "references": [
+        "https://ubuntu.com/security"
+      ],
+      "cis_controls": [
+        "CIS Controls v8 4.8 Uninstall or Disable Unnecessary Services on Enterprise Assets and Software"
+      ],
+      "check": {
+        "type": "equals",
+        "command": "! dpkg -s samba 2>/dev/null | grep -q '^Status: install ok installed' && echo ABSENT || echo PRESENT",
+        "expected": "ABSENT"
+      },
+      "recommendation": "Executer : apt purge samba"
+    },
+    {
+      "id": "CIS-UBU-2.2.14",
+      "cis_rule": "2.2.14",
+      "profile": "Level 1 - Server, Level 1 - Workstation",
+      "category": "Services réseau non essentiels désinstallés",
+      "title": "Le serveur NIS n'est pas installé",
+      "severity": "high",
+      "description": "Vérifie que le paquet nis n'est pas installé.",
+      "rationale": "NIS est un service intrinsèquement peu sûr, vulnérable aux attaques DoS et à une authentification faible pour l'interrogation de ses tables.",
+      "audit_reference": "CIS Ubuntu Linux 20.04 LTS STIG Benchmark v2.0.0, section 2.2.14. Paquet(s) : nis.",
+      "audit_procedure": "Executer : ! dpkg -s nis 2>/dev/null | grep -q '^Status: install ok installed' && echo ABSENT || echo PRESENT",
+      "remediation_path": "apt purge nis",
+      "default_value": "Non installe par defaut sur une installation minimale.",
+      "references": [
+        "https://ubuntu.com/security"
+      ],
+      "cis_controls": [
+        "CIS Controls v8 4.8 Uninstall or Disable Unnecessary Services on Enterprise Assets and Software"
+      ],
+      "check": {
+        "type": "equals",
+        "command": "! dpkg -s nis 2>/dev/null | grep -q '^Status: install ok installed' && echo ABSENT || echo PRESENT",
+        "expected": "ABSENT"
+      },
+      "recommendation": "Executer : apt purge nis"
+    },
+    {
+      "id": "CIS-UBU-2.2.17",
+      "cis_rule": "2.2.17",
+      "profile": "Level 1 - Server, Level 1 - Workstation",
+      "category": "Services réseau non essentiels désinstallés",
+      "title": "telnetd n'est pas installé",
+      "severity": "high",
+      "description": "Vérifie que le paquet telnetd (serveur telnet) n'est pas installé.",
+      "rationale": "Telnet transmet les mots de passe en clair sur le réseau, un risque de compromission d'identifiants directement exploitable par interception passive.",
+      "audit_reference": "CIS Ubuntu Linux 20.04 LTS STIG Benchmark v2.0.0, section 2.2.17. Paquet(s) : telnetd.",
+      "audit_procedure": "Executer : ! dpkg -s telnetd 2>/dev/null | grep -q '^Status: install ok installed' && echo ABSENT || echo PRESENT",
+      "remediation_path": "apt purge telnetd",
+      "default_value": "Non installe par defaut sur une installation minimale.",
+      "references": [
+        "https://ubuntu.com/security"
+      ],
+      "cis_controls": [
+        "CIS Controls v8 4.8 Uninstall or Disable Unnecessary Services on Enterprise Assets and Software"
+      ],
+      "check": {
+        "type": "equals",
+        "command": "! dpkg -s telnetd 2>/dev/null | grep -q '^Status: install ok installed' && echo ABSENT || echo PRESENT",
+        "expected": "ABSENT"
+      },
+      "recommendation": "Executer : apt purge telnetd"
+    },
+    {
+      "id": "CIS-UBU-2.2.19",
+      "cis_rule": "2.2.19",
+      "profile": "Level 1 - Server, Level 1 - Workstation",
+      "category": "Services réseau non essentiels désinstallés",
+      "title": "rsh-server n'est pas installé",
+      "severity": "high",
+      "description": "Vérifie que le paquet rsh-server n'est pas installé.",
+      "rationale": "Les services rsh authentifient sur la base de la confiance réseau (adresse IP), un mécanisme trivialement usurpable, contrairement à SSH.",
+      "audit_reference": "CIS Ubuntu Linux 20.04 LTS STIG Benchmark v2.0.0, section 2.2.19. Paquet(s) : rsh-server.",
+      "audit_procedure": "Executer : ! dpkg -s rsh-server 2>/dev/null | grep -q '^Status: install ok installed' && echo ABSENT || echo PRESENT",
+      "remediation_path": "apt purge rsh-server",
+      "default_value": "Non installe par defaut sur une installation minimale.",
+      "references": [
+        "https://ubuntu.com/security"
+      ],
+      "cis_controls": [
+        "CIS Controls v8 4.8 Uninstall or Disable Unnecessary Services on Enterprise Assets and Software"
+      ],
+      "check": {
+        "type": "equals",
+        "command": "! dpkg -s rsh-server 2>/dev/null | grep -q '^Status: install ok installed' && echo ABSENT || echo PRESENT",
+        "expected": "ABSENT"
+      },
+      "recommendation": "Executer : apt purge rsh-server"
+    },
+    {
+      "id": "CIS-UBU-2.2.6",
+      "cis_rule": "2.2.6",
+      "profile": "Level 1 - Server, Level 1 - Workstation",
+      "category": "Services réseau non essentiels désinstallés",
+      "title": "NFS n'est pas installé",
+      "severity": "high",
+      "description": "Vérifie que le paquet nfs-kernel-server n'est pas installé.",
+      "rationale": "NFS peut exposer des systèmes de fichiers sur le réseau avec des contrôles d'accès historiquement faibles.",
+      "audit_reference": "CIS Ubuntu Linux 20.04 LTS STIG Benchmark v2.0.0, section 2.2.6. Paquet(s) : nfs-kernel-server.",
+      "audit_procedure": "Executer : ! dpkg -s nfs-kernel-server 2>/dev/null | grep -q '^Status: install ok installed' && echo ABSENT || echo PRESENT",
+      "remediation_path": "apt purge nfs-kernel-server",
+      "default_value": "Non installe par defaut sur une installation minimale.",
+      "references": [
+        "https://ubuntu.com/security"
+      ],
+      "cis_controls": [
+        "CIS Controls v8 4.8 Uninstall or Disable Unnecessary Services on Enterprise Assets and Software"
+      ],
+      "check": {
+        "type": "equals",
+        "command": "! dpkg -s nfs-kernel-server 2>/dev/null | grep -q '^Status: install ok installed' && echo ABSENT || echo PRESENT",
+        "expected": "ABSENT"
+      },
+      "recommendation": "Executer : apt purge nfs-kernel-server"
+    },
+    {
+      "id": "CIS-UBU-3.3.1",
+      "cis_rule": "3.3.1",
+      "profile": "Level 1 - Server, Level 1 - Workstation",
+      "category": "Paramètres kernel réseau (anti-spoofing, redirections ICMP)",
+      "title": "Le transfert de paquets IPv4 est désactivé",
+      "severity": "high",
+      "description": "Vérifie que net.ipv4.ip_forward est réglé sur 0, empêchant le système d'agir comme routeur.",
+      "rationale": "Un système faisant office de routeur non intentionnel pourrait être utilisé pour contourner des contrôles réseau ou faciliter un mouvement latéral.",
+      "audit_reference": "CIS Ubuntu Linux 20.04 LTS STIG Benchmark v2.0.0, section 3.3.1. Parametre noyau : net.ipv4.ip_forward.",
+      "audit_procedure": "Executer : sysctl -n net.ipv4.ip_forward",
+      "remediation_path": "/etc/sysctl.d/60-netipv4_sysctl.conf (ou 60-netipv6_sysctl.conf)",
+      "default_value": "Voir description du benchmark CIS.",
+      "references": [
+        "https://man7.org/linux/man-pages/man8/sysctl.8.html"
+      ],
+      "cis_controls": [
+        "CIS Controls v8 4.1 Establish and Maintain a Secure Configuration Process"
+      ],
+      "check": {
+        "type": "equals",
+        "command": "sysctl -n net.ipv4.ip_forward 2>/dev/null",
+        "expected": "0"
+      },
+      "recommendation": "Definir 'net.ipv4.ip_forward = 0' dans un fichier de /etc/sysctl.d/ puis executer : sysctl -w net.ipv4.ip_forward=0 && sysctl -w net.ipv4.route.flush=1"
+    },
+    {
+      "id": "CIS-UBU-3.3.5",
+      "cis_rule": "3.3.5",
+      "profile": "Level 1 - Server, Level 1 - Workstation",
+      "category": "Paramètres kernel réseau (anti-spoofing, redirections ICMP)",
+      "title": "Les redirections ICMP ne sont pas acceptées (IPv4)",
+      "severity": "high",
+      "description": "Vérifie que net.ipv4.conf.all.accept_redirects est réglé sur 0.",
+      "rationale": "Accepter des redirections ICMP permettrait à un attaquant réseau de modifier la table de routage du système à distance (attaque de l'homme du milieu).",
+      "audit_reference": "CIS Ubuntu Linux 20.04 LTS STIG Benchmark v2.0.0, section 3.3.5. Parametre noyau : net.ipv4.conf.all.accept_redirects.",
+      "audit_procedure": "Executer : sysctl -n net.ipv4.conf.all.accept_redirects",
+      "remediation_path": "/etc/sysctl.d/60-netipv4_sysctl.conf (ou 60-netipv6_sysctl.conf)",
+      "default_value": "Voir description du benchmark CIS.",
+      "references": [
+        "https://man7.org/linux/man-pages/man8/sysctl.8.html"
+      ],
+      "cis_controls": [
+        "CIS Controls v8 4.1 Establish and Maintain a Secure Configuration Process"
+      ],
+      "check": {
+        "type": "equals",
+        "command": "sysctl -n net.ipv4.conf.all.accept_redirects 2>/dev/null",
+        "expected": "0"
+      },
+      "recommendation": "Definir 'net.ipv4.conf.all.accept_redirects = 0' dans un fichier de /etc/sysctl.d/ puis executer : sysctl -w net.ipv4.conf.all.accept_redirects=0 && sysctl -w net.ipv4.route.flush=1"
+    },
+    {
+      "id": "CIS-UBU-3.3.7",
+      "cis_rule": "3.3.7",
+      "profile": "Level 1 - Server, Level 1 - Workstation",
+      "category": "Paramètres kernel réseau (anti-spoofing, redirections ICMP)",
+      "title": "Le filtrage par chemin inverse (reverse path filtering) est activé",
+      "severity": "high",
+      "description": "Vérifie que net.ipv4.conf.all.rp_filter est réglé sur 1 (mode strict).",
+      "rationale": "Le filtrage par chemin inverse rejette les paquets dont l'adresse source ne correspond à aucune route connue, une protection efficace contre l'usurpation d'adresse IP (spoofing).",
+      "audit_reference": "CIS Ubuntu Linux 20.04 LTS STIG Benchmark v2.0.0, section 3.3.7. Parametre noyau : net.ipv4.conf.all.rp_filter.",
+      "audit_procedure": "Executer : sysctl -n net.ipv4.conf.all.rp_filter",
+      "remediation_path": "/etc/sysctl.d/60-netipv4_sysctl.conf (ou 60-netipv6_sysctl.conf)",
+      "default_value": "Voir description du benchmark CIS.",
+      "references": [
+        "https://man7.org/linux/man-pages/man8/sysctl.8.html"
+      ],
+      "cis_controls": [
+        "CIS Controls v8 4.1 Establish and Maintain a Secure Configuration Process"
+      ],
+      "check": {
+        "type": "equals",
+        "command": "sysctl -n net.ipv4.conf.all.rp_filter 2>/dev/null",
+        "expected": "1"
+      },
+      "recommendation": "Definir 'net.ipv4.conf.all.rp_filter = 1' dans un fichier de /etc/sysctl.d/ puis executer : sysctl -w net.ipv4.conf.all.rp_filter=1 && sysctl -w net.ipv4.route.flush=1"
+    },
+    {
+      "id": "CIS-UBU-3.3.8",
+      "cis_rule": "3.3.8",
+      "profile": "Level 1 - Server, Level 1 - Workstation",
+      "category": "Paramètres kernel réseau (anti-spoofing, redirections ICMP)",
+      "title": "Les cookies SYN TCP sont activés",
+      "severity": "high",
+      "description": "Vérifie que net.ipv4.tcp_syncookies est réglé sur 1.",
+      "rationale": "Les cookies SYN protègent contre les attaques par inondation SYN (SYN flood), une forme classique de déni de service contre la pile TCP.",
+      "audit_reference": "CIS Ubuntu Linux 20.04 LTS STIG Benchmark v2.0.0, section 3.3.8. Parametre noyau : net.ipv4.tcp_syncookies.",
+      "audit_procedure": "Executer : sysctl -n net.ipv4.tcp_syncookies",
+      "remediation_path": "/etc/sysctl.d/60-netipv4_sysctl.conf (ou 60-netipv6_sysctl.conf)",
+      "default_value": "Voir description du benchmark CIS.",
+      "references": [
+        "https://man7.org/linux/man-pages/man8/sysctl.8.html"
+      ],
+      "cis_controls": [
+        "CIS Controls v8 4.1 Establish and Maintain a Secure Configuration Process"
+      ],
+      "check": {
+        "type": "equals",
+        "command": "sysctl -n net.ipv4.tcp_syncookies 2>/dev/null",
+        "expected": "1"
+      },
+      "recommendation": "Definir 'net.ipv4.tcp_syncookies = 1' dans un fichier de /etc/sysctl.d/ puis executer : sysctl -w net.ipv4.tcp_syncookies=1 && sysctl -w net.ipv4.route.flush=1"
+    },
+    {
+      "id": "CIS-UBU-3.3.9",
+      "cis_rule": "3.3.9",
+      "profile": "Level 1 - Server, Level 1 - Workstation",
+      "category": "Paramètres kernel réseau (anti-spoofing, redirections ICMP)",
+      "title": "Les paquets à routage source ne sont pas acceptés (IPv4)",
+      "severity": "high",
+      "description": "Vérifie que net.ipv4.conf.all.accept_source_route est réglé sur 0.",
+      "rationale": "Le routage source permet à l'émetteur de spécifier le chemin réseau d'un paquet, une fonctionnalité historiquement exploitée pour contourner des contrôles de sécurité réseau et usurper une identité.",
+      "audit_reference": "CIS Ubuntu Linux 20.04 LTS STIG Benchmark v2.0.0, section 3.3.9. Parametre noyau : net.ipv4.conf.all.accept_source_route.",
+      "audit_procedure": "Executer : sysctl -n net.ipv4.conf.all.accept_source_route",
+      "remediation_path": "/etc/sysctl.d/60-netipv4_sysctl.conf (ou 60-netipv6_sysctl.conf)",
+      "default_value": "Voir description du benchmark CIS.",
+      "references": [
+        "https://man7.org/linux/man-pages/man8/sysctl.8.html"
+      ],
+      "cis_controls": [
+        "CIS Controls v8 4.1 Establish and Maintain a Secure Configuration Process"
+      ],
+      "check": {
+        "type": "equals",
+        "command": "sysctl -n net.ipv4.conf.all.accept_source_route 2>/dev/null",
+        "expected": "0"
+      },
+      "recommendation": "Definir 'net.ipv4.conf.all.accept_source_route = 0' dans un fichier de /etc/sysctl.d/ puis executer : sysctl -w net.ipv4.conf.all.accept_source_route=0 && sysctl -w net.ipv4.route.flush=1"
+    },
+    {
+      "id": "CIS-UBU-1.2.4",
+      "cis_rule": "1.2.4",
+      "profile": "Level 1 - Server, Level 1 - Workstation",
+      "category": "Intégrité système et démarrage sécurisé",
+      "title": "APT interdit l'installation de paquets sans signature numérique vérifiée",
+      "severity": "high",
+      "description": "Vérifie qu'aucun fichier de configuration APT ne règle 'AllowUnauthenticated' à 'true'.",
+      "rationale": "Sans vérification de signature, un paquet altéré ou provenant d'un dépôt compromis pourrait être installé sans détection, un vecteur direct de compromission de la chaîne d'approvisionnement logicielle.",
+      "audit_reference": "CIS Ubuntu Linux 20.04 LTS STIG Benchmark v2.0.0, section 1.2.4.",
+      "audit_procedure": "Executer : grep -rh AllowUnauthenticated /etc/apt/apt.conf.d/ 2>/dev/null | grep -i true || true",
+      "remediation_path": "/etc/apt/apt.conf.d/, /boot/grub/grub.cfg, /etc/shadow",
+      "default_value": "Voir description du benchmark CIS.",
+      "references": [
+        "https://help.ubuntu.com/community/Grub2/Passwords"
+      ],
+      "cis_controls": [
+        "CIS Controls v8 4.1 Establish and Maintain a Secure Configuration Process"
+      ],
+      "check": {
+        "type": "equals",
+        "command": "grep -rh AllowUnauthenticated /etc/apt/apt.conf.d/ 2>/dev/null | grep -i true || true",
+        "expected": ""
+      },
+      "recommendation": "Configurer le parametre correspondant a la section 1.2.4 (voir description)."
+    },
+    {
+      "id": "CIS-UBU-1.3.1",
+      "cis_rule": "1.3.1",
+      "profile": "Level 1 - Server, Level 1 - Workstation",
+      "category": "Intégrité système et démarrage sécurisé",
+      "title": "Un mot de passe du chargeur de démarrage (GRUB) est configuré",
+      "severity": "high",
+      "description": "Vérifie que grub.cfg définit un superutilisateur et un mot de passe (password_pbkdf2) pour protéger l'édition des paramètres de démarrage.",
+      "rationale": "Sans mot de passe GRUB, un attaquant ayant un accès physique pourrait modifier les paramètres de démarrage (ex. désactiver AppArmor, obtenir un shell root) sans authentification.",
+      "audit_reference": "CIS Ubuntu Linux 20.04 LTS STIG Benchmark v2.0.0, section 1.3.1. Necessite les privileges root pour lire /boot/grub/grub.cfg (mode 0600 recommande par la regle 1.3.2).",
+      "audit_procedure": "Executer : grep -q '^set superusers=' /boot/grub/grub.cfg 2>/dev/null && grep -q '^password' /boot/grub/grub.cfg 2>/dev/null && echo OK || echo BAD",
+      "remediation_path": "/etc/apt/apt.conf.d/, /boot/grub/grub.cfg, /etc/shadow",
+      "default_value": "Voir description du benchmark CIS.",
+      "references": [
+        "https://help.ubuntu.com/community/Grub2/Passwords"
+      ],
+      "cis_controls": [
+        "CIS Controls v8 4.1 Establish and Maintain a Secure Configuration Process"
+      ],
+      "check": {
+        "type": "equals",
+        "command": "grep -q '^set superusers=' /boot/grub/grub.cfg 2>/dev/null && grep -q '^password' /boot/grub/grub.cfg 2>/dev/null && echo OK || echo BAD",
+        "expected": "OK"
+      },
+      "recommendation": "Configurer le parametre correspondant a la section 1.3.1 (voir description)."
+    },
+    {
+      "id": "CIS-UBU-1.3.3",
+      "cis_rule": "1.3.3",
+      "profile": "Level 1 - Server, Level 1 - Workstation",
+      "category": "Intégrité système et démarrage sécurisé",
+      "title": "Une authentification est requise pour le mode mono-utilisateur",
+      "severity": "high",
+      "description": "Vérifie que le compte root dispose d'un mot de passe haché valide dans /etc/shadow, condition nécessaire pour exiger une authentification en mode recovery/single-user.",
+      "rationale": "Sans mot de passe root défini, un utilisateur ayant un accès physique pourrait redémarrer en mode mono-utilisateur et obtenir un accès root sans identifiants.",
+      "audit_reference": "CIS Ubuntu Linux 20.04 LTS STIG Benchmark v2.0.0, section 1.3.3. Necessite les privileges root pour lire /etc/shadow.",
+      "audit_procedure": "Executer : grep -Eq '^root:\\$[0-9]' /etc/shadow 2>/dev/null && echo OK || echo BAD",
+      "remediation_path": "/etc/apt/apt.conf.d/, /boot/grub/grub.cfg, /etc/shadow",
+      "default_value": "Voir description du benchmark CIS.",
+      "references": [
+        "https://help.ubuntu.com/community/Grub2/Passwords"
+      ],
+      "cis_controls": [
+        "CIS Controls v8 4.1 Establish and Maintain a Secure Configuration Process"
+      ],
+      "check": {
+        "type": "equals",
+        "command": "grep -Eq '^root:\\$[0-9]' /etc/shadow 2>/dev/null && echo OK || echo BAD",
+        "expected": "OK"
+      },
+      "recommendation": "Configurer le parametre correspondant a la section 1.3.3 (voir description)."
+    },
+    {
+      "id": "CIS-UBU-5.3.1",
+      "cis_rule": "5.3.1",
+      "profile": "Level 1 - Server, Level 1 - Workstation",
+      "category": "Intégrité système et démarrage sécurisé",
+      "title": "AIDE est installé",
+      "severity": "high",
+      "description": "Vérifie que les paquets aide et aide-common sont installés.",
+      "rationale": "AIDE prend un instantané de l'état du système de fichiers (hachages, permissions, dates) permettant de détecter toute modification non autorisée, y compris le remplacement de binaires système.",
+      "audit_reference": "CIS Ubuntu Linux 20.04 LTS STIG Benchmark v2.0.0, section 5.3.1.",
+      "audit_procedure": "Executer : dpkg -s aide >/dev/null 2>&1 && dpkg -s aide-common >/dev/null 2>&1 && echo INSTALLED || echo ABSENT",
+      "remediation_path": "/etc/aide/aide.conf, /etc/default/aide, crontab",
+      "default_value": "Voir description du benchmark CIS.",
+      "references": [
+        "https://aide.github.io/"
+      ],
+      "cis_controls": [
+        "CIS Controls v8 8.5 Collect Detailed Audit Logs"
+      ],
+      "check": {
+        "type": "equals",
+        "command": "dpkg -s aide >/dev/null 2>&1 && dpkg -s aide-common >/dev/null 2>&1 && echo INSTALLED || echo ABSENT",
+        "expected": "INSTALLED"
+      },
+      "recommendation": "Configurer le parametre correspondant a la section 5.3.1 (voir description)."
+    },
+    {
+      "id": "CIS-UBU-1.3.2",
+      "cis_rule": "1.3.2",
+      "profile": "Level 1 - Server, Level 1 - Workstation",
+      "category": "Intégrité système et démarrage sécurisé",
+      "title": "Les permissions sur la configuration du chargeur de démarrage sont correctement configurées",
+      "severity": "medium",
+      "description": "Vérifie que /boot/grub/grub.cfg est en mode 0600 ou plus restrictif, appartenant à root:root.",
+      "rationale": "Un utilisateur non privilégié pouvant lire ce fichier pourrait découvrir le mot de passe haché de GRUB ou identifier des faiblesses de configuration de démarrage à exploiter.",
+      "audit_reference": "CIS Ubuntu Linux 20.04 LTS STIG Benchmark v2.0.0, section 1.3.2.",
+      "audit_procedure": "Executer : stat -c '%a %U %G' /boot/grub/grub.cfg 2>/dev/null",
+      "remediation_path": "/etc/apt/apt.conf.d/, /boot/grub/grub.cfg, /etc/shadow",
+      "default_value": "Voir description du benchmark CIS.",
+      "references": [
+        "https://help.ubuntu.com/community/Grub2/Passwords"
+      ],
+      "cis_controls": [
+        "CIS Controls v8 4.1 Establish and Maintain a Secure Configuration Process"
+      ],
+      "check": {
+        "type": "regex",
+        "command": "stat -c '%a %U %G' /boot/grub/grub.cfg 2>/dev/null",
+        "expected": "^[0-6]00 root root$"
+      },
+      "recommendation": "Configurer le parametre correspondant a la section 1.3.2 (voir description)."
+    },
+    {
+      "id": "CIS-UBU-2.1.1.1",
+      "cis_rule": "2.1.1.1",
+      "profile": "Level 1 - Server, Level 1 - Workstation",
+      "category": "Synchronisation temporelle",
+      "title": "Un seul démon de synchronisation temporelle est utilisé",
+      "severity": "medium",
+      "description": "Vérifie qu'exactement un des trois démons de synchronisation (chrony, ntp, systemd-timesyncd) est actif.",
+      "rationale": "Plusieurs démons de synchronisation actifs simultanément peuvent entrer en conflit et provoquer une dérive ou une instabilité de l'horloge système.",
+      "audit_reference": "CIS Ubuntu Linux 20.04 LTS STIG Benchmark v2.0.0, section 2.1.1.1.",
+      "audit_procedure": "Executer : n=0; systemctl is-active chrony >/dev/null 2>&1 && n=$((n+1)); systemctl is-active ntp >/dev/null 2>&1 && n=$((n+1)); systemctl is-active systemd-timesyncd >/dev/null 2>&1 && n=$((n+1)); echo $n",
+      "remediation_path": "/etc/chrony/chrony.conf, /etc/ntp.conf, /etc/systemd/timesyncd.conf",
+      "default_value": "Voir description du benchmark CIS.",
+      "references": [
+        "https://chrony-project.org/documentation.html"
+      ],
+      "cis_controls": [
+        "CIS Controls v8 8.4 Standardize Time Synchronization"
+      ],
+      "check": {
+        "type": "equals",
+        "command": "n=0; systemctl is-active chrony >/dev/null 2>&1 && n=$((n+1)); systemctl is-active ntp >/dev/null 2>&1 && n=$((n+1)); systemctl is-active systemd-timesyncd >/dev/null 2>&1 && n=$((n+1)); echo $n",
+        "expected": "1"
+      },
+      "recommendation": "Configurer le parametre correspondant a la section 2.1.1.1 (voir description)."
+    },
+    {
+      "id": "CIS-UBU-2.1.2.2",
+      "cis_rule": "2.1.2.2",
+      "profile": "Level 1 - Server, Level 1 - Workstation",
+      "category": "Synchronisation temporelle",
+      "title": "chrony s'exécute avec l'utilisateur _chrony",
+      "severity": "medium",
+      "description": "Si chrony est utilisé, vérifie que le processus chronyd s'exécute sous le compte système dédié _chrony et non root.",
+      "rationale": "Exécuter le démon de synchronisation avec un compte non privilégié dédié limite l'impact d'une éventuelle compromission du service.",
+      "audit_reference": "CIS Ubuntu Linux 20.04 LTS STIG Benchmark v2.0.0, section 2.1.2.2. Regle conditionnelle : conforme (OK) si chrony n'est pas utilise sur le systeme.",
+      "audit_procedure": "Executer : if pgrep chronyd >/dev/null 2>&1; then ps -ef | awk '(/[c]hronyd/ && $1!=\"_chrony\"){f=1} END{exit !f}' && echo BAD || echo OK; else echo OK; fi",
+      "remediation_path": "/etc/chrony/chrony.conf, /etc/ntp.conf, /etc/systemd/timesyncd.conf",
+      "default_value": "Voir description du benchmark CIS.",
+      "references": [
+        "https://chrony-project.org/documentation.html"
+      ],
+      "cis_controls": [
+        "CIS Controls v8 8.4 Standardize Time Synchronization"
+      ],
+      "check": {
+        "type": "equals",
+        "command": "if pgrep chronyd >/dev/null 2>&1; then ps -ef | awk '(/[c]hronyd/ && $1!=\"_chrony\"){f=1} END{exit !f}' && echo BAD || echo OK; else echo OK; fi",
+        "expected": "OK"
+      },
+      "recommendation": "Configurer le parametre correspondant a la section 2.1.2.2 (voir description)."
+    },
+    {
+      "id": "CIS-UBU-2.1.2.3",
+      "cis_rule": "2.1.2.3",
+      "profile": "Level 1 - Server, Level 1 - Workstation",
+      "category": "Synchronisation temporelle",
+      "title": "chrony est activé et actif",
+      "severity": "medium",
+      "description": "Si chrony est installé, vérifie que le service est activé au démarrage et actuellement actif.",
+      "rationale": "Sans synchronisation temporelle active, l'horloge système dérive progressivement, compromettant la fiabilité des horodatages utilisés pour l'analyse forensique et la corrélation d'événements.",
+      "audit_reference": "CIS Ubuntu Linux 20.04 LTS STIG Benchmark v2.0.0, section 2.1.2.3. Regle conditionnelle : conforme (OK) si chrony n'est pas installe sur le systeme.",
+      "audit_procedure": "Executer : if dpkg -s chrony >/dev/null 2>&1; then [ \"$(systemctl is-enabled chrony 2>/dev/null)\" = enabled ] && [ \"$(systemctl is-active chrony 2>/dev/null)\" = active ] && echo OK || echo BAD; else echo OK; fi",
+      "remediation_path": "/etc/chrony/chrony.conf, /etc/ntp.conf, /etc/systemd/timesyncd.conf",
+      "default_value": "Voir description du benchmark CIS.",
+      "references": [
+        "https://chrony-project.org/documentation.html"
+      ],
+      "cis_controls": [
+        "CIS Controls v8 8.4 Standardize Time Synchronization"
+      ],
+      "check": {
+        "type": "equals",
+        "command": "if dpkg -s chrony >/dev/null 2>&1; then [ \"$(systemctl is-enabled chrony 2>/dev/null)\" = enabled ] && [ \"$(systemctl is-active chrony 2>/dev/null)\" = active ] && echo OK || echo BAD; else echo OK; fi",
+        "expected": "OK"
+      },
+      "recommendation": "Configurer le parametre correspondant a la section 2.1.2.3 (voir description)."
+    },
+    {
+      "id": "CIS-UBU-2.1.3.1",
+      "cis_rule": "2.1.3.1",
+      "profile": "Level 1 - Server, Level 1 - Workstation",
+      "category": "Synchronisation temporelle",
+      "title": "systemd-timesyncd est configuré avec un serveur de temps autorisé",
+      "severity": "medium",
+      "description": "Si systemd-timesyncd est utilisé, vérifie qu'un serveur NTP ou de secours (NTP=/FallbackNTP=) est configuré dans timesyncd.conf.",
+      "rationale": "Sans serveur de temps configuré explicitement, le système peut se synchroniser sur une source non maîtrisée par l'organisation.",
+      "audit_reference": "CIS Ubuntu Linux 20.04 LTS STIG Benchmark v2.0.0, section 2.1.3.1. Regle conditionnelle : conforme (OK) si systemd-timesyncd n'est pas utilise sur le systeme.",
+      "audit_procedure": "Executer : if systemctl is-enabled systemd-timesyncd 2>/dev/null | grep -qE '^(enabled|static)'; then grep -Pqh '^\\s*(NTP|FallbackNTP)=\\S+' /etc/systemd/timesyncd.conf 2>/dev/null && echo OK || echo BAD; else echo OK; fi",
+      "remediation_path": "/etc/chrony/chrony.conf, /etc/ntp.conf, /etc/systemd/timesyncd.conf",
+      "default_value": "Voir description du benchmark CIS.",
+      "references": [
+        "https://chrony-project.org/documentation.html"
+      ],
+      "cis_controls": [
+        "CIS Controls v8 8.4 Standardize Time Synchronization"
+      ],
+      "check": {
+        "type": "equals",
+        "command": "if systemctl is-enabled systemd-timesyncd 2>/dev/null | grep -qE '^(enabled|static)'; then grep -Pqh '^\\s*(NTP|FallbackNTP)=\\S+' /etc/systemd/timesyncd.conf 2>/dev/null && echo OK || echo BAD; else echo OK; fi",
+        "expected": "OK"
+      },
+      "recommendation": "Configurer le parametre correspondant a la section 2.1.3.1 (voir description)."
+    },
+    {
+      "id": "CIS-UBU-2.1.4.1",
+      "cis_rule": "2.1.4.1",
+      "profile": "Level 1 - Server, Level 1 - Workstation",
+      "category": "Synchronisation temporelle",
+      "title": "Le contrôle d'accès NTP est configuré",
+      "severity": "medium",
+      "description": "Si ntp est utilisé, vérifie que des directives 'restrict default' incluant 'noquery' limitent les actions autorisées aux clients NTP distants.",
+      "rationale": "Sans restriction, un serveur NTP local pourrait être interrogé ou reconfiguré à distance par un tiers non autorisé.",
+      "audit_reference": "CIS Ubuntu Linux 20.04 LTS STIG Benchmark v2.0.0, section 2.1.4.1. Regle conditionnelle : conforme (OK) si le paquet ntp n'est pas installe sur le systeme.",
+      "audit_procedure": "Executer : if dpkg -s ntp >/dev/null 2>&1; then grep -Pq '^\\s*restrict\\s+.*default.*noquery' /etc/ntp.conf 2>/dev/null && echo OK || echo BAD; else echo OK; fi",
+      "remediation_path": "/etc/chrony/chrony.conf, /etc/ntp.conf, /etc/systemd/timesyncd.conf",
+      "default_value": "Voir description du benchmark CIS.",
+      "references": [
+        "https://chrony-project.org/documentation.html"
+      ],
+      "cis_controls": [
+        "CIS Controls v8 8.4 Standardize Time Synchronization"
+      ],
+      "check": {
+        "type": "equals",
+        "command": "if dpkg -s ntp >/dev/null 2>&1; then grep -Pq '^\\s*restrict\\s+.*default.*noquery' /etc/ntp.conf 2>/dev/null && echo OK || echo BAD; else echo OK; fi",
+        "expected": "OK"
+      },
+      "recommendation": "Configurer le parametre correspondant a la section 2.1.4.1 (voir description)."
+    },
+    {
+      "id": "CIS-UBU-5.1.1.2",
+      "cis_rule": "5.1.1.2",
+      "profile": "Level 1 - Server, Level 1 - Workstation",
+      "category": "Journalisation (journald / rsyslog)",
+      "title": "Le service journald est activé",
+      "severity": "high",
+      "description": "Vérifie que systemd-journald.service est à l'état 'static' (référencé par d'autres unités, toujours actif).",
+      "rationale": "Sans journald actif, les événements systèmes ne sont pas capturés du tout, empêchant toute détection ou investigation ultérieure.",
+      "audit_reference": "CIS Ubuntu Linux 20.04 LTS STIG Benchmark v2.0.0, section 5.1.1.2.",
+      "audit_procedure": "Executer : systemctl is-enabled systemd-journald.service 2>/dev/null",
+      "remediation_path": "/etc/systemd/journald.conf, /etc/rsyslog.conf, /var/log",
+      "default_value": "Voir description du benchmark CIS.",
+      "references": [
+        "https://www.freedesktop.org/software/systemd/man/journald.conf.html"
+      ],
+      "cis_controls": [
+        "CIS Controls v8 8.2 Collect Audit Logs"
+      ],
+      "check": {
+        "type": "equals",
+        "command": "systemctl is-enabled systemd-journald.service 2>/dev/null",
+        "expected": "static"
+      },
+      "recommendation": "Configurer le parametre correspondant a la section 5.1.1.2 (voir description)."
+    },
+    {
+      "id": "CIS-UBU-5.1.1.4",
+      "cis_rule": "5.1.1.4",
+      "profile": "Level 1 - Server, Level 1 - Workstation",
+      "category": "Journalisation (journald / rsyslog)",
+      "title": "journald est configuré pour écrire les journaux sur disque persistant",
+      "severity": "high",
+      "description": "Vérifie que Storage=persistent est configuré dans journald.conf.",
+      "rationale": "Sans persistance, les journaux stockés en mémoire volatile sont perdus à chaque redémarrage, empêchant toute reconstruction forensique après un incident ou un crash.",
+      "audit_reference": "CIS Ubuntu Linux 20.04 LTS STIG Benchmark v2.0.0, section 5.1.1.4.",
+      "audit_procedure": "Executer : grep -Psi '^\\s*Storage\\s*=\\s*persistent\\b' /etc/systemd/journald.conf /etc/systemd/journald.conf.d/* 2>/dev/null || true",
+      "remediation_path": "/etc/systemd/journald.conf, /etc/rsyslog.conf, /var/log",
+      "default_value": "Voir description du benchmark CIS.",
+      "references": [
+        "https://www.freedesktop.org/software/systemd/man/journald.conf.html"
+      ],
+      "cis_controls": [
+        "CIS Controls v8 8.2 Collect Audit Logs"
+      ],
+      "check": {
+        "type": "contains",
+        "command": "grep -Psi '^\\s*Storage\\s*=\\s*persistent\\b' /etc/systemd/journald.conf /etc/systemd/journald.conf.d/* 2>/dev/null || true",
+        "expected": "persistent"
+      },
+      "recommendation": "Configurer le parametre correspondant a la section 5.1.1.4 (voir description)."
+    },
+    {
+      "id": "CIS-UBU-5.1.2.1",
+      "cis_rule": "5.1.2.1",
+      "profile": "Level 1 - Server, Level 1 - Workstation",
+      "category": "Journalisation (journald / rsyslog)",
+      "title": "rsyslog est installé",
+      "severity": "high",
+      "description": "Vérifie que le paquet rsyslog est installé.",
+      "rationale": "rsyslog apporte des fonctionnalités de sécurité (transmission chiffrée, format base de données) absentes du démon syslogd historique.",
+      "audit_reference": "CIS Ubuntu Linux 20.04 LTS STIG Benchmark v2.0.0, section 5.1.2.1.",
+      "audit_procedure": "Executer : dpkg -s rsyslog 2>/dev/null | grep -q '^Status: install ok installed' && echo INSTALLED || echo ABSENT",
+      "remediation_path": "/etc/systemd/journald.conf, /etc/rsyslog.conf, /var/log",
+      "default_value": "Voir description du benchmark CIS.",
+      "references": [
+        "https://www.freedesktop.org/software/systemd/man/journald.conf.html"
+      ],
+      "cis_controls": [
+        "CIS Controls v8 8.2 Collect Audit Logs"
+      ],
+      "check": {
+        "type": "equals",
+        "command": "dpkg -s rsyslog 2>/dev/null | grep -q '^Status: install ok installed' && echo INSTALLED || echo ABSENT",
+        "expected": "INSTALLED"
+      },
+      "recommendation": "Configurer le parametre correspondant a la section 5.1.2.1 (voir description)."
+    },
+    {
+      "id": "CIS-UBU-5.1.2.2",
+      "cis_rule": "5.1.2.2",
+      "profile": "Level 1 - Server, Level 1 - Workstation",
+      "category": "Journalisation (journald / rsyslog)",
+      "title": "Le service rsyslog est activé",
+      "severity": "high",
+      "description": "Vérifie que le service rsyslog est activé au démarrage.",
+      "rationale": "Sans rsyslog actif au démarrage, les événements système générés avant l'intervention manuelle ne sont pas capturés.",
+      "audit_reference": "CIS Ubuntu Linux 20.04 LTS STIG Benchmark v2.0.0, section 5.1.2.2.",
+      "audit_procedure": "Executer : systemctl is-enabled rsyslog 2>/dev/null",
+      "remediation_path": "/etc/systemd/journald.conf, /etc/rsyslog.conf, /var/log",
+      "default_value": "Voir description du benchmark CIS.",
+      "references": [
+        "https://www.freedesktop.org/software/systemd/man/journald.conf.html"
+      ],
+      "cis_controls": [
+        "CIS Controls v8 8.2 Collect Audit Logs"
+      ],
+      "check": {
+        "type": "equals",
+        "command": "systemctl is-enabled rsyslog 2>/dev/null",
+        "expected": "enabled"
+      },
+      "recommendation": "Configurer le parametre correspondant a la section 5.1.2.2 (voir description)."
+    },
+    {
+      "id": "CIS-UBU-5.1.1.1.4",
+      "cis_rule": "5.1.1.1.4",
+      "profile": "Level 1 - Server, Level 1 - Workstation",
+      "category": "Journalisation (journald / rsyslog)",
+      "title": "journald n'est pas configuré pour recevoir des journaux d'un client distant",
+      "severity": "medium",
+      "description": "Vérifie que systemd-journal-remote.socket est désactivé, empêchant ce système d'agir comme serveur de collecte de journaux.",
+      "rationale": "Un poste client acceptant des journaux distants agit en dehors de son périmètre opérationnel prévu et expose un service réseau supplémentaire.",
+      "audit_reference": "CIS Ubuntu Linux 20.04 LTS STIG Benchmark v2.0.0, section 5.1.1.1.4.",
+      "audit_procedure": "Executer : systemctl is-enabled systemd-journal-remote.socket 2>/dev/null",
+      "remediation_path": "/etc/systemd/journald.conf, /etc/rsyslog.conf, /var/log",
+      "default_value": "Voir description du benchmark CIS.",
+      "references": [
+        "https://www.freedesktop.org/software/systemd/man/journald.conf.html"
+      ],
+      "cis_controls": [
+        "CIS Controls v8 8.2 Collect Audit Logs"
+      ],
+      "check": {
+        "type": "equals",
+        "command": "systemctl is-enabled systemd-journal-remote.socket 2>/dev/null",
+        "expected": "disabled"
+      },
+      "recommendation": "Configurer le parametre correspondant a la section 5.1.1.1.4 (voir description)."
+    },
+    {
+      "id": "CIS-UBU-5.2.1.1",
+      "cis_rule": "5.2.1.1",
+      "profile": "Level 2 - Server, Level 2 - Workstation",
+      "category": "auditd — activation et rétention des journaux d'audit",
+      "title": "auditd est installé",
+      "severity": "high",
+      "description": "Vérifie que le paquet auditd, composant utilisateur du système d'audit Linux, est installé.",
+      "rationale": "Sans auditd, aucun événement système détaillé (appels privilégiés, modifications de fichiers sensibles, authentification) n'est capturé sur disque.",
+      "audit_reference": "CIS Ubuntu Linux 20.04 LTS STIG Benchmark v2.0.0, section 5.2.1.1.",
+      "audit_procedure": "Executer : dpkg -s auditd 2>/dev/null | grep -q '^Status: install ok installed' && echo INSTALLED || echo ABSENT",
+      "remediation_path": "/etc/audit/auditd.conf, /etc/default/grub",
+      "default_value": "Voir description du benchmark CIS.",
+      "references": [
+        "https://linux.die.net/man/8/auditd"
+      ],
+      "cis_controls": [
+        "CIS Controls v8 8.2 Collect Audit Logs"
+      ],
+      "check": {
+        "type": "equals",
+        "command": "dpkg -s auditd 2>/dev/null | grep -q '^Status: install ok installed' && echo INSTALLED || echo ABSENT",
+        "expected": "INSTALLED"
+      },
+      "recommendation": "Configurer le parametre correspondant a la section 5.2.1.1 (voir description)."
+    },
+    {
+      "id": "CIS-UBU-5.2.1.2",
+      "cis_rule": "5.2.1.2",
+      "profile": "Level 2 - Server, Level 2 - Workstation",
+      "category": "auditd — activation et rétention des journaux d'audit",
+      "title": "Le service auditd est activé et actif",
+      "severity": "high",
+      "description": "Vérifie que le service auditd est activé au démarrage et actuellement actif.",
+      "rationale": "Sans auditd actif, le système ne capture aucun événement d'audit, empêchant la détection d'accès non autorisés.",
+      "audit_reference": "CIS Ubuntu Linux 20.04 LTS STIG Benchmark v2.0.0, section 5.2.1.2.",
+      "audit_procedure": "Executer : [ \"$(systemctl is-enabled auditd 2>/dev/null)\" = enabled ] && [ \"$(systemctl is-active auditd 2>/dev/null)\" = active ] && echo OK || echo BAD",
+      "remediation_path": "/etc/audit/auditd.conf, /etc/default/grub",
+      "default_value": "Voir description du benchmark CIS.",
+      "references": [
+        "https://linux.die.net/man/8/auditd"
+      ],
+      "cis_controls": [
+        "CIS Controls v8 8.2 Collect Audit Logs"
+      ],
+      "check": {
+        "type": "equals",
+        "command": "[ \"$(systemctl is-enabled auditd 2>/dev/null)\" = enabled ] && [ \"$(systemctl is-active auditd 2>/dev/null)\" = active ] && echo OK || echo BAD",
+        "expected": "OK"
+      },
+      "recommendation": "Configurer le parametre correspondant a la section 5.2.1.2 (voir description)."
+    },
+    {
+      "id": "CIS-UBU-5.2.1.3",
+      "cis_rule": "5.2.1.3",
+      "profile": "Level 2 - Server, Level 2 - Workstation",
+      "category": "auditd — activation et rétention des journaux d'audit",
+      "title": "L'audit des processus démarrant avant auditd est activé",
+      "severity": "medium",
+      "description": "Vérifie que le paramètre noyau audit=1 est présent dans la configuration GRUB, permettant d'auditer les processus démarrant avant auditd.",
+      "rationale": "Sans ce paramètre, les processus démarrés très tôt au boot (avant le lancement d'auditd) échappent totalement à la journalisation d'audit, créant un angle mort pour une activité malveillante précoce.",
+      "audit_reference": "CIS Ubuntu Linux 20.04 LTS STIG Benchmark v2.0.0, section 5.2.1.3.",
+      "audit_procedure": "Executer : find -L /boot -type f -name 'grub.cfg' -exec grep -Ph -- '^\\s*linux\\b' {} + 2>/dev/null | grep -v 'audit=1' || true",
+      "remediation_path": "/etc/audit/auditd.conf, /etc/default/grub",
+      "default_value": "Voir description du benchmark CIS.",
+      "references": [
+        "https://linux.die.net/man/8/auditd"
+      ],
+      "cis_controls": [
+        "CIS Controls v8 8.2 Collect Audit Logs"
+      ],
+      "check": {
+        "type": "equals",
+        "command": "find -L /boot -type f -name 'grub.cfg' -exec grep -Ph -- '^\\s*linux\\b' {} + 2>/dev/null | grep -v 'audit=1' || true",
+        "expected": ""
+      },
+      "recommendation": "Configurer le parametre correspondant a la section 5.2.1.3 (voir description)."
+    },
+    {
+      "id": "CIS-UBU-5.2.2.2",
+      "cis_rule": "5.2.2.2",
+      "profile": "Level 2 - Server, Level 2 - Workstation",
+      "category": "auditd — activation et rétention des journaux d'audit",
+      "title": "Les journaux d'audit ne sont pas supprimés automatiquement",
+      "severity": "medium",
+      "description": "Vérifie que max_log_file_action est réglé sur keep_logs dans auditd.conf.",
+      "rationale": "Dans un contexte de sécurité exigeant, la valeur de l'historique d'audit complet dépasse le coût de son stockage ; une suppression automatique des anciens journaux pourrait effacer des preuves d'un incident.",
+      "audit_reference": "CIS Ubuntu Linux 20.04 LTS STIG Benchmark v2.0.0, section 5.2.2.2.",
+      "audit_procedure": "Executer : grep max_log_file_action /etc/audit/auditd.conf 2>/dev/null || true",
+      "remediation_path": "/etc/audit/auditd.conf, /etc/default/grub",
+      "default_value": "Voir description du benchmark CIS.",
+      "references": [
+        "https://linux.die.net/man/8/auditd"
+      ],
+      "cis_controls": [
+        "CIS Controls v8 8.2 Collect Audit Logs"
+      ],
+      "check": {
+        "type": "contains",
+        "command": "grep max_log_file_action /etc/audit/auditd.conf 2>/dev/null || true",
+        "expected": "keep_logs"
+      },
+      "recommendation": "Configurer le parametre correspondant a la section 5.2.2.2 (voir description)."
+    },
+    {
+      "id": "CIS-UBU-5.2.2.3",
+      "cis_rule": "5.2.2.3",
+      "profile": "Level 2 - Server, Level 2 - Workstation",
+      "category": "auditd — activation et rétention des journaux d'audit",
+      "title": "Le système est désactivé lorsque les journaux d'audit sont pleins",
+      "severity": "medium",
+      "description": "Vérifie qu'admin_space_left_action est réglé sur 'halt' ou 'single' dans auditd.conf.",
+      "rationale": "Dans un contexte de sécurité exigeant, le risque de fonctionner sans journalisation d'audit dépasse le coût d'une indisponibilité temporaire du système.",
+      "audit_reference": "CIS Ubuntu Linux 20.04 LTS STIG Benchmark v2.0.0, section 5.2.2.3.",
+      "audit_procedure": "Executer : grep -E 'admin_space_left_action\\s*=\\s*(halt|single)' /etc/audit/auditd.conf 2>/dev/null",
+      "remediation_path": "/etc/audit/auditd.conf, /etc/default/grub",
+      "default_value": "Voir description du benchmark CIS.",
+      "references": [
+        "https://linux.die.net/man/8/auditd"
+      ],
+      "cis_controls": [
+        "CIS Controls v8 8.2 Collect Audit Logs"
+      ],
+      "check": {
+        "type": "regex",
+        "command": "grep -E 'admin_space_left_action\\s*=\\s*(halt|single)' /etc/audit/auditd.conf 2>/dev/null",
+        "expected": "admin_space_left_action\\s*=\\s*(halt|single)"
+      },
+      "recommendation": "Configurer le parametre correspondant a la section 5.2.2.3 (voir description)."
+    },
+    {
+      "id": "CIS-UBU-5.2.3.1",
+      "cis_rule": "5.2.3.1",
+      "profile": "Level 2 - Server, Level 2 - Workstation",
+      "category": "auditd — règles de surveillance (auditctl)",
+      "title": "Les modifications du périmètre d'administration système (sudoers) sont collectées",
+      "severity": "high",
+      "description": "Vérifie que /etc/sudoers et /etc/sudoers.d sont surveillés en écriture/attributs par auditd.",
+      "rationale": "Toute modification du fichier sudoers change qui peut obtenir des privilèges administratifs ; cet événement doit être tracé sans exception.",
+      "audit_reference": "CIS Ubuntu Linux 20.04 LTS STIG Benchmark v2.0.0, section 5.2.3.1. Verifie la configuration active via 'auditctl -l' (necessite les privileges root). Le nom du champ -k/key est arbitraire par design CIS/STIG ; seule la signature (chemin/appel systeme/permission) est verifiee.",
+      "audit_procedure": "Executer : auditctl -l 2>/dev/null | grep -qE '^-w /etc/sudoers( |$).*-p wa' && auditctl -l 2>/dev/null | grep -qE '^-w /etc/sudoers\\.d( |$).*-p wa' && echo OK || echo BAD",
+      "remediation_path": "/etc/audit/rules.d/*.rules (puis augenrules --load)",
+      "default_value": "Regle non presente par defaut.",
+      "references": [
+        "https://man7.org/linux/man-pages/man8/auditctl.8.html"
+      ],
+      "cis_controls": [
+        "CIS Controls v8 8.5 Collect Detailed Audit Logs"
+      ],
+      "check": {
+        "type": "equals",
+        "command": "auditctl -l 2>/dev/null | grep -qE '^-w /etc/sudoers( |$).*-p wa' && auditctl -l 2>/dev/null | grep -qE '^-w /etc/sudoers\\.d( |$).*-p wa' && echo OK || echo BAD",
+        "expected": "OK"
+      },
+      "recommendation": "Ajouter la regle auditd correspondante a la section 5.2.3.1 dans /etc/audit/rules.d/ puis executer : augenrules --load (voir description)."
+    },
+    {
+      "id": "CIS-UBU-5.2.3.19",
+      "cis_rule": "5.2.3.19",
+      "profile": "Level 2 - Server, Level 2 - Workstation",
+      "category": "auditd — règles de surveillance (auditctl)",
+      "title": "Le chargement, déchargement et la modification de modules noyau sont collectés",
+      "severity": "high",
+      "description": "Vérifie qu'une règle audite les appels init_module/delete_module ou l'exécution de /usr/bin/kmod.",
+      "rationale": "Le chargement d'un module noyau malveillant permet une compromission au niveau le plus privilégié du système ; cet événement doit être tracé sans exception.",
+      "audit_reference": "CIS Ubuntu Linux 20.04 LTS STIG Benchmark v2.0.0, section 5.2.3.19. Verifie la configuration active via 'auditctl -l' (necessite les privileges root). Le nom du champ -k/key est arbitraire par design CIS/STIG ; seule la signature (chemin/appel systeme/permission) est verifiee.",
+      "audit_procedure": "Executer : auditctl -l 2>/dev/null | grep -qE '(init_module|delete_module)|path=/usr/bin/kmod' && echo OK || echo BAD",
+      "remediation_path": "/etc/audit/rules.d/*.rules (puis augenrules --load)",
+      "default_value": "Regle non presente par defaut.",
+      "references": [
+        "https://man7.org/linux/man-pages/man8/auditctl.8.html"
+      ],
+      "cis_controls": [
+        "CIS Controls v8 8.5 Collect Detailed Audit Logs"
+      ],
+      "check": {
+        "type": "equals",
+        "command": "auditctl -l 2>/dev/null | grep -qE '(init_module|delete_module)|path=/usr/bin/kmod' && echo OK || echo BAD",
+        "expected": "OK"
+      },
+      "recommendation": "Ajouter la regle auditd correspondante a la section 5.2.3.19 dans /etc/audit/rules.d/ puis executer : augenrules --load (voir description)."
+    },
+    {
+      "id": "CIS-UBU-5.2.3.2",
+      "cis_rule": "5.2.3.2",
+      "profile": "Level 2 - Server, Level 2 - Workstation",
+      "category": "auditd — règles de surveillance (auditctl)",
+      "title": "Les actions effectuées en tant qu'un autre utilisateur sont toujours journalisées",
+      "severity": "high",
+      "description": "Vérifie qu'une règle audite les appels execve où l'UID effectif diffère de l'UID réel (usage de sudo/su).",
+      "rationale": "Journaliser les élévations temporaires de privilèges permet de corréler les actions du journal d'audit avec les journaux applicatifs (ex. sudo.log) pour détecter un usage non autorisé.",
+      "audit_reference": "CIS Ubuntu Linux 20.04 LTS STIG Benchmark v2.0.0, section 5.2.3.2. Verifie la configuration active via 'auditctl -l' (necessite les privileges root). Le nom du champ -k/key est arbitraire par design CIS/STIG ; seule la signature (chemin/appel systeme/permission) est verifiee.",
+      "audit_procedure": "Executer : auditctl -l 2>/dev/null | grep -qE '-S execve' && auditctl -l 2>/dev/null | grep -qE '(euid!=uid|uid!=euid)' && echo OK || echo BAD",
+      "remediation_path": "/etc/audit/rules.d/*.rules (puis augenrules --load)",
+      "default_value": "Regle non presente par defaut.",
+      "references": [
+        "https://man7.org/linux/man-pages/man8/auditctl.8.html"
+      ],
+      "cis_controls": [
+        "CIS Controls v8 8.5 Collect Detailed Audit Logs"
+      ],
+      "check": {
+        "type": "equals",
+        "command": "auditctl -l 2>/dev/null | grep -qE '-S execve' && auditctl -l 2>/dev/null | grep -qE '(euid!=uid|uid!=euid)' && echo OK || echo BAD",
+        "expected": "OK"
+      },
+      "recommendation": "Ajouter la regle auditd correspondante a la section 5.2.3.2 dans /etc/audit/rules.d/ puis executer : augenrules --load (voir description)."
+    },
+    {
+      "id": "CIS-UBU-5.2.3.20",
+      "cis_rule": "5.2.3.20",
+      "profile": "Level 2 - Server, Level 2 - Workstation",
+      "category": "auditd — règles de surveillance (auditctl)",
+      "title": "Les utilisations réussies et échouées de la commande su sont collectées",
+      "severity": "high",
+      "description": "Vérifie qu'une règle audite l'exécution de /bin/su.",
+      "rationale": "su permet une élévation de privilège vers un autre compte, y compris root ; son usage doit être tracé sans exception.",
+      "audit_reference": "CIS Ubuntu Linux 20.04 LTS STIG Benchmark v2.0.0, section 5.2.3.20. Verifie la configuration active via 'auditctl -l' (necessite les privileges root). Le nom du champ -k/key est arbitraire par design CIS/STIG ; seule la signature (chemin/appel systeme/permission) est verifiee.",
+      "audit_procedure": "Executer : auditctl -l 2>/dev/null | grep -qE 'path=/bin/su' && echo OK || echo BAD",
+      "remediation_path": "/etc/audit/rules.d/*.rules (puis augenrules --load)",
+      "default_value": "Regle non presente par defaut.",
+      "references": [
+        "https://man7.org/linux/man-pages/man8/auditctl.8.html"
+      ],
+      "cis_controls": [
+        "CIS Controls v8 8.5 Collect Detailed Audit Logs"
+      ],
+      "check": {
+        "type": "equals",
+        "command": "auditctl -l 2>/dev/null | grep -qE 'path=/bin/su' && echo OK || echo BAD",
+        "expected": "OK"
+      },
+      "recommendation": "Ajouter la regle auditd correspondante a la section 5.2.3.20 dans /etc/audit/rules.d/ puis executer : augenrules --load (voir description)."
+    },
+    {
+      "id": "CIS-UBU-5.2.3.25",
+      "cis_rule": "5.2.3.25",
+      "profile": "Level 2 - Server, Level 2 - Workstation",
+      "category": "auditd — règles de surveillance (auditctl)",
+      "title": "Les utilisations réussies et échouées de la commande sudo sont enregistrées",
+      "severity": "high",
+      "description": "Vérifie qu'une règle audite l'exécution de /usr/bin/sudo.",
+      "rationale": "sudo est le mécanisme principal d'élévation de privilège de l'administration système ; chaque invocation doit être tracée.",
+      "audit_reference": "CIS Ubuntu Linux 20.04 LTS STIG Benchmark v2.0.0, section 5.2.3.25. Verifie la configuration active via 'auditctl -l' (necessite les privileges root). Le nom du champ -k/key est arbitraire par design CIS/STIG ; seule la signature (chemin/appel systeme/permission) est verifiee.",
+      "audit_procedure": "Executer : auditctl -l 2>/dev/null | grep -qE 'path=/usr/bin/sudo\\b' && echo OK || echo BAD",
+      "remediation_path": "/etc/audit/rules.d/*.rules (puis augenrules --load)",
+      "default_value": "Regle non presente par defaut.",
+      "references": [
+        "https://man7.org/linux/man-pages/man8/auditctl.8.html"
+      ],
+      "cis_controls": [
+        "CIS Controls v8 8.5 Collect Detailed Audit Logs"
+      ],
+      "check": {
+        "type": "equals",
+        "command": "auditctl -l 2>/dev/null | grep -qE 'path=/usr/bin/sudo\\b' && echo OK || echo BAD",
+        "expected": "OK"
+      },
+      "recommendation": "Ajouter la regle auditd correspondante a la section 5.2.3.25 dans /etc/audit/rules.d/ puis executer : augenrules --load (voir description)."
+    },
+    {
+      "id": "CIS-UBU-5.2.4.3",
+      "cis_rule": "5.2.4.3",
+      "profile": "Level 2 - Server, Level 2 - Workstation",
+      "category": "auditd — permissions des fichiers et outils",
+      "title": "Les fichiers journaux d'audit sont en mode 0600 ou plus restrictif (STIG)",
+      "severity": "high",
+      "description": "Vérifie qu'aucun fichier journal d'audit n'est accessible en lecture ou écriture par un utilisateur autre que le propriétaire.",
+      "rationale": "Une divulgation non autorisée des journaux d'audit compromet la confidentialité des informations système qu'ils contiennent.",
+      "audit_reference": "CIS Ubuntu Linux 20.04 LTS STIG Benchmark v2.0.0, section 5.2.4.3.",
+      "audit_procedure": "Executer : d=$(dirname $(awk -F= '/^\\s*log_file/ {print $2}' /etc/audit/auditd.conf 2>/dev/null | xargs) 2>/dev/null); find \"$d\" -type f -perm /0177 2>/dev/null",
+      "remediation_path": "/var/log/audit/, /etc/audit/",
+      "default_value": "Voir description du benchmark CIS.",
+      "references": [
+        "https://man7.org/linux/man-pages/man8/auditd.8.html"
+      ],
+      "cis_controls": [
+        "CIS Controls v8 3.3 Configure Data Access Control Lists"
+      ],
+      "check": {
+        "type": "equals",
+        "command": "d=$(dirname $(awk -F= '/^\\s*log_file/ {print $2}' /etc/audit/auditd.conf 2>/dev/null | xargs) 2>/dev/null); find \"$d\" -type f -perm /0177 2>/dev/null",
+        "expected": ""
+      },
+      "recommendation": "Configurer le parametre correspondant a la section 5.2.4.3 (voir description)."
+    },
+    {
+      "id": "CIS-UBU-5.2.4.1",
+      "cis_rule": "5.2.4.1",
+      "profile": "Level 2 - Server, Level 2 - Workstation",
+      "category": "auditd — permissions des fichiers et outils",
+      "title": "Le répertoire des journaux d'audit est en mode 0750 ou plus restrictif",
+      "severity": "medium",
+      "description": "Vérifie que le répertoire contenant les journaux d'audit (log_file dans auditd.conf) est en mode 0750 ou plus restrictif.",
+      "rationale": "Les journaux d'audit contiennent des informations sensibles sur l'activité système ; un répertoire trop permissif pourrait exposer ces données ou permettre leur altération.",
+      "audit_reference": "CIS Ubuntu Linux 20.04 LTS STIG Benchmark v2.0.0, section 5.2.4.1.",
+      "audit_procedure": "Executer : d=$(dirname $(awk -F= '/^\\s*log_file/ {print $2}' /etc/audit/auditd.conf 2>/dev/null | xargs) 2>/dev/null); [ -n \"$d\" ] && stat -Lc '%a' \"$d\" 2>/dev/null",
+      "remediation_path": "/var/log/audit/, /etc/audit/",
+      "default_value": "Voir description du benchmark CIS.",
+      "references": [
+        "https://man7.org/linux/man-pages/man8/auditd.8.html"
+      ],
+      "cis_controls": [
+        "CIS Controls v8 3.3 Configure Data Access Control Lists"
+      ],
+      "check": {
+        "type": "numeric_max",
+        "command": "d=$(dirname $(awk -F= '/^\\s*log_file/ {print $2}' /etc/audit/auditd.conf 2>/dev/null | xargs) 2>/dev/null); [ -n \"$d\" ] && stat -Lc '%a' \"$d\" 2>/dev/null",
+        "expected": "750"
+      },
+      "recommendation": "Configurer le parametre correspondant a la section 5.2.4.1 (voir description)."
+    },
+    {
+      "id": "CIS-UBU-5.2.4.10",
+      "cis_rule": "5.2.4.10",
+      "profile": "Level 2 - Server, Level 2 - Workstation",
+      "category": "auditd — permissions des fichiers et outils",
+      "title": "Seuls les utilisateurs autorisés possèdent les outils d'audit",
+      "severity": "medium",
+      "description": "Vérifie que tous les outils auditd appartiennent à l'utilisateur root.",
+      "rationale": "Un propriétaire incorrect sur un outil d'audit pourrait permettre à un utilisateur non autorisé de le remplacer par une version compromise.",
+      "audit_reference": "CIS Ubuntu Linux 20.04 LTS STIG Benchmark v2.0.0, section 5.2.4.10.",
+      "audit_procedure": "Executer : for f in /sbin/auditctl /sbin/aureport /sbin/ausearch /sbin/autrace /sbin/auditd /sbin/audispd /sbin/augenrules; do [ -e \"$f\" ] && find \"$f\" ! -user root 2>/dev/null; done",
+      "remediation_path": "/var/log/audit/, /etc/audit/",
+      "default_value": "Voir description du benchmark CIS.",
+      "references": [
+        "https://man7.org/linux/man-pages/man8/auditd.8.html"
+      ],
+      "cis_controls": [
+        "CIS Controls v8 3.3 Configure Data Access Control Lists"
+      ],
+      "check": {
+        "type": "equals",
+        "command": "for f in /sbin/auditctl /sbin/aureport /sbin/ausearch /sbin/autrace /sbin/auditd /sbin/audispd /sbin/augenrules; do [ -e \"$f\" ] && find \"$f\" ! -user root 2>/dev/null; done",
+        "expected": ""
+      },
+      "recommendation": "Configurer le parametre correspondant a la section 5.2.4.10 (voir description)."
+    },
+    {
+      "id": "CIS-UBU-5.2.4.11",
+      "cis_rule": "5.2.4.11",
+      "profile": "Level 2 - Server, Level 2 - Workstation",
+      "category": "auditd — permissions des fichiers et outils",
+      "title": "Seuls les groupes autorisés possèdent les outils d'audit",
+      "severity": "medium",
+      "description": "Vérifie que tous les outils auditd sont groupés-propriété du groupe root.",
+      "rationale": "Un groupe propriétaire incorrect pourrait accorder un accès en modification non souhaité aux outils d'audit.",
+      "audit_reference": "CIS Ubuntu Linux 20.04 LTS STIG Benchmark v2.0.0, section 5.2.4.11.",
+      "audit_procedure": "Executer : for f in /sbin/auditctl /sbin/aureport /sbin/ausearch /sbin/autrace /sbin/auditd /sbin/audispd /sbin/augenrules; do [ -e \"$f\" ] && find \"$f\" ! -group root 2>/dev/null; done",
+      "remediation_path": "/var/log/audit/, /etc/audit/",
+      "default_value": "Voir description du benchmark CIS.",
+      "references": [
+        "https://man7.org/linux/man-pages/man8/auditd.8.html"
+      ],
+      "cis_controls": [
+        "CIS Controls v8 3.3 Configure Data Access Control Lists"
+      ],
+      "check": {
+        "type": "equals",
+        "command": "for f in /sbin/auditctl /sbin/aureport /sbin/ausearch /sbin/autrace /sbin/auditd /sbin/audispd /sbin/augenrules; do [ -e \"$f\" ] && find \"$f\" ! -group root 2>/dev/null; done",
+        "expected": ""
+      },
+      "recommendation": "Configurer le parametre correspondant a la section 5.2.4.11 (voir description)."
+    },
+    {
+      "id": "CIS-UBU-5.2.4.2",
+      "cis_rule": "5.2.4.2",
+      "profile": "Level 2 - Server, Level 2 - Workstation",
+      "category": "auditd — permissions des fichiers et outils",
+      "title": "Les fichiers journaux d'audit sont en mode 0640 ou plus restrictif",
+      "severity": "medium",
+      "description": "Vérifie qu'aucun fichier journal d'audit n'accorde de droit d'exécution, ni de droit d'écriture au groupe ou aux autres.",
+      "rationale": "L'accès aux journaux d'audit peut révéler des données système et de configuration à un attaquant, compromettant leur confidentialité.",
+      "audit_reference": "CIS Ubuntu Linux 20.04 LTS STIG Benchmark v2.0.0, section 5.2.4.2.",
+      "audit_procedure": "Executer : d=$(dirname $(awk -F= '/^\\s*log_file/ {print $2}' /etc/audit/auditd.conf 2>/dev/null | xargs) 2>/dev/null); find \"$d\" -type f -perm /0137 2>/dev/null",
+      "remediation_path": "/var/log/audit/, /etc/audit/",
+      "default_value": "Voir description du benchmark CIS.",
+      "references": [
+        "https://man7.org/linux/man-pages/man8/auditd.8.html"
+      ],
+      "cis_controls": [
+        "CIS Controls v8 3.3 Configure Data Access Control Lists"
+      ],
+      "check": {
+        "type": "equals",
+        "command": "d=$(dirname $(awk -F= '/^\\s*log_file/ {print $2}' /etc/audit/auditd.conf 2>/dev/null | xargs) 2>/dev/null); find \"$d\" -type f -perm /0137 2>/dev/null",
+        "expected": ""
+      },
+      "recommendation": "Configurer le parametre correspondant a la section 5.2.4.2 (voir description)."
+    },
+    {
+      "id": "CIS-UBU-4.1.1.1",
+      "cis_rule": "4.1.1.1",
+      "profile": "Level 1 - Server, Level 1 - Workstation",
+      "category": "Cron et planification des tâches",
+      "title": "Le démon cron est activé et actif",
+      "severity": "high",
+      "description": "Vérifie que le service cron est activé au démarrage et actuellement actif.",
+      "rationale": "Sans cron actif, les tâches planifiées de sécurité (mises à jour, rotations de journaux, vérifications d'intégrité) ne s'exécutent pas.",
+      "audit_reference": "CIS Ubuntu Linux 20.04 LTS STIG Benchmark v2.0.0, section 4.1.1.1.",
+      "audit_procedure": "Executer : [ \"$(systemctl is-enabled cron 2>/dev/null)\" = enabled ] && [ \"$(systemctl is-active cron 2>/dev/null)\" = active ] && echo OK || echo BAD",
+      "remediation_path": "/etc/crontab, /etc/cron.*, /etc/cron.allow, /etc/at.allow",
+      "default_value": "Voir description du benchmark CIS.",
+      "references": [
+        "https://man7.org/linux/man-pages/man5/crontab.5.html"
+      ],
+      "cis_controls": [
+        "CIS Controls v8 3.3 Configure Data Access Control Lists"
+      ],
+      "check": {
+        "type": "equals",
+        "command": "[ \"$(systemctl is-enabled cron 2>/dev/null)\" = enabled ] && [ \"$(systemctl is-active cron 2>/dev/null)\" = active ] && echo OK || echo BAD",
+        "expected": "OK"
+      },
+      "recommendation": "Configurer le parametre correspondant a la section 4.1.1.1 (voir description)."
+    },
+    {
+      "id": "CIS-UBU-4.1.1.2",
+      "cis_rule": "4.1.1.2",
+      "profile": "Level 1 - Server, Level 1 - Workstation",
+      "category": "Cron et planification des tâches",
+      "title": "Les permissions sur /etc/crontab sont configurées",
+      "severity": "medium",
+      "description": "Vérifie que /etc/crontab est en mode 0600 ou plus restrictif, appartenant à root:root (UID/GID 0).",
+      "rationale": "Un fichier crontab modifiable par un utilisateur non privilégié permettrait de planifier l'exécution de code arbitraire avec les privilèges du démon cron (root).",
+      "audit_reference": "CIS Ubuntu Linux 20.04 LTS STIG Benchmark v2.0.0, section 4.1.1.2.",
+      "audit_procedure": "Executer : stat -Lc '%a %u %g' /etc/crontab 2>/dev/null",
+      "remediation_path": "/etc/crontab, /etc/cron.*, /etc/cron.allow, /etc/at.allow",
+      "default_value": "Voir description du benchmark CIS.",
+      "references": [
+        "https://man7.org/linux/man-pages/man5/crontab.5.html"
+      ],
+      "cis_controls": [
+        "CIS Controls v8 3.3 Configure Data Access Control Lists"
+      ],
+      "check": {
+        "type": "regex",
+        "command": "stat -Lc '%a %u %g' /etc/crontab 2>/dev/null",
+        "expected": "^[0-7]00 0 0$"
+      },
+      "recommendation": "Configurer le parametre correspondant a la section 4.1.1.2 (voir description)."
+    },
+    {
+      "id": "CIS-UBU-4.1.1.3",
+      "cis_rule": "4.1.1.3",
+      "profile": "Level 1 - Server, Level 1 - Workstation",
+      "category": "Cron et planification des tâches",
+      "title": "Les permissions sur /etc/cron.hourly sont configurées",
+      "severity": "medium",
+      "description": "Vérifie que /etc/cron.hourly est en mode 0700 ou plus restrictif, appartenant à root:root.",
+      "rationale": "Un répertoire cron accessible en écriture par un utilisateur non privilégié permettrait d'y déposer un script exécuté automatiquement avec les privilèges root.",
+      "audit_reference": "CIS Ubuntu Linux 20.04 LTS STIG Benchmark v2.0.0, section 4.1.1.3.",
+      "audit_procedure": "Executer : stat -Lc '%a %u %g' /etc/cron.hourly 2>/dev/null",
+      "remediation_path": "/etc/crontab, /etc/cron.*, /etc/cron.allow, /etc/at.allow",
+      "default_value": "Voir description du benchmark CIS.",
+      "references": [
+        "https://man7.org/linux/man-pages/man5/crontab.5.html"
+      ],
+      "cis_controls": [
+        "CIS Controls v8 3.3 Configure Data Access Control Lists"
+      ],
+      "check": {
+        "type": "regex",
+        "command": "stat -Lc '%a %u %g' /etc/cron.hourly 2>/dev/null",
+        "expected": "^[0-7]00 0 0$"
+      },
+      "recommendation": "Configurer le parametre correspondant a la section 4.1.1.3 (voir description)."
+    },
+    {
+      "id": "CIS-UBU-4.1.1.4",
+      "cis_rule": "4.1.1.4",
+      "profile": "Level 1 - Server, Level 1 - Workstation",
+      "category": "Cron et planification des tâches",
+      "title": "Les permissions sur /etc/cron.daily sont configurées",
+      "severity": "medium",
+      "description": "Vérifie que /etc/cron.daily est en mode 0700 ou plus restrictif, appartenant à root:root.",
+      "rationale": "Un répertoire cron accessible en écriture par un utilisateur non privilégié permettrait d'y déposer un script exécuté automatiquement avec les privilèges root.",
+      "audit_reference": "CIS Ubuntu Linux 20.04 LTS STIG Benchmark v2.0.0, section 4.1.1.4.",
+      "audit_procedure": "Executer : stat -Lc '%a %u %g' /etc/cron.daily 2>/dev/null",
+      "remediation_path": "/etc/crontab, /etc/cron.*, /etc/cron.allow, /etc/at.allow",
+      "default_value": "Voir description du benchmark CIS.",
+      "references": [
+        "https://man7.org/linux/man-pages/man5/crontab.5.html"
+      ],
+      "cis_controls": [
+        "CIS Controls v8 3.3 Configure Data Access Control Lists"
+      ],
+      "check": {
+        "type": "regex",
+        "command": "stat -Lc '%a %u %g' /etc/cron.daily 2>/dev/null",
+        "expected": "^[0-7]00 0 0$"
+      },
+      "recommendation": "Configurer le parametre correspondant a la section 4.1.1.4 (voir description)."
+    },
+    {
+      "id": "CIS-UBU-4.1.1.5",
+      "cis_rule": "4.1.1.5",
+      "profile": "Level 1 - Server, Level 1 - Workstation",
+      "category": "Cron et planification des tâches",
+      "title": "Les permissions sur /etc/cron.weekly sont configurées",
+      "severity": "medium",
+      "description": "Vérifie que /etc/cron.weekly est en mode 0700 ou plus restrictif, appartenant à root:root.",
+      "rationale": "Un répertoire cron accessible en écriture par un utilisateur non privilégié permettrait d'y déposer un script exécuté automatiquement avec les privilèges root.",
+      "audit_reference": "CIS Ubuntu Linux 20.04 LTS STIG Benchmark v2.0.0, section 4.1.1.5.",
+      "audit_procedure": "Executer : stat -Lc '%a %u %g' /etc/cron.weekly 2>/dev/null",
+      "remediation_path": "/etc/crontab, /etc/cron.*, /etc/cron.allow, /etc/at.allow",
+      "default_value": "Voir description du benchmark CIS.",
+      "references": [
+        "https://man7.org/linux/man-pages/man5/crontab.5.html"
+      ],
+      "cis_controls": [
+        "CIS Controls v8 3.3 Configure Data Access Control Lists"
+      ],
+      "check": {
+        "type": "regex",
+        "command": "stat -Lc '%a %u %g' /etc/cron.weekly 2>/dev/null",
+        "expected": "^[0-7]00 0 0$"
+      },
+      "recommendation": "Configurer le parametre correspondant a la section 4.1.1.5 (voir description)."
+    },
+    {
+      "id": "CIS-UBU-1.4.2",
+      "cis_rule": "1.4.2",
+      "profile": "Level 1 - Server, Level 1 - Workstation",
+      "category": "Durcissement additionnel (processus, AppArmor, bannières, GDM, FIPS)",
+      "title": "L'ASLR (Address Space Layout Randomization) est activé",
+      "severity": "high",
+      "description": "Vérifie que kernel.randomize_va_space est réglé sur 2 (randomisation complète).",
+      "rationale": "L'ASLR rend beaucoup plus difficile l'exploitation de vulnérabilités mémoire en randomisant l'emplacement des zones mémoire d'un processus, empêchant un attaquant de prédire des adresses fiables.",
+      "audit_reference": "CIS Ubuntu Linux 20.04 LTS STIG Benchmark v2.0.0, section 1.4.2.",
+      "audit_procedure": "Executer : sysctl -n kernel.randomize_va_space 2>/dev/null",
+      "remediation_path": "/etc/sysctl.d/, /etc/security/limits.conf, /etc/dconf/db",
+      "default_value": "Voir description du benchmark CIS.",
+      "references": [
+        "https://man7.org/linux/man-pages/man5/sysctl.d.5.html"
+      ],
+      "cis_controls": [
+        "CIS Controls v8 4.1 Establish and Maintain a Secure Configuration Process"
+      ],
+      "check": {
+        "type": "equals",
+        "command": "sysctl -n kernel.randomize_va_space 2>/dev/null",
+        "expected": "2"
+      },
+      "recommendation": "Configurer le parametre correspondant a la section 1.4.2 (voir description)."
+    },
+    {
+      "id": "CIS-UBU-1.5.1.1",
+      "cis_rule": "1.5.1.1",
+      "profile": "Level 1 - Server, Level 1 - Workstation",
+      "category": "Durcissement additionnel (processus, AppArmor, bannières, GDM, FIPS)",
+      "title": "AppArmor est installé",
+      "severity": "high",
+      "description": "Vérifie que les paquets apparmor et apparmor-utils sont installés.",
+      "rationale": "AppArmor fournit un contrôle d'accès obligatoire (MAC) confinant les applications à leurs ressources déclarées, une protection essentielle en complément du contrôle d'accès discrétionnaire (DAC) standard.",
+      "audit_reference": "CIS Ubuntu Linux 20.04 LTS STIG Benchmark v2.0.0, section 1.5.1.1.",
+      "audit_procedure": "Executer : dpkg -s apparmor >/dev/null 2>&1 && dpkg -s apparmor-utils >/dev/null 2>&1 && echo INSTALLED || echo ABSENT",
+      "remediation_path": "/etc/sysctl.d/, /etc/security/limits.conf, /etc/dconf/db",
+      "default_value": "Voir description du benchmark CIS.",
+      "references": [
+        "https://man7.org/linux/man-pages/man5/sysctl.d.5.html"
+      ],
+      "cis_controls": [
+        "CIS Controls v8 4.1 Establish and Maintain a Secure Configuration Process"
+      ],
+      "check": {
+        "type": "equals",
+        "command": "dpkg -s apparmor >/dev/null 2>&1 && dpkg -s apparmor-utils >/dev/null 2>&1 && echo INSTALLED || echo ABSENT",
+        "expected": "INSTALLED"
+      },
+      "recommendation": "Configurer le parametre correspondant a la section 1.5.1.1 (voir description)."
+    },
+    {
+      "id": "CIS-UBU-1.5.1.2",
+      "cis_rule": "1.5.1.2",
+      "profile": "Level 1 - Server, Level 1 - Workstation",
+      "category": "Durcissement additionnel (processus, AppArmor, bannières, GDM, FIPS)",
+      "title": "AppArmor est activé dans la configuration du chargeur de démarrage",
+      "severity": "high",
+      "description": "Vérifie que toutes les lignes 'linux' de grub.cfg incluent apparmor=1 et security=apparmor.",
+      "rationale": "Sans ces paramètres au démarrage, le noyau charge sans activer le module de sécurité AppArmor, désactivant silencieusement toute la protection MAC configurée.",
+      "audit_reference": "CIS Ubuntu Linux 20.04 LTS STIG Benchmark v2.0.0, section 1.5.1.2. Necessite les privileges root pour lire /boot/grub/grub.cfg.",
+      "audit_procedure": "Executer : { grep '^\\s*linux' /boot/grub/grub.cfg 2>/dev/null | grep -v 'apparmor=1'; grep '^\\s*linux' /boot/grub/grub.cfg 2>/dev/null | grep -v 'security=apparmor'; }",
+      "remediation_path": "/etc/sysctl.d/, /etc/security/limits.conf, /etc/dconf/db",
+      "default_value": "Voir description du benchmark CIS.",
+      "references": [
+        "https://man7.org/linux/man-pages/man5/sysctl.d.5.html"
+      ],
+      "cis_controls": [
+        "CIS Controls v8 4.1 Establish and Maintain a Secure Configuration Process"
+      ],
+      "check": {
+        "type": "equals",
+        "command": "{ grep '^\\s*linux' /boot/grub/grub.cfg 2>/dev/null | grep -v 'apparmor=1'; grep '^\\s*linux' /boot/grub/grub.cfg 2>/dev/null | grep -v 'security=apparmor'; }",
+        "expected": ""
+      },
+      "recommendation": "Configurer le parametre correspondant a la section 1.5.1.2 (voir description)."
+    },
+    {
+      "id": "CIS-UBU-1.5.1.3",
+      "cis_rule": "1.5.1.3",
+      "profile": "Level 1 - Server, Level 1 - Workstation",
+      "category": "Durcissement additionnel (processus, AppArmor, bannières, GDM, FIPS)",
+      "title": "AppArmor est installé, activé et actif",
+      "severity": "high",
+      "description": "Vérifie que le paquet apparmor est installé et que le service apparmor.service est activé et actif.",
+      "rationale": "Sans le service actif, aucun profil AppArmor n'est appliqué, quelle que soit leur configuration, laissant toutes les applications sans confinement MAC.",
+      "audit_reference": "CIS Ubuntu Linux 20.04 LTS STIG Benchmark v2.0.0, section 1.5.1.3.",
+      "audit_procedure": "Executer : dpkg -s apparmor >/dev/null 2>&1 && [ \"$(systemctl is-active apparmor.service 2>/dev/null)\" = active ] && [ \"$(systemctl is-enabled apparmor.service 2>/dev/null)\" = enabled ] && echo OK || echo BAD",
+      "remediation_path": "/etc/sysctl.d/, /etc/security/limits.conf, /etc/dconf/db",
+      "default_value": "Voir description du benchmark CIS.",
+      "references": [
+        "https://man7.org/linux/man-pages/man5/sysctl.d.5.html"
+      ],
+      "cis_controls": [
+        "CIS Controls v8 4.1 Establish and Maintain a Secure Configuration Process"
+      ],
+      "check": {
+        "type": "equals",
+        "command": "dpkg -s apparmor >/dev/null 2>&1 && [ \"$(systemctl is-active apparmor.service 2>/dev/null)\" = active ] && [ \"$(systemctl is-enabled apparmor.service 2>/dev/null)\" = enabled ] && echo OK || echo BAD",
+        "expected": "OK"
+      },
+      "recommendation": "Configurer le parametre correspondant a la section 1.5.1.3 (voir description)."
+    },
+    {
+      "id": "CIS-UBU-1.7.11",
+      "cis_rule": "1.7.11",
+      "profile": "Level 1 - Server, Level 1 - Workstation",
+      "category": "Durcissement additionnel (processus, AppArmor, bannières, GDM, FIPS)",
+      "title": "XDMCP n'est pas activé",
+      "severity": "high",
+      "description": "Vérifie que le protocole XDMCP (accès graphique distant non chiffré) n'est pas activé dans /etc/gdm3/custom.conf.",
+      "rationale": "XDMCP transmet les données en clair et est vulnérable aux attaques de l'homme du milieu, exposant potentiellement les identifiants et frappes clavier d'une session distante.",
+      "audit_reference": "CIS Ubuntu Linux 20.04 LTS STIG Benchmark v2.0.0, section 1.7.11.",
+      "audit_procedure": "Executer : grep -Eis '^\\s*Enable\\s*=\\s*true' /etc/gdm3/custom.conf 2>/dev/null || true",
+      "remediation_path": "/etc/sysctl.d/, /etc/security/limits.conf, /etc/dconf/db",
+      "default_value": "Voir description du benchmark CIS.",
+      "references": [
+        "https://man7.org/linux/man-pages/man5/sysctl.d.5.html"
+      ],
+      "cis_controls": [
+        "CIS Controls v8 4.1 Establish and Maintain a Secure Configuration Process"
+      ],
+      "check": {
+        "type": "equals",
+        "command": "grep -Eis '^\\s*Enable\\s*=\\s*true' /etc/gdm3/custom.conf 2>/dev/null || true",
+        "expected": ""
+      },
+      "recommendation": "Configurer le parametre correspondant a la section 1.7.11 (voir description)."
+    }
+  ]
+}

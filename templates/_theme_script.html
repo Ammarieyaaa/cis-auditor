@@ -1,0 +1,19 @@
+<script>
+  (function () {
+    var stored = localStorage.getItem("ram-security-theme");
+    if (stored === "dark" || stored === "light") {
+      document.documentElement.setAttribute("data-theme", stored);
+    }
+  })();
+
+  document.addEventListener("click", function (event) {
+    var button = event.target.closest(".theme-toggle");
+    if (!button) {
+      return;
+    }
+    var current = document.documentElement.getAttribute("data-theme") === "dark" ? "dark" : "light";
+    var next = current === "dark" ? "light" : "dark";
+    document.documentElement.setAttribute("data-theme", next);
+    localStorage.setItem("ram-security-theme", next);
+  });
+</script>

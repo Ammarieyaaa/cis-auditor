@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+
+{% block title %}Tableau de bord - RAM Security{% endblock %}
+
+{% block content %}
+  <section class="section-head">
+    <div>
+      <p class="eyebrow">Vue d'ensemble</p>
+      <h1>Audit de configuration basé sur les CIS Benchmarks</h1>
+      <p class="muted">Machine détectée : {{ platform_label }}</p>
+    </div>
+    {% if current_user and current_user.role == 'technicien' %}
+      <a class="button primary" href="{{ url_for('audit') }}">Lancer un audit</a>
+    {% endif %}
+  </section>
+
+  <section class="metrics">
+    <article class="metric">
+      <span>Dernier score</span>
+      <strong>{{ latest.score if latest else 0 }}%</strong>
+    </article>
+    <article class="metric">
+      <span>Audits réalisés</span>
+      <strong>{{ total_runs }}</strong>
+    </article>
+  </section>
+
+  <section class="panel">
+    <div class="panel-head">
+      <h2>Derniers audits</h2>
+      <a href="{{ url_for('history') }}">Tout voir</a>
+    </div>
+
+    {% if runs %}
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>OS</th>
+              <th>Cible</th>
+              <th>Score</th>
+              <th>Statut</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for run in runs %}
+              <tr>
+                <td>{{ run.started_at | fr_datetime }}</td>
+                <td>{{ 'Windows' if run.os_type == 'windows' else 'Linux/Unix' }}</td>
+                <td>{{ 'Locale' if run.target == 'local' else run.target }}</td>
+                <td>{{ run.score }}%</td>
+                <td>
+                  <span class="pill {{ 'pass' if run.failed == 0 else 'fail' }}">
+                    {{ run.passed }}/{{ run.total }} conformes
+                  </span>
+                </td>
+                <td><a href="{{ url_for('results', run_id=run.id) }}">Ouvrir</a></td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% else %}
+      <div class="empty">
+        <h2>Aucun audit enregistré</h2>
+        <p>Lance le premier audit pour générer un score et un rapport.</p>
+      </div>
+    {% endif %}
+  </section>
+{% endblock %}

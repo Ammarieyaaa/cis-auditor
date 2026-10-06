@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Connexion - RAM Security</title>
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='img/logo-mark.png') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    {% include "_theme_script.html" %}
+  </head>
+  <body>
+    <main class="auth-shell">
+      <button type="button" class="theme-toggle" aria-label="Changer de thème">
+        <svg class="icon-sun" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <circle cx="12" cy="12" r="4"/>
+          <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/>
+        </svg>
+        <svg class="icon-moon" viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true">
+          <path d="M20 14.5A8.5 8.5 0 0 1 9.5 4a8.5 8.5 0 1 0 10.5 10.5Z"/>
+        </svg>
+      </button>
+      <form class="panel form-panel auth-card" method="post">
+        <div>
+          <div class="auth-card-head">
+            <img class="brand-mark" src="{{ url_for('static', filename='img/logo-mark.png') }}" alt="">
+            <h1>RAM Security</h1>
+          </div>
+          <p class="muted">Connectez-vous pour accéder à la plateforme d'audit.</p>
+        </div>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+          {% for category, message in messages %}
+            <div class="flash {{ 'flash-success' if category == 'success' else 'flash-error' }}">
+              <p>{{ message }}</p>
+            </div>
+          {% endfor %}
+        {% endwith %}
+
+        <label class="field">
+          <span>Identifiant</span>
+          <input type="text" name="username" autocomplete="username" required autofocus>
+        </label>
+
+        <label class="field">
+          <span>Mot de passe</span>
+          <input type="password" name="password" autocomplete="current-password" required>
+        </label>
+
+        <button class="button primary" type="submit">Se connecter</button>
+      </form>
+    </main>
+  </body>
+</html>

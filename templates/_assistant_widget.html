@@ -1,0 +1,121 @@
+<div class="assistant-widget">
+  <input type="checkbox" id="assistant-toggle" class="tab-input">
+  <label class="assistant-fab" for="assistant-toggle" aria-label="Ouvrir l'assistant CIS">
+    <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+      <path d="M4 5h16v11H7l-3 3V5Z" stroke-linejoin="round"/>
+    </svg>
+  </label>
+
+  <div class="assistant-panel">
+    <div class="assistant-panel-head">
+      <span>Assistant RAM Security</span>
+      <label for="assistant-toggle" class="assistant-close" aria-label="Fermer">&times;</label>
+    </div>
+
+    <div class="chat-log" id="chat-log">
+      <div class="chat-bubble assistant">
+        <p>Bonjour. Je cherche dans les règles internes et dans les documents que vous avez importés. Posez votre question.</p>
+      </div>
+    </div>
+
+    <form class="chat-form" id="chat-form">
+      <textarea id="chat-input" placeholder="Poser une question..." required></textarea>
+      <button class="button primary" type="submit">Envoyer</button>
+    </form>
+  </div>
+</div>
+
+<script>
+  (function () {
+    const chatLog = document.getElementById("chat-log");
+    const chatForm = document.getElementById("chat-form");
+    const chatInput = document.getElementById("chat-input");
+
+    function addBubble(role, text) {
+      const bubble = document.createElement("div");
+      bubble.className = "chat-bubble " + role;
+      const p = document.createElement("p");
+      p.textContent = text;
+      bubble.appendChild(p);
+      chatLog.appendChild(bubble);
+      chatLog.scrollTop = chatLog.scrollHeight;
+      return bubble;
+    }
+
+    function addSources(bubble, sources) {
+      if (!sources || sources.length === 0) {
+        return;
+      }
+      const list = document.createElement("div");
+      list.className = "chat-sources";
+      sources.forEach(function (source) {
+        const badge = document.createElement("span");
+        badge.className = "chat-source-badge source-" + source.kind;
+        badge.textContent = source.label;
+        list.appendChild(badge);
+      });
+      bubble.appendChild(list);
+    }
+
+    function addWarnings(bubble, warnings) {
+      if (!warnings || warnings.length === 0) {
+        return;
+      }
+      const box = document.createElement("div");
+      box.className = "chat-warning";
+      const title = document.createElement("strong");
+      title.textContent = warnings.length === 1
+        ? "Commande absente des sources — ne l'exécute pas telle quelle :"
+        : "Commandes absentes des sources — ne les exécute pas telles quelles :";
+      box.appendChild(title);
+      const list = document.createElement("ul");
+      warnings.forEach(function (command) {
+        const item = document.createElement("li");
+        const code = document.createElement("code");
+        code.textContent = command;
+        item.appendChild(code);
+        list.appendChild(item);
+      });
+      box.appendChild(list);
+      bubble.appendChild(box);
+    }
+
+    chatForm.addEventListener("submit", function (event) {
+      event.preventDefault();
+      const message = chatInput.value.trim();
+      if (!message) {
+        return;
+      }
+
+      addBubble("user", message);
+      chatInput.value = "";
+      const pending = addBubble("assistant", "Réflexion en cours…");
+
+      fetch("{{ url_for('assistant_ask') }}", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ message: message }),
+      })
+        .then(function (response) {
+          return response.json().then(function (data) {
+            return { ok: response.ok, data: data };
+          });
+        })
+        .then(function (result) {
+          pending.querySelector("p").textContent = result.ok
+            ? result.data.answer
+            : result.data.error || "Une erreur est survenue.";
+          if (result.ok) {
+            addSources(pending, result.data.sources);
+            addWarnings(pending, result.data.warnings);
+          } else {
+            pending.classList.add("error");
+          }
+        })
+        .catch(function () {
+          pending.querySelector("p").textContent = "Impossible de contacter le serveur.";
+          pending.classList.add("error");
+        });
+    });
+  })();
+</script>

@@ -1,0 +1,123 @@
+{% extends "base.html" %}
+
+{% block title %}Résultats - RAM Security Audit{% endblock %}
+
+{% block content %}
+  <section class="section-head">
+    <div>
+      <p class="eyebrow">Audit #{{ run.id }}</p>
+      <h1>Résultats de l'audit {{ 'Windows' if run.os_type == 'windows' else 'Linux/Unix' }}</h1>
+      <p class="muted">
+        {{ run.started_at | fr_datetime }} · Cible : {{ 'Locale' if run.target == 'local' else run.target }}
+        {% if run.profile %}· Profil : {{ run.profile }}{% endif %}
+      </p>
+    </div>
+    <div class="report-downloads">
+      <a class="button" href="{{ url_for('report', run_id=run.id) }}">HTML</a>
+      <a class="button" href="{{ url_for('report_pdf', run_id=run.id) }}">PDF</a>
+      <a class="button" href="{{ url_for('report_json', run_id=run.id) }}">JSON</a>
+    </div>
+  </section>
+
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% for category, message in messages %}
+      <div class="flash {{ 'flash-success' if category == 'success' else 'flash-error' }}">
+        <p>{{ message }}</p>
+      </div>
+    {% endfor %}
+  {% endwith %}
+
+  {% if comparable_runs %}
+    <form class="compare-form" method="get" action="{{ url_for('compare') }}">
+      <input type="hidden" name="apres" value="{{ run.id }}">
+      <label for="compare-select">Comparer avec</label>
+      <select name="avant" id="compare-select">
+        {% for other in comparable_runs %}
+          <option value="{{ other.id }}" {% if other.id == default_compare_id %}selected{% endif %}>
+            #{{ other.id }} · {{ other.started_at | fr_datetime }} · {{ 'Locale' if other.target == 'local' else other.target }} · {{ other.score }}%
+          </option>
+        {% endfor %}
+      </select>
+      <button class="button" type="submit">Comparer</button>
+    </form>
+  {% endif %}
+
+  <section class="metrics">
+    <article class="metric">
+      <span>Score</span>
+      <strong>{{ run.score }}%</strong>
+    </article>
+    <article class="metric">
+      <span>Conformes</span>
+      <strong>{{ run.passed }}</strong>
+    </article>
+    <article class="metric">
+      <span>Non conformes</span>
+      <strong>{{ run.failed }}</strong>
+    </article>
+    {% if run.manual %}
+      <article class="metric">
+        <span>Manuels</span>
+        <strong>{{ run.manual }}</strong>
+      </article>
+    {% endif %}
+    {% if run.errors %}
+      <article class="metric">
+        <span>Erreurs d'exécution</span>
+        <strong>{{ run.errors }}</strong>
+      </article>
+    {% endif %}
+    <article class="metric">
+      <span>Durée</span>
+      <strong>{{ run.duration_seconds | fr_duration }}</strong>
+    </article>
+  </section>
+
+  {# Les categories en echec sont ouvertes d'office, les autres repliees :
+     c'est ce qui demande une action qu'on veut voir en arrivant. #}
+  {% for group in groups %}
+    <section class="panel category-group">
+      <details {{ 'open' if group.failed or group.manual or group.errors else '' }}>
+        <summary class="category-summary-row">
+          <span class="category-summary-name">{{ group.name }}</span>
+          <span class="category-summary-counts">
+            {% if group.failed %}<span class="pill fail">{{ group.failed }} non conforme{{ 's' if group.failed > 1 }}</span>{% endif %}
+            {% if group.errors %}<span class="pill error">{{ group.errors }} erreur{{ 's' if group.errors > 1 }}</span>{% endif %}
+            {% if group.manual %}<span class="pill manual">{{ group.manual }} manuel{{ 's' if group.manual > 1 }}</span>{% endif %}
+            {% if group.passed %}<span class="pill pass">{{ group.passed }} conforme{{ 's' if group.passed > 1 }}</span>{% endif %}
+            <span class="category-score">{{ '—' if group.score is none else group.score ~ ' %' }}</span>
+          </span>
+        </summary>
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Règle</th>
+                <th>Statut</th>
+                <th>Résultat obtenu</th>
+                <th>Recommandation</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for item in group.rules %}
+                <tr>
+                  <td>
+                    <strong>{{ item.rule_id }}</strong>
+                    <span class="row-title">{{ item.title }}</span>
+                  </td>
+                  <td><span class="pill {{ item.status | status_class }}">{{ item.status | fr_status }}</span></td>
+                  <td>
+                    <small>Attendu : {{ item.expected }}</small>
+                    <pre>{{ item.actual }}</pre>
+                  </td>
+                  <td>{{ item.recommendation }}</td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </details>
+    </section>
+  {% endfor %}
+{% endblock %}

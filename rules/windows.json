@@ -1,0 +1,2108 @@
+{
+  "os": "windows",
+  "benchmark": "CIS Microsoft Windows 11 Stand-alone Benchmark v5.0.0",
+  "rules": [
+    {
+      "id": "CIS-WIN-1.1.4",
+      "cis_rule": "1.1.4",
+      "profile": "Level 1 (L1)",
+      "category": "Politique de mots de passe et comptes",
+      "title": "Longueur minimale du mot de passe fixée à 14 caractères ou plus",
+      "severity": "high",
+      "description": "Cette regle determine le nombre minimal de caracteres que doit contenir le mot de passe d'un compte utilisateur. L'etat recommande est 14 caracteres ou plus.",
+      "rationale": "Des mots de passe plus longs reduisent l'exposition aux attaques par dictionnaire, par force brute et au cassage hors ligne des bases de comptes.",
+      "impact": "Exiger des mots de passe tres longs peut augmenter les oublis, les erreurs de saisie et les appels au support. L'usage de phrases de passe est recommande pour l'ergonomie.",
+      "audit_reference": "CIS Microsoft Windows 11 Stand-alone Benchmark v5.0.0, section 1.1.4.",
+      "audit_procedure": "Naviguer vers le chemin UI de la remediation et confirmer que 'Minimum password length' est fixe a 14 caracteres ou plus.",
+      "remediation_path": "Computer Configuration\\Policies\\Windows Settings\\Security Settings\\Account Policies\\Password Policy\\Minimum password length",
+      "default_value": "7 caracteres sur les membres de domaine. 0 caractere sur les serveurs autonomes.",
+      "references": [
+        "https://www.cisecurity.org/white-papers/cis-password-policy-guide/",
+        "https://learn.microsoft.com/en-us/windows/security/threat-protection/security-policy-settings/password-policy",
+        "GRID: MS-00000004"
+      ],
+      "cis_controls": [
+        "CIS Controls v8 5.2 Use Unique Passwords",
+        "CIS Controls v7 4.4 Use Unique Passwords",
+        "CIS Controls v7 16.2 Configure Centralized Point of Authentication"
+      ],
+      "check": {
+        "type": "numeric_min",
+        "command": "$line = (cmd /c net accounts) | Select-String -Pattern 'Minimum password length' | Select-Object -First 1; if ($line) { $value = ($line.Line -replace '.*:\\s*', '').Trim(); if ($value -match '^\\d+$') { $value } else { '0' } } else { 'NOT_FOUND' }",
+        "expected": "14"
+      },
+      "recommendation": "Fixer la politique locale 'Minimum password length' a 14 caracteres ou plus."
+    },
+    {
+      "id": "CIS-WIN-1.1.5",
+      "cis_rule": "1.1.5",
+      "profile": "Level 1 (L1)",
+      "category": "Politique de mots de passe et comptes",
+      "title": "Mots de passe soumis aux exigences de complexité",
+      "severity": "high",
+      "description": "Cette regle verifie que tout nouveau mot de passe respecte des exigences minimales de robustesse : ne pas contenir le nom du compte, faire au moins 6 caracteres et melanger au moins 3 des 4 categories (majuscules, minuscules, chiffres, caracteres speciaux).",
+      "rationale": "Les mots de passe purement alphanumeriques sont faciles a decouvrir avec des outils publics. La complexite augmente exponentiellement le nombre de combinaisons a tester lors d'une attaque par force brute.",
+      "impact": "Peut augmenter les appels au support pour comptes verrouilles si les utilisateurs ne sont pas habitues aux mots de passe complexes.",
+      "audit_reference": "CIS Microsoft Windows 11 Stand-alone Benchmark v5.0.0, section 1.1.5.",
+      "audit_procedure": "Naviguer vers le chemin UI de la remediation et confirmer que 'Password must meet complexity requirements' est fixe a Active. Verification technique via secedit /export (cle PasswordComplexity) - necessite des droits administrateur.",
+      "remediation_path": "Computer Configuration\\Policies\\Windows Settings\\Security Settings\\Account Policies\\Password Policy\\Password must meet complexity requirements",
+      "default_value": "Active sur les membres de domaine. Desactive sur les postes autonomes.",
+      "references": [
+        "https://www.cisecurity.org/white-papers/cis-password-policy-guide/",
+        "GRID: MS-00000005"
+      ],
+      "cis_controls": [
+        "CIS Controls v8 5.2 Use Unique Passwords",
+        "CIS Controls v7 4.4 Use Unique Passwords"
+      ],
+      "check": {
+        "type": "equals",
+        "command": "$tmp = [System.IO.Path]::GetTempFileName(); secedit /export /cfg $tmp /quiet | Out-Null; $line = Get-Content $tmp | Select-String -Pattern 'PasswordComplexity'; Remove-Item $tmp -Force -ErrorAction SilentlyContinue; if ($line) { ($line.Line -split '=')[1].Trim() } else { 'NOT_FOUND' }",
+        "expected": "1"
+      },
+      "recommendation": "Activer la regle 'Password must meet complexity requirements' dans la politique de mots de passe locale."
+    },
+    {
+      "id": "CIS-WIN-1.1.7",
+      "cis_rule": "1.1.7",
+      "profile": "Level 1 (L1)",
+      "category": "Politique de mots de passe et comptes",
+      "title": "Chiffrement réversible des mots de passe désactivé",
+      "severity": "high",
+      "description": "Cette regle determine si le systeme stocke les mots de passe avec un chiffrement reversible, ce qui equivaut en pratique a les stocker en clair.",
+      "rationale": "Activer cette regle affaiblit fortement la securite du systeme en rendant les mots de passe stockes quasiment aussi vulnerables qu'un stockage en texte clair.",
+      "impact": "Seuls certains protocoles anciens (CHAP, Digest Authentication IIS) necessitent cette regle activee ; ce cas doit rester exceptionnel.",
+      "audit_reference": "CIS Microsoft Windows 11 Stand-alone Benchmark v5.0.0, section 1.1.7.",
+      "audit_procedure": "Naviguer vers le chemin UI de la remediation et confirmer que 'Store passwords using reversible encryption' est fixe a Desactive. Verification technique via secedit /export (cle ClearTextPassword) - necessite des droits administrateur.",
+      "remediation_path": "Computer Configuration\\Policies\\Windows Settings\\Security Settings\\Account Policies\\Password Policy\\Store passwords using reversible encryption",
+      "default_value": "Desactive.",
+      "references": [
+        "https://www.cisecurity.org/white-papers/cis-password-policy-guide/",
+        "GRID: MS-00000007"
+      ],
+      "cis_controls": [
+        "CIS Controls v8 3.11 Encrypt Sensitive Data at Rest",
+        "CIS Controls v7 16.4 Encrypt or Hash all Authentication Credentials"
+      ],
+      "check": {
+        "type": "equals",
+        "command": "$tmp = [System.IO.Path]::GetTempFileName(); secedit /export /cfg $tmp /quiet | Out-Null; $line = Get-Content $tmp | Select-String -Pattern 'ClearTextPassword'; Remove-Item $tmp -Force -ErrorAction SilentlyContinue; if ($line) { ($line.Line -split '=')[1].Trim() } else { 'NOT_FOUND' }",
+        "expected": "0"
+      },
+      "recommendation": "Desactiver 'Store passwords using reversible encryption' dans la politique de mots de passe locale."
+    },
+    {
+      "id": "CIS-WIN-1.2.2",
+      "cis_rule": "1.2.2",
+      "profile": "Level 1 (L1)",
+      "category": "Politique de mots de passe et comptes",
+      "title": "Seuil de verrouillage de compte fixé à 5 tentatives invalides ou moins (hors 0)",
+      "severity": "high",
+      "description": "Cette regle definit le nombre de tentatives de connexion echouees avant verrouillage du compte. L'etat recommande est 5 tentatives ou moins, sans etre a 0 (0 desactivant le verrouillage).",
+      "rationale": "Un seuil de verrouillage reduit la probabilite de succes d'une attaque par force brute en ligne. Un seuil a 0 desactive totalement la protection.",
+      "impact": "Un seuil trop bas augmente le risque de verrouillages accidentels et peut generer des appels au support.",
+      "audit_reference": "CIS Microsoft Windows 11 Stand-alone Benchmark v5.0.0, section 1.2.2.",
+      "audit_procedure": "Naviguer vers le chemin UI de la remediation et confirmer que 'Account lockout threshold' est fixe a 5 ou moins, sans etre a 0.",
+      "remediation_path": "Computer Configuration\\Policies\\Windows Settings\\Security Settings\\Account Policies\\Account Lockout Policy\\Account lockout threshold",
+      "default_value": "0 tentative de connexion echouee (verrouillage desactive).",
+      "references": [
+        "https://www.cisecurity.org/white-papers/cis-password-policy-guide/",
+        "GRID: MS-00000009"
+      ],
+      "cis_controls": [
+        "CIS Controls v8 4.10 Enforce Automatic Device Lockout on Portable End-User Devices",
+        "CIS Controls v7 16.2 Configure Centralized Point of Authentication"
+      ],
+      "check": {
+        "type": "numeric_max",
+        "command": "$line = (cmd /c net accounts) | Select-String -Pattern 'Lockout threshold' | Select-Object -First 1; if ($line) { $value = ($line.Line -replace '.*:\\s*', '').Trim(); if ($value -match '^\\d+$') { $value } else { '9999' } } else { 'NOT_FOUND' }",
+        "expected": "5"
+      },
+      "recommendation": "Fixer la politique locale 'Account lockout threshold' a 5 tentatives ou moins, sans la laisser a 0."
+    },
+    {
+      "id": "CIS-WIN-1.1.1",
+      "cis_rule": "1.1.1",
+      "profile": "Level 1 (L1)",
+      "category": "Politique de mots de passe et comptes",
+      "title": "Historique des mots de passe fixé à 24 ou plus",
+      "severity": "medium",
+      "description": "Cette regle determine le nombre de mots de passe uniques qui doivent etre utilises avant qu'un ancien mot de passe puisse etre reutilise. L'etat recommande est 24 mots de passe ou plus.",
+      "rationale": "Plus un mot de passe reste reutilisable longtemps, plus il est probable qu'un attaquant parvienne a le determiner par force brute. Empecher la reutilisation des anciens mots de passe renforce l'efficacite de la politique de mots de passe.",
+      "impact": "Les utilisateurs doivent creer un nouveau mot de passe a chaque changement, ce qui peut augmenter les appels au support si la regle n'est pas accompagnee d'un age minimal du mot de passe.",
+      "audit_reference": "CIS Microsoft Windows 11 Stand-alone Benchmark v5.0.0, section 1.1.1.",
+      "audit_procedure": "Naviguer vers le chemin UI de la remediation et confirmer que 'Enforce password history' est fixe a 24 ou plus.",
+      "remediation_path": "Computer Configuration\\Policies\\Windows Settings\\Security Settings\\Account Policies\\Password Policy\\Enforce password history",
+      "default_value": "24 mots de passe sur un domaine. 0 mot de passe sur un poste autonome.",
+      "references": [
+        "https://www.cisecurity.org/white-papers/cis-password-policy-guide/",
+        "GRID: MS-00000001"
+      ],
+      "cis_controls": [
+        "CIS Controls v8 5.2 Use Unique Passwords",
+        "CIS Controls v7 16.2 Configure Centralized Point of Authentication"
+      ],
+      "check": {
+        "type": "numeric_min",
+        "command": "$line = (cmd /c net accounts) | Select-String -Pattern 'Length of password history maintained' | Select-Object -First 1; if ($line) { $value = ($line.Line -replace '.*:\\s*', '').Trim(); if ($value -match '^\\d+$') { $value } else { '0' } } else { 'NOT_FOUND' }",
+        "expected": "24"
+      },
+      "recommendation": "Fixer la politique locale 'Enforce password history' a 24 mots de passe ou plus."
+    },
+    {
+      "id": "CIS-WIN-9.2.1",
+      "cis_rule": "9.2.1",
+      "profile": "Level 1 (L1)",
+      "category": "Pare-feu",
+      "title": "Pare-feu (Privé) activé",
+      "severity": "high",
+      "description": "Détermine si le pare-feu Privé est activé ou désactivé.",
+      "rationale": "Si le pare-feu est désactivé, tout le trafic peut atteindre le systeme et un attaquant peut plus facilement exploiter une faiblesse d'un service reseau.",
+      "audit_reference": "CIS Microsoft Windows 11 Stand-alone Benchmark v5.0.0, section 9.2.1. Valeur de registre : HKLM:\\SOFTWARE\\Policies\\Microsoft\\WindowsFirewall\\PrivateProfile:EnableFirewall.",
+      "audit_procedure": "Naviguer vers le chemin UI de la remediation et confirmer le reglage, ou verifier la valeur de registre HKLM:\\SOFTWARE\\Policies\\Microsoft\\WindowsFirewall\\PrivateProfile:EnableFirewall.",
+      "remediation_path": "Computer Configuration\\Policies\\Windows Settings\\Security Settings\\Windows Defender Firewall with Advanced Security\\Windows Defender Firewall with Advanced Security\\Windows Defender Firewall Properties\\Privé Profile",
+      "default_value": "Activé (comportement par défaut).",
+      "references": [
+        "https://learn.microsoft.com/en-us/windows/security/threat-protection/windows-firewall/best-practices-configuring"
+      ],
+      "cis_controls": [
+        "CIS Controls v8 4.5 Implement and Manage a Firewall on End-User Devices",
+        "CIS Controls v7 9.4 Apply Host-based Firewalls or Port Filtering"
+      ],
+      "check": {
+        "type": "equals",
+        "command": "(Get-ItemProperty -Path 'HKLM:\\SOFTWARE\\Policies\\Microsoft\\WindowsFirewall\\PrivateProfile' -Name EnableFirewall -ErrorAction SilentlyContinue).EnableFirewall",
+        "expected": "1"
+      },
+      "recommendation": "Configurer 'Privé Profile' selon la valeur recommandee par le benchmark CIS (voir description)."
+    },
+    {
+      "id": "CIS-WIN-9.2.2",
+      "cis_rule": "9.2.2",
+      "profile": "Level 1 (L1)",
+      "category": "Pare-feu",
+      "title": "Pare-feu (Privé) bloquées par défaut",
+      "severity": "high",
+      "description": "Détermine le comportement pour les connexions entrantes qui ne correspondent a aucune regle de pare-feu.",
+      "rationale": "Si le pare-feu autorise tout le trafic, un attaquant peut plus facilement exploiter une faiblesse d'un service reseau accessible.",
+      "audit_reference": "CIS Microsoft Windows 11 Stand-alone Benchmark v5.0.0, section 9.2.2. Valeur de registre : HKLM:\\SOFTWARE\\Policies\\Microsoft\\WindowsFirewall\\PrivateProfile:DefaultInboundAction.",
+      "audit_procedure": "Naviguer vers le chemin UI de la remediation et confirmer le reglage, ou verifier la valeur de registre HKLM:\\SOFTWARE\\Policies\\Microsoft\\WindowsFirewall\\PrivateProfile:DefaultInboundAction.",
+      "remediation_path": "Computer Configuration\\Policies\\Windows Settings\\Security Settings\\Windows Defender Firewall with Advanced Security\\Windows Defender Firewall with Advanced Security\\Windows Defender Firewall Properties\\Privé Profile",
+      "default_value": "Bloqué (comportement par défaut).",
+      "references": [
+        "https://learn.microsoft.com/en-us/windows/security/threat-protection/windows-firewall/best-practices-configuring"
+      ],
+      "cis_controls": [
+        "CIS Controls v8 4.5 Implement and Manage a Firewall on End-User Devices",
+        "CIS Controls v7 9.4 Apply Host-based Firewalls or Port Filtering"
+      ],
+      "check": {
+        "type": "equals",
+        "command": "(Get-ItemProperty -Path 'HKLM:\\SOFTWARE\\Policies\\Microsoft\\WindowsFirewall\\PrivateProfile' -Name DefaultInboundAction -ErrorAction SilentlyContinue).DefaultInboundAction",
+        "expected": "1"
+      },
+      "recommendation": "Configurer 'Privé Profile' selon la valeur recommandee par le benchmark CIS (voir description)."
+    },
+    {
+      "id": "CIS-WIN-9.3.1",
+      "cis_rule": "9.3.1",
+      "profile": "Level 1 (L1)",
+      "category": "Pare-feu",
+      "title": "Pare-feu (Public) activé",
+      "severity": "high",
+      "description": "Détermine si le pare-feu Public est activé ou désactivé.",
+      "rationale": "Si le pare-feu est désactivé, tout le trafic peut atteindre le systeme et un attaquant peut plus facilement exploiter une faiblesse d'un service reseau.",
+      "audit_reference": "CIS Microsoft Windows 11 Stand-alone Benchmark v5.0.0, section 9.3.1. Valeur de registre : HKLM:\\SOFTWARE\\Policies\\Microsoft\\WindowsFirewall\\PublicProfile:EnableFirewall.",
+      "audit_procedure": "Naviguer vers le chemin UI de la remediation et confirmer le reglage, ou verifier la valeur de registre HKLM:\\SOFTWARE\\Policies\\Microsoft\\WindowsFirewall\\PublicProfile:EnableFirewall.",
+      "remediation_path": "Computer Configuration\\Policies\\Windows Settings\\Security Settings\\Windows Defender Firewall with Advanced Security\\Windows Defender Firewall with Advanced Security\\Windows Defender Firewall Properties\\Public Profile",
+      "default_value": "Activé (comportement par défaut).",
+      "references": [
+        "https://learn.microsoft.com/en-us/windows/security/threat-protection/windows-firewall/best-practices-configuring"
+      ],
+      "cis_controls": [
+        "CIS Controls v8 4.5 Implement and Manage a Firewall on End-User Devices",
+        "CIS Controls v7 9.4 Apply Host-based Firewalls or Port Filtering"
+      ],
+      "check": {
+        "type": "equals",
+        "command": "(Get-ItemProperty -Path 'HKLM:\\SOFTWARE\\Policies\\Microsoft\\WindowsFirewall\\PublicProfile' -Name EnableFirewall -ErrorAction SilentlyContinue).EnableFirewall",
+        "expected": "1"
+      },
+      "recommendation": "Configurer 'Public Profile' selon la valeur recommandee par le benchmark CIS (voir description)."
+    },
+    {
+      "id": "CIS-WIN-9.3.2",
+      "cis_rule": "9.3.2",
+      "profile": "Level 1 (L1)",
+      "category": "Pare-feu",
+      "title": "Pare-feu (Public) bloquées par défaut",
+      "severity": "high",
+      "description": "Détermine le comportement pour les connexions entrantes qui ne correspondent a aucune regle de pare-feu.",
+      "rationale": "Si le pare-feu autorise tout le trafic, un attaquant peut plus facilement exploiter une faiblesse d'un service reseau accessible.",
+      "audit_reference": "CIS Microsoft Windows 11 Stand-alone Benchmark v5.0.0, section 9.3.2. Valeur de registre : HKLM:\\SOFTWARE\\Policies\\Microsoft\\WindowsFirewall\\PublicProfile:DefaultInboundAction.",
+      "audit_procedure": "Naviguer vers le chemin UI de la remediation et confirmer le reglage, ou verifier la valeur de registre HKLM:\\SOFTWARE\\Policies\\Microsoft\\WindowsFirewall\\PublicProfile:DefaultInboundAction.",
+      "remediation_path": "Computer Configuration\\Policies\\Windows Settings\\Security Settings\\Windows Defender Firewall with Advanced Security\\Windows Defender Firewall with Advanced Security\\Windows Defender Firewall Properties\\Public Profile",
+      "default_value": "Bloqué (comportement par défaut).",
+      "references": [
+        "https://learn.microsoft.com/en-us/windows/security/threat-protection/windows-firewall/best-practices-configuring"
+      ],
+      "cis_controls": [
+        "CIS Controls v8 4.5 Implement and Manage a Firewall on End-User Devices",
+        "CIS Controls v7 9.4 Apply Host-based Firewalls or Port Filtering"
+      ],
+      "check": {
+        "type": "equals",
+        "command": "(Get-ItemProperty -Path 'HKLM:\\SOFTWARE\\Policies\\Microsoft\\WindowsFirewall\\PublicProfile' -Name DefaultInboundAction -ErrorAction SilentlyContinue).DefaultInboundAction",
+        "expected": "1"
+      },
+      "recommendation": "Configurer 'Public Profile' selon la valeur recommandee par le benchmark CIS (voir description)."
+    },
+    {
+      "id": "CIS-WIN-9.2.3",
+      "cis_rule": "9.2.3",
+      "profile": "Level 1 (L1)",
+      "category": "Pare-feu",
+      "title": "Pare-feu (Privé) sans notification a l'utilisateur",
+      "severity": "medium",
+      "description": "Détermine si Windows Firewall affiche une notification a l'utilisateur lorsqu'un programme est bloque.",
+      "rationale": "Les notifications de pare-feu peuvent etre complexes et perturber les utilisateurs, qui ne peuvent de toute facon pas traiter l'alerte.",
+      "audit_reference": "CIS Microsoft Windows 11 Stand-alone Benchmark v5.0.0, section 9.2.3. Valeur de registre : HKLM:\\SOFTWARE\\Policies\\Microsoft\\WindowsFirewall\\PrivateProfile:DisableNotifications.",
+      "audit_procedure": "Naviguer vers le chemin UI de la remediation et confirmer le reglage, ou verifier la valeur de registre HKLM:\\SOFTWARE\\Policies\\Microsoft\\WindowsFirewall\\PrivateProfile:DisableNotifications.",
+      "remediation_path": "Computer Configuration\\Policies\\Windows Settings\\Security Settings\\Windows Defender Firewall with Advanced Security\\Windows Defender Firewall with Advanced Security\\Windows Defender Firewall Properties\\Privé Profile",
+      "default_value": "Oui (une notification est affichee par defaut).",
+      "references": [
+        "https://learn.microsoft.com/en-us/windows/security/threat-protection/windows-firewall/best-practices-configuring"
+      ],
+      "cis_controls": [
+        "CIS Controls v8 4.5 Implement and Manage a Firewall on End-User Devices",
+        "CIS Controls v7 9.4 Apply Host-based Firewalls or Port Filtering"
+      ],
+      "check": {
+        "type": "equals",
+        "command": "(Get-ItemProperty -Path 'HKLM:\\SOFTWARE\\Policies\\Microsoft\\WindowsFirewall\\PrivateProfile' -Name DisableNotifications -ErrorAction SilentlyContinue).DisableNotifications",
+        "expected": "1"
+      },
+      "recommendation": "Configurer 'Privé Profile' selon la valeur recommandee par le benchmark CIS (voir description)."
+    },
+    {
+      "id": "CIS-WIN-2.3.17.1",
+      "cis_rule": "2.3.17.1",
+      "profile": "Level 1 (L1)",
+      "category": "Contrôle de compte utilisateur (UAC)",
+      "title": "UAC : mode d'approbation admin pour le compte Administrateur intégré",
+      "severity": "high",
+      "description": "Détermine si le mode d'approbation administrateur (Admin Approval Mode) s'applique au compte Administrateur intégré.",
+      "rationale": "Le compte Administrateur intégré est une cible privilégiée pour les attaquants ; sans ce réglage, un logiciel malveillant lancé sous ce compte s'exécute avec les privilèges élevés sans confirmation de l'utilisateur.",
+      "audit_reference": "CIS Microsoft Windows 11 Stand-alone Benchmark v5.0.0, section 2.3.17.1. Valeur de registre : HKLM:\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Policies\\System:FilterAdministratorToken.",
+      "audit_procedure": "Naviguer vers le chemin UI de la remediation et confirmer le reglage, ou verifier la valeur de registre HKLM:\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Policies\\System:FilterAdministratorToken.",
+      "remediation_path": "Computer Configuration\\Policies\\Windows Settings\\Security Settings\\Local Policies\\Security Options\\User Account Control: Admin Approval Mode for the Built-in Administrator account",
+      "default_value": "Désactivé (le compte Administrateur intégré exécute toutes les applications avec les pleins privilèges).",
+      "references": [
+        "https://learn.microsoft.com/en-us/windows/security/threat-protection/security-policy-settings/"
+      ],
+      "cis_controls": [
+        "CIS Controls v8 4.1 Establish and Maintain a Secure Configuration Process"
+      ],
+      "check": {
+        "type": "equals",
+        "command": "(Get-ItemProperty -Path 'HKLM:\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Policies\\System' -Name FilterAdministratorToken -ErrorAction SilentlyContinue).FilterAdministratorToken",
+        "expected": "1"
+      },
+      "recommendation": "Configurer 'User Account Control: Admin Approval Mode for the Built-in Administrator account' selon la valeur recommandee par le benchmark CIS (voir description)."
+    },
+    {
+      "id": "CIS-WIN-2.3.17.2",
+      "cis_rule": "2.3.17.2",
+      "profile": "Level 1 (L1)",
+      "category": "Contrôle de compte utilisateur (UAC)",
+      "title": "UAC : invite d'élévation sur le bureau sécurisé pour les administrateurs",
+      "severity": "high",
+      "description": "Détermine le comportement de l'invite d'élévation pour les comptes administrateurs en mode d'approbation admin.",
+      "rationale": "Afficher l'invite sur le bureau sécurisé empêche un programme malveillant de simuler ou d'intercepter la confirmation d'élévation de privilège.",
+      "audit_reference": "CIS Microsoft Windows 11 Stand-alone Benchmark v5.0.0, section 2.3.17.2. Valeur de registre : HKLM:\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Policies\\System:ConsentPromptBehaviorAdmin.",
+      "audit_procedure": "Naviguer vers le chemin UI de la remediation et confirmer le reglage, ou verifier la valeur de registre HKLM:\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Policies\\System:ConsentPromptBehaviorAdmin.",
+      "remediation_path": "Computer Configuration\\Policies\\Windows Settings\\Security Settings\\Local Policies\\Security Options\\User Account Control: Behavior of the elevation prompt for administrators in Admin Approval Mode",
+      "default_value": "Demander un consentement pour les binaires non-Windows.",
+      "references": [
+        "https://learn.microsoft.com/en-us/windows/security/threat-protection/security-policy-settings/"
+      ],
+      "cis_controls": [
+        "CIS Controls v8 4.1 Establish and Maintain a Secure Configuration Process"
+      ],
+      "check": {
+        "type": "regex",
+        "command": "(Get-ItemProperty -Path 'HKLM:\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Policies\\System' -Name ConsentPromptBehaviorAdmin -ErrorAction SilentlyContinue).ConsentPromptBehaviorAdmin",
+        "expected": "^[12]$"
+      },
+      "recommendation": "Configurer 'User Account Control: Behavior of the elevation prompt for administrators in Admin Approval Mode' selon la valeur recommandee par le benchmark CIS (voir description)."
+    },
+    {
+      "id": "CIS-WIN-2.3.17.3",
+      "cis_rule": "2.3.17.3",
+      "profile": "Level 1 (L1)",
+      "category": "Contrôle de compte utilisateur (UAC)",
+      "title": "UAC : refus automatique d'élévation pour les utilisateurs standards",
+      "severity": "high",
+      "description": "Détermine le comportement de l'invite d'élévation pour les comptes utilisateurs standards.",
+      "rationale": "Empêche un utilisateur standard de fournir des identifiants administrateur en réponse à une demande d'élévation potentiellement déclenchée par un programme malveillant.",
+      "audit_reference": "CIS Microsoft Windows 11 Stand-alone Benchmark v5.0.0, section 2.3.17.3. Valeur de registre : HKLM:\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Policies\\System:ConsentPromptBehaviorUser.",
+      "audit_procedure": "Naviguer vers le chemin UI de la remediation et confirmer le reglage, ou verifier la valeur de registre HKLM:\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Policies\\System:ConsentPromptBehaviorUser.",
+      "remediation_path": "Computer Configuration\\Policies\\Windows Settings\\Security Settings\\Local Policies\\Security Options\\User Account Control: Behavior of the elevation prompt for standard users",
+      "default_value": "Demander les informations d'identification.",
+      "references": [
+        "https://learn.microsoft.com/en-us/windows/security/threat-protection/security-policy-settings/"
+      ],
+      "cis_controls": [
+        "CIS Controls v8 4.1 Establish and Maintain a Secure Configuration Process"
+      ],
+      "check": {
+        "type": "equals",
+        "command": "(Get-ItemProperty -Path 'HKLM:\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Policies\\System' -Name ConsentPromptBehaviorUser -ErrorAction SilentlyContinue).ConsentPromptBehaviorUser",
+        "expected": "0"
+      },
+      "recommendation": "Configurer 'User Account Control: Behavior of the elevation prompt for standard users' selon la valeur recommandee par le benchmark CIS (voir description)."
+    },
+    {
+      "id": "CIS-WIN-2.3.17.6",
+      "cis_rule": "2.3.17.6",
+      "profile": "Level 1 (L1)",
+      "category": "Contrôle de compte utilisateur (UAC)",
+      "title": "UAC : activation globale du contrôle de compte utilisateur",
+      "severity": "high",
+      "description": "Détermine le comportement de l'ensemble des réglages UAC de l'ordinateur ; c'est l'interrupteur principal de l'UAC.",
+      "rationale": "Si ce réglage est désactivé, l'UAC est totalement inactif et tous les bénéfices de sécurité associés disparaissent.",
+      "audit_reference": "CIS Microsoft Windows 11 Stand-alone Benchmark v5.0.0, section 2.3.17.6. Valeur de registre : HKLM:\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Policies\\System:EnableLUA.",
+      "audit_procedure": "Naviguer vers le chemin UI de la remediation et confirmer le reglage, ou verifier la valeur de registre HKLM:\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Policies\\System:EnableLUA.",
+      "remediation_path": "Computer Configuration\\Policies\\Windows Settings\\Security Settings\\Local Policies\\Security Options\\User Account Control: Run all administrators in Admin Approval Mode",
+      "default_value": "Activé.",
+      "references": [
+        "https://learn.microsoft.com/en-us/windows/security/threat-protection/security-policy-settings/"
+      ],
+      "cis_controls": [
+        "CIS Controls v8 4.1 Establish and Maintain a Secure Configuration Process"
+      ],
+      "check": {
+        "type": "equals",
+        "command": "(Get-ItemProperty -Path 'HKLM:\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Policies\\System' -Name EnableLUA -ErrorAction SilentlyContinue).EnableLUA",
+        "expected": "1"
+      },
+      "recommendation": "Configurer 'User Account Control: Run all administrators in Admin Approval Mode' selon la valeur recommandee par le benchmark CIS (voir description)."
+    },
+    {
+      "id": "CIS-WIN-2.3.17.4",
+      "cis_rule": "2.3.17.4",
+      "profile": "Level 1 (L1)",
+      "category": "Contrôle de compte utilisateur (UAC)",
+      "title": "UAC : détection des installations d'applications avec invite d'élévation",
+      "severity": "medium",
+      "description": "Détermine si le système détecte les packages d'installation d'application et invite à une élévation de privilège.",
+      "rationale": "Un logiciel malveillant peut tenter de s'installer après avoir obtenu la permission de s'exécuter ; cette détection ajoute un point de contrôle supplémentaire avant l'installation.",
+      "audit_reference": "CIS Microsoft Windows 11 Stand-alone Benchmark v5.0.0, section 2.3.17.4. Valeur de registre : HKLM:\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Policies\\System:EnableInstallerDetection.",
+      "audit_procedure": "Naviguer vers le chemin UI de la remediation et confirmer le reglage, ou verifier la valeur de registre HKLM:\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Policies\\System:EnableInstallerDetection.",
+      "remediation_path": "Computer Configuration\\Policies\\Windows Settings\\Security Settings\\Local Policies\\Security Options\\User Account Control: Detect application installations and prompt for elevation",
+      "default_value": "Désactivé (par défaut en environnement d'entreprise).",
+      "references": [
+        "https://learn.microsoft.com/en-us/windows/security/threat-protection/security-policy-settings/"
+      ],
+      "cis_controls": [
+        "CIS Controls v8 4.1 Establish and Maintain a Secure Configuration Process"
+      ],
+      "check": {
+        "type": "equals",
+        "command": "(Get-ItemProperty -Path 'HKLM:\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Policies\\System' -Name EnableInstallerDetection -ErrorAction SilentlyContinue).EnableInstallerDetection",
+        "expected": "1"
+      },
+      "recommendation": "Configurer 'User Account Control: Detect application installations and prompt for elevation' selon la valeur recommandee par le benchmark CIS (voir description)."
+    },
+    {
+      "id": "CIS-WIN-18.9.13.1",
+      "cis_rule": "18.9.13.1",
+      "profile": "Level 1 (L1)",
+      "category": "Protection LSASS / Credential Guard / VBS",
+      "title": "Politique d'initialisation des pilotes au démarrage (Early Launch Antimalware)",
+      "severity": "high",
+      "description": "Détermine quels pilotes de démarrage (boot-start) sont initialisés selon leur classification par le pilote Early Launch Antimalware : bon, inconnu, ou mauvais mais critique au démarrage.",
+      "rationale": "Réduit l'impact d'un logiciel malveillant déjà installé en empêchant l'initialisation de pilotes identifiés comme malveillants au tout premier stade du démarrage du système.",
+      "audit_reference": "CIS Microsoft Windows 11 Stand-alone Benchmark v5.0.0, section 18.9.13.1.",
+      "audit_procedure": "Naviguer vers le chemin UI de la remediation et confirmer le reglage, ou verifier la valeur de registre correspondante.",
+      "remediation_path": "Computer Configuration\\Policies\\Administrative Templates\\System (section 18.9.13.1)",
+      "default_value": "Voir description du benchmark CIS.",
+      "references": [
+        "https://learn.microsoft.com/en-us/windows/security/hardware-security/kernel-dma-protection-for-thunderbolt"
+      ],
+      "cis_controls": [
+        "CIS Controls v8 10.5 Enable Anti-Exploitation Features"
+      ],
+      "check": {
+        "type": "equals",
+        "command": "(Get-ItemProperty -Path 'HKLM:\\SYSTEM\\CurrentControlSet\\Policies\\EarlyLaunch' -Name DriverLoadPolicy -ErrorAction SilentlyContinue).DriverLoadPolicy",
+        "expected": "3"
+      },
+      "recommendation": "Configurer le parametre correspondant a la section 18.9.13.1 selon la valeur recommandee par le benchmark CIS (voir description)."
+    },
+    {
+      "id": "CIS-WIN-18.9.27.1",
+      "cis_rule": "18.9.27.1",
+      "profile": "Level 1 (L1)",
+      "category": "Protection LSASS / Credential Guard / VBS",
+      "title": "Interdiction des SSP/AP personnalisés dans LSASS",
+      "severity": "high",
+      "description": "Contrôle si LSASS peut charger des paquets SSP/AP (Security Support Provider/Authentication Package) personnalisés et non signés par Microsoft.",
+      "rationale": "Des attaquants peuvent intercepter les identifiants de connexion via un SSP/AP malveillant chargé dans LSASS ; désactiver ce chargement réduit cette surface d'attaque.",
+      "audit_reference": "CIS Microsoft Windows 11 Stand-alone Benchmark v5.0.0, section 18.9.27.1. Valeur de registre : HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\System:AllowCustomSSPsAPs.",
+      "audit_procedure": "Naviguer vers le chemin UI de la remediation et confirmer le reglage, ou verifier la valeur de registre HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\System:AllowCustomSSPsAPs.",
+      "remediation_path": "Computer Configuration\\Policies\\Administrative Templates\\System\\Local Security Authority\\Allow Custom SSPs and APs to be loaded into LSASS",
+      "default_value": "Activé (LSA autorise le chargement de SSP/AP personnalisés).",
+      "references": [
+        "https://learn.microsoft.com/en-us/windows/security/identity-protection/credential-guard/"
+      ],
+      "cis_controls": [
+        "CIS Controls v8 10.5 Enable Anti-Exploitation Features"
+      ],
+      "check": {
+        "type": "equals",
+        "command": "(Get-ItemProperty -Path 'HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\System' -Name AllowCustomSSPsAPs -ErrorAction SilentlyContinue).AllowCustomSSPsAPs",
+        "expected": "0"
+      },
+      "recommendation": "Configurer 'Allow Custom SSPs and APs to be loaded into LSASS' selon la valeur recommandee par le benchmark CIS (voir description)."
+    },
+    {
+      "id": "CIS-WIN-18.9.27.2",
+      "cis_rule": "18.9.27.2",
+      "profile": "Level 1 (L1)",
+      "category": "Protection LSASS / Credential Guard / VBS",
+      "title": "LSASS exécuté en tant que processus protégé (PPL, verrouillage UEFI)",
+      "severity": "high",
+      "description": "Force LSASS à s'exécuter en tant que processus protégé (Protected Process Light), avec verrouillage UEFI empêchant sa désactivation à distance.",
+      "rationale": "Empêche la lecture de la mémoire et l'injection de code dans LSASS par des processus non protégés — bloque directement les outils de dump de credentials comme Mimikatz.",
+      "audit_reference": "CIS Microsoft Windows 11 Stand-alone Benchmark v5.0.0, section 18.9.27.2. Valeur de registre : HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\System:RunAsPPL.",
+      "audit_procedure": "Naviguer vers le chemin UI de la remediation et confirmer le reglage, ou verifier la valeur de registre HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\System:RunAsPPL.",
+      "remediation_path": "Computer Configuration\\Policies\\Administrative Templates\\System\\Local Security Authority\\Configures LSASS to run as a protected process",
+      "default_value": "Non configuré.",
+      "references": [
+        "https://learn.microsoft.com/en-us/windows/security/identity-protection/credential-guard/"
+      ],
+      "cis_controls": [
+        "CIS Controls v8 10.5 Enable Anti-Exploitation Features"
+      ],
+      "check": {
+        "type": "equals",
+        "command": "(Get-ItemProperty -Path 'HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\System' -Name RunAsPPL -ErrorAction SilentlyContinue).RunAsPPL",
+        "expected": "1"
+      },
+      "recommendation": "Configurer 'Configures LSASS to run as a protected process' selon la valeur recommandee par le benchmark CIS (voir description)."
+    },
+    {
+      "id": "CIS-WIN-18.9.4.1",
+      "cis_rule": "18.9.4.1",
+      "profile": "Level 1 (L1)",
+      "category": "Protection LSASS / Credential Guard / VBS",
+      "title": "Correctif de l'oracle de chiffrement CredSSP (Encryption Oracle Remediation)",
+      "severity": "high",
+      "description": "Contrôle la compatibilité avec les clients/serveurs CredSSP vulnérables à l'attaque par oracle de chiffrement (CVE-2018-0886).",
+      "rationale": "Mitige la vulnérabilité CredSSP (CVE-2018-0886, RCE) utilisée notamment par le Bureau à distance ; sans ce correctif, un attaquant en position de MITM peut exécuter du code arbitraire via une session RDP.",
+      "audit_reference": "CIS Microsoft Windows 11 Stand-alone Benchmark v5.0.0, section 18.9.4.1. Valeur de registre : HKLM:\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Policies\\System\\CredSSP\\Parameters:AllowEncryptionOracle.",
+      "audit_procedure": "Naviguer vers le chemin UI de la remediation et confirmer le reglage, ou verifier la valeur de registre HKLM:\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Policies\\System\\CredSSP\\Parameters:AllowEncryptionOracle.",
+      "remediation_path": "Computer Configuration\\Policies\\Administrative Templates\\System\\Credentials Delegation\\Encryption Oracle Remediation",
+      "default_value": "Sans le correctif de mai 2018 : Activé : Vulnérable.",
+      "references": [
+        "https://learn.microsoft.com/en-us/windows/security/identity-protection/credential-guard/"
+      ],
+      "cis_controls": [
+        "CIS Controls v8 10.5 Enable Anti-Exploitation Features"
+      ],
+      "check": {
+        "type": "equals",
+        "command": "(Get-ItemProperty -Path 'HKLM:\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Policies\\System\\CredSSP\\Parameters' -Name AllowEncryptionOracle -ErrorAction SilentlyContinue).AllowEncryptionOracle",
+        "expected": "0"
+      },
+      "recommendation": "Configurer 'Encryption Oracle Remediation' selon la valeur recommandee par le benchmark CIS (voir description)."
+    },
+    {
+      "id": "CIS-WIN-18.9.5.1",
+      "cis_rule": "18.9.5.1",
+      "profile": "Level 1 (L1)",
+      "category": "Protection LSASS / Credential Guard / VBS",
+      "title": "Activation de la sécurité basée sur la virtualisation (VBS)",
+      "severity": "high",
+      "description": "Active la sécurité basée sur la virtualisation (VBS), qui isole les secrets Kerberos/NTLM/Credential Manager du reste du système via l'hyperviseur.",
+      "rationale": "Sans VBS, les secrets d'authentification sont stockés dans le processus LSA standard, accessible en cas de compromission du noyau.",
+      "audit_reference": "CIS Microsoft Windows 11 Stand-alone Benchmark v5.0.0, section 18.9.5.1. Valeur de registre : HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\DeviceGuard:EnableVirtualizationBasedSecurity.",
+      "audit_procedure": "Naviguer vers le chemin UI de la remediation et confirmer le reglage, ou verifier la valeur de registre HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\DeviceGuard:EnableVirtualizationBasedSecurity.",
+      "remediation_path": "Computer Configuration\\Policies\\Administrative Templates\\System\\Device Guard\\Turn On Virtualization Based Security",
+      "default_value": "Désactivé.",
+      "references": [
+        "https://learn.microsoft.com/en-us/windows/security/identity-protection/credential-guard/"
+      ],
+      "cis_controls": [
+        "CIS Controls v8 10.5 Enable Anti-Exploitation Features"
+      ],
+      "check": {
+        "type": "equals",
+        "command": "(Get-ItemProperty -Path 'HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\DeviceGuard' -Name EnableVirtualizationBasedSecurity -ErrorAction SilentlyContinue).EnableVirtualizationBasedSecurity",
+        "expected": "1"
+      },
+      "recommendation": "Configurer 'Turn On Virtualization Based Security' selon la valeur recommandee par le benchmark CIS (voir description)."
+    },
+    {
+      "id": "CIS-WIN-18.7.1",
+      "cis_rule": "18.7.1",
+      "profile": "Level 1 (L1)",
+      "category": "Spouleur d'impression (PrintNightmare)",
+      "title": "Spouleur d'impression : refus des connexions clientes distantes",
+      "severity": "high",
+      "description": "Contrôle si le service Spouleur d'impression accepte les connexions clientes distantes.",
+      "rationale": "Mitige les attaques distantes exploitant PrintNightmare (CVE-2021-34527) contre le service Spouleur d'impression.",
+      "audit_reference": "CIS Microsoft Windows 11 Stand-alone Benchmark v5.0.0, section 18.7.1. Valeur de registre : HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows NT\\Printers:RegisterSpoolerRemoteRpcEndPoint.",
+      "audit_procedure": "Naviguer vers le chemin UI de la remediation et confirmer le reglage, ou verifier la valeur de registre HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows NT\\Printers:RegisterSpoolerRemoteRpcEndPoint.",
+      "remediation_path": "Computer Configuration\\Policies\\Administrative Templates\\Printers\\Allow Print Spooler to accept client connections",
+      "default_value": "Activé (le spouleur accepte toujours les connexions clientes).",
+      "references": [
+        "https://msrc.microsoft.com/update-guide/vulnerability/CVE-2021-34527"
+      ],
+      "cis_controls": [
+        "CIS Controls v8 4.1 Establish and Maintain a Secure Configuration Process"
+      ],
+      "check": {
+        "type": "equals",
+        "command": "(Get-ItemProperty -Path 'HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows NT\\Printers' -Name RegisterSpoolerRemoteRpcEndPoint -ErrorAction SilentlyContinue).RegisterSpoolerRemoteRpcEndPoint",
+        "expected": "2"
+      },
+      "recommendation": "Configurer 'Allow Print Spooler to accept client connections' selon la valeur recommandee par le benchmark CIS (voir description)."
+    },
+    {
+      "id": "CIS-WIN-18.7.10",
+      "cis_rule": "18.7.10",
+      "profile": "Level 1 (L1)",
+      "category": "Spouleur d'impression (PrintNightmare)",
+      "title": "Installation de pilotes d'impression réservée aux administrateurs",
+      "severity": "high",
+      "description": "Contrôle si des utilisateurs non-administrateurs peuvent installer des pilotes d'impression sur le système.",
+      "rationale": "Restreindre l'installation des pilotes d'impression aux administrateurs mitige PrintNightmare (CVE-2021-34527) et d'autres attaques du Spouleur.",
+      "audit_reference": "CIS Microsoft Windows 11 Stand-alone Benchmark v5.0.0, section 18.7.10. Valeur de registre : HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows NT\\Printers\\PointAndPrint:RestrictDriverInstallationToAdministrators.",
+      "audit_procedure": "Naviguer vers le chemin UI de la remediation et confirmer le reglage, ou verifier la valeur de registre HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows NT\\Printers\\PointAndPrint:RestrictDriverInstallationToAdministrators.",
+      "remediation_path": "Computer Configuration\\Policies\\Administrative Templates\\Printers\\Limits print driver installation to Administrators",
+      "default_value": "Activé (comportement par défaut).",
+      "references": [
+        "https://msrc.microsoft.com/update-guide/vulnerability/CVE-2021-34527"
+      ],
+      "cis_controls": [
+        "CIS Controls v8 4.1 Establish and Maintain a Secure Configuration Process"
+      ],
+      "check": {
+        "type": "equals",
+        "command": "(Get-ItemProperty -Path 'HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows NT\\Printers\\PointAndPrint' -Name RestrictDriverInstallationToAdministrators -ErrorAction SilentlyContinue).RestrictDriverInstallationToAdministrators",
+        "expected": "1"
+      },
+      "recommendation": "Configurer 'Limits print driver installation to Administrators' selon la valeur recommandee par le benchmark CIS (voir description)."
+    },
+    {
+      "id": "CIS-WIN-18.7.12",
+      "cis_rule": "18.7.12",
+      "profile": "Level 1 (L1)",
+      "category": "Spouleur d'impression (PrintNightmare)",
+      "title": "Point and Print : avertissement et élévation à l'installation d'une nouvelle connexion",
+      "severity": "high",
+      "description": "Contrôle si un avertissement et une invite d'élévation de sécurité s'affichent lors de la création d'une nouvelle connexion d'imprimante via Point and Print.",
+      "rationale": "Mitige PrintNightmare (CVE-2021-34527) et les vulnérabilités Point and Print associées (CVE-2021-1675, CVE-2021-34481) en imposant une confirmation administrateur.",
+      "audit_reference": "CIS Microsoft Windows 11 Stand-alone Benchmark v5.0.0, section 18.7.12. Valeur de registre : HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows NT\\Printers\\PointAndPrint:NoWarningNoElevationOnInstall.",
+      "audit_procedure": "Naviguer vers le chemin UI de la remediation et confirmer le reglage, ou verifier la valeur de registre HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows NT\\Printers\\PointAndPrint:NoWarningNoElevationOnInstall.",
+      "remediation_path": "Computer Configuration\\Policies\\Administrative Templates\\Printers\\Point and Print Restrictions: When installing drivers for a new connection",
+      "default_value": "Activé (l'avertissement et l'invite d'élévation s'affichent).",
+      "references": [
+        "https://msrc.microsoft.com/update-guide/vulnerability/CVE-2021-34527"
+      ],
+      "cis_controls": [
+        "CIS Controls v8 4.1 Establish and Maintain a Secure Configuration Process"
+      ],
+      "check": {
+        "type": "equals",
+        "command": "(Get-ItemProperty -Path 'HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows NT\\Printers\\PointAndPrint' -Name NoWarningNoElevationOnInstall -ErrorAction SilentlyContinue).NoWarningNoElevationOnInstall",
+        "expected": "0"
+      },
+      "recommendation": "Configurer 'Point and Print Restrictions: When installing drivers for a new connection' selon la valeur recommandee par le benchmark CIS (voir description)."
+    },
+    {
+      "id": "CIS-WIN-18.7.13",
+      "cis_rule": "18.7.13",
+      "profile": "Level 1 (L1)",
+      "category": "Spouleur d'impression (PrintNightmare)",
+      "title": "Point and Print : avertissement et élévation à la mise à jour d'une connexion existante",
+      "severity": "high",
+      "description": "Contrôle si un avertissement et une invite d'élévation de sécurité s'affichent lors de la mise à jour de pilotes pour une connexion d'imprimante existante via Point and Print.",
+      "rationale": "Mitige PrintNightmare (CVE-2021-34527) et les vulnérabilités Point and Print associées en imposant une confirmation administrateur lors des mises à jour de pilotes.",
+      "audit_reference": "CIS Microsoft Windows 11 Stand-alone Benchmark v5.0.0, section 18.7.13. Valeur de registre : HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows NT\\Printers\\PointAndPrint:UpdatePromptSettings.",
+      "audit_procedure": "Naviguer vers le chemin UI de la remediation et confirmer le reglage, ou verifier la valeur de registre HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows NT\\Printers\\PointAndPrint:UpdatePromptSettings.",
+      "remediation_path": "Computer Configuration\\Policies\\Administrative Templates\\Printers\\Point and Print Restrictions: When updating drivers for an existing connection",
+      "default_value": "Activé (l'avertissement et l'invite d'élévation s'affichent).",
+      "references": [
+        "https://msrc.microsoft.com/update-guide/vulnerability/CVE-2021-34527"
+      ],
+      "cis_controls": [
+        "CIS Controls v8 4.1 Establish and Maintain a Secure Configuration Process"
+      ],
+      "check": {
+        "type": "equals",
+        "command": "(Get-ItemProperty -Path 'HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows NT\\Printers\\PointAndPrint' -Name UpdatePromptSettings -ErrorAction SilentlyContinue).UpdatePromptSettings",
+        "expected": "0"
+      },
+      "recommendation": "Configurer 'Point and Print Restrictions: When updating drivers for an existing connection' selon la valeur recommandee par le benchmark CIS (voir description)."
+    },
+    {
+      "id": "CIS-WIN-18.7.11",
+      "cis_rule": "18.7.11",
+      "profile": "Level 1 (L1)",
+      "category": "Spouleur d'impression (PrintNightmare)",
+      "title": "Restriction des fichiers spécifiques à la file d'attente aux profils couleur",
+      "severity": "medium",
+      "description": "Limite les fichiers spécifiques à une file d'impression pouvant être copiés lors de l'installation d'une imprimante aux seuls profils de couleur.",
+      "rationale": "Mitige CVE-2021-36958 (exécution de code à distance via le Spouleur d'impression) liée à la copie de fichiers arbitraires lors de l'installation.",
+      "audit_reference": "CIS Microsoft Windows 11 Stand-alone Benchmark v5.0.0, section 18.7.11. Valeur de registre : HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows NT\\Printers:CopyFilesPolicy.",
+      "audit_procedure": "Naviguer vers le chemin UI de la remediation et confirmer le reglage, ou verifier la valeur de registre HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows NT\\Printers:CopyFilesPolicy.",
+      "remediation_path": "Computer Configuration\\Policies\\Administrative Templates\\Printers\\Manage processing of Queue-specific files",
+      "default_value": "Désactivé.",
+      "references": [
+        "https://msrc.microsoft.com/update-guide/vulnerability/CVE-2021-34527"
+      ],
+      "cis_controls": [
+        "CIS Controls v8 4.1 Establish and Maintain a Secure Configuration Process"
+      ],
+      "check": {
+        "type": "equals",
+        "command": "(Get-ItemProperty -Path 'HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows NT\\Printers' -Name CopyFilesPolicy -ErrorAction SilentlyContinue).CopyFilesPolicy",
+        "expected": "1"
+      },
+      "recommendation": "Configurer 'Manage processing of Queue-specific files' selon la valeur recommandee par le benchmark CIS (voir description)."
+    },
+    {
+      "id": "CIS-WIN-18.10.57.3.9.1",
+      "cis_rule": "18.10.57.3.9.1",
+      "profile": "Level 1 (L1)",
+      "category": "Bureau à distance (RDP) durci",
+      "title": "RDP : invite systématique du mot de passe à la connexion",
+      "severity": "high",
+      "description": "Détermine si les services Bureau à distance invitent systématiquement l'ordinateur client à saisir un mot de passe lors de la connexion.",
+      "rationale": "Sans cette invite, un attaquant ayant un accès physique au poste d'un utilisateur ayant enregistré ses identifiants pourrait se connecter au serveur RDP sans connaître le mot de passe.",
+      "audit_reference": "CIS Microsoft Windows 11 Stand-alone Benchmark v5.0.0, section 18.10.57.3.9.1. Valeur de registre : HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows NT\\Terminal Services:fPromptForPassword.",
+      "audit_procedure": "Naviguer vers le chemin UI de la remediation et confirmer le reglage, ou verifier la valeur de registre HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows NT\\Terminal Services:fPromptForPassword.",
+      "remediation_path": "Computer Configuration\\Policies\\Administrative Templates\\Windows Components\\Remote Desktop Services\\Remote Desktop Session Host\\Security\\Always prompt for password upon connection",
+      "default_value": "Désactivé (connexion automatique possible si le mot de passe est enregistré dans le client).",
+      "references": [
+        "https://learn.microsoft.com/en-us/windows-server/remote/remote-desktop-services/"
+      ],
+      "cis_controls": [
+        "CIS Controls v8 3.10 Encrypt Sensitive Data in Transit"
+      ],
+      "check": {
+        "type": "equals",
+        "command": "(Get-ItemProperty -Path 'HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows NT\\Terminal Services' -Name fPromptForPassword -ErrorAction SilentlyContinue).fPromptForPassword",
+        "expected": "1"
+      },
+      "recommendation": "Configurer 'Always prompt for password upon connection' selon la valeur recommandee par le benchmark CIS (voir description)."
+    },
+    {
+      "id": "CIS-WIN-18.10.57.3.9.2",
+      "cis_rule": "18.10.57.3.9.2",
+      "profile": "Level 1 (L1)",
+      "category": "Bureau à distance (RDP) durci",
+      "title": "RDP : exigence de communication RPC sécurisée",
+      "severity": "high",
+      "description": "Détermine si les services Bureau à distance exigent une communication RPC (Remote Procedure Call) sécurisée avec tous les clients.",
+      "rationale": "Autoriser une communication RPC non sécurisée expose le serveur à des attaques de type homme du milieu et à la divulgation de données.",
+      "audit_reference": "CIS Microsoft Windows 11 Stand-alone Benchmark v5.0.0, section 18.10.57.3.9.2. Valeur de registre : HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows NT\\Terminal Services:fEncryptRPCTraffic.",
+      "audit_procedure": "Naviguer vers le chemin UI de la remediation et confirmer le reglage, ou verifier la valeur de registre HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows NT\\Terminal Services:fEncryptRPCTraffic.",
+      "remediation_path": "Computer Configuration\\Policies\\Administrative Templates\\Windows Components\\Remote Desktop Services\\Remote Desktop Session Host\\Security\\Require secure RPC communication",
+      "default_value": "Désactivé (la sécurité est demandée mais une communication non sécurisée reste possible avec des clients ne répondant pas).",
+      "references": [
+        "https://learn.microsoft.com/en-us/windows-server/remote/remote-desktop-services/"
+      ],
+      "cis_controls": [
+        "CIS Controls v8 3.10 Encrypt Sensitive Data in Transit"
+      ],
+      "check": {
+        "type": "equals",
+        "command": "(Get-ItemProperty -Path 'HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows NT\\Terminal Services' -Name fEncryptRPCTraffic -ErrorAction SilentlyContinue).fEncryptRPCTraffic",
+        "expected": "1"
+      },
+      "recommendation": "Configurer 'Require secure RPC communication' selon la valeur recommandee par le benchmark CIS (voir description)."
+    },
+    {
+      "id": "CIS-WIN-18.10.57.3.9.3",
+      "cis_rule": "18.10.57.3.9.3",
+      "profile": "Level 1 (L1)",
+      "category": "Bureau à distance (RDP) durci",
+      "title": "RDP : exigence de la couche de sécurité TLS pour les connexions distantes",
+      "severity": "high",
+      "description": "Détermine si une couche de sécurité spécifique (TLS, désigné 'SSL' dans l'interface) est exigée pour sécuriser les communications entre clients et serveur RDP.",
+      "rationale": "Le chiffrement RDP natif est considéré comme faible ; imposer TLS renforce significativement la confidentialité et l'intégrité du trafic RDP.",
+      "audit_reference": "CIS Microsoft Windows 11 Stand-alone Benchmark v5.0.0, section 18.10.57.3.9.3. Valeur de registre : HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows NT\\Terminal Services:SecurityLayer.",
+      "audit_procedure": "Naviguer vers le chemin UI de la remediation et confirmer le reglage, ou verifier la valeur de registre HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows NT\\Terminal Services:SecurityLayer.",
+      "remediation_path": "Computer Configuration\\Policies\\Administrative Templates\\Windows Components\\Remote Desktop Services\\Remote Desktop Session Host\\Security\\Require use of specific security layer for remote (RDP) connections",
+      "default_value": "Désactivé (la méthode de sécurité n'est pas imposée au niveau stratégie de groupe).",
+      "references": [
+        "https://learn.microsoft.com/en-us/windows-server/remote/remote-desktop-services/"
+      ],
+      "cis_controls": [
+        "CIS Controls v8 3.10 Encrypt Sensitive Data in Transit"
+      ],
+      "check": {
+        "type": "equals",
+        "command": "(Get-ItemProperty -Path 'HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows NT\\Terminal Services' -Name SecurityLayer -ErrorAction SilentlyContinue).SecurityLayer",
+        "expected": "2"
+      },
+      "recommendation": "Configurer 'Require use of specific security layer for remote (RDP) connections' selon la valeur recommandee par le benchmark CIS (voir description)."
+    },
+    {
+      "id": "CIS-WIN-18.10.57.3.9.4",
+      "cis_rule": "18.10.57.3.9.4",
+      "profile": "Level 1 (L1)",
+      "category": "Bureau à distance (RDP) durci",
+      "title": "RDP : authentification au niveau réseau (NLA) obligatoire",
+      "severity": "high",
+      "description": "Détermine si l'authentification de l'utilisateur est exigée avant l'établissement de la session, via l'authentification au niveau réseau (Network Level Authentication).",
+      "rationale": "Authentifier l'utilisateur plus tôt dans le processus de connexion réduit la surface d'attaque exposée avant authentification, notamment contre les attaques automatisées de type BlueKeep.",
+      "audit_reference": "CIS Microsoft Windows 11 Stand-alone Benchmark v5.0.0, section 18.10.57.3.9.4. Valeur de registre : HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows NT\\Terminal Services:UserAuthentication.",
+      "audit_procedure": "Naviguer vers le chemin UI de la remediation et confirmer le reglage, ou verifier la valeur de registre HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows NT\\Terminal Services:UserAuthentication.",
+      "remediation_path": "Computer Configuration\\Policies\\Administrative Templates\\Windows Components\\Remote Desktop Services\\Remote Desktop Session Host\\Security\\Require user authentication for remote connections by using Network Level Authentication",
+      "default_value": "Windows 8.0 ou plus récent : Activé.",
+      "references": [
+        "https://learn.microsoft.com/en-us/windows-server/remote/remote-desktop-services/"
+      ],
+      "cis_controls": [
+        "CIS Controls v8 3.10 Encrypt Sensitive Data in Transit"
+      ],
+      "check": {
+        "type": "equals",
+        "command": "(Get-ItemProperty -Path 'HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows NT\\Terminal Services' -Name UserAuthentication -ErrorAction SilentlyContinue).UserAuthentication",
+        "expected": "1"
+      },
+      "recommendation": "Configurer 'Require user authentication for remote connections by using Network Level Authentication' selon la valeur recommandee par le benchmark CIS (voir description)."
+    },
+    {
+      "id": "CIS-WIN-18.10.57.3.3.8",
+      "cis_rule": "18.10.57.3.3.8",
+      "profile": "Level 2 (L2)",
+      "category": "Bureau à distance (RDP) durci",
+      "title": "RDP : interdiction du transfert de presse-papiers du serveur vers le client",
+      "severity": "medium",
+      "description": "Contrôle si le presse-papiers peut être utilisé pour transférer des données de la session Bureau à distance vers le client.",
+      "rationale": "Réduit la surface d'attaque : le besoin de transférer des données du serveur vers le client via le presse-papiers est rare, et ce canal peut servir à l'exfiltration ou à l'injection de contenu malveillant.",
+      "audit_reference": "CIS Microsoft Windows 11 Stand-alone Benchmark v5.0.0, section 18.10.57.3.3.8. Valeur de registre : HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows NT\\Terminal Services:SCClipLevel.",
+      "audit_procedure": "Naviguer vers le chemin UI de la remediation et confirmer le reglage, ou verifier la valeur de registre HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows NT\\Terminal Services:SCClipLevel.",
+      "remediation_path": "Computer Configuration\\Administrative Templates\\Windows Components\\Remote Desktop Services\\Remote Desktop Session Host\\Device and Resource Redirection\\Restrict clipboard transfer from server to client",
+      "default_value": "Désactivé (les utilisateurs peuvent copier tout contenu du serveur vers le client).",
+      "references": [
+        "https://learn.microsoft.com/en-us/windows-server/remote/remote-desktop-services/"
+      ],
+      "cis_controls": [
+        "CIS Controls v8 3.10 Encrypt Sensitive Data in Transit"
+      ],
+      "check": {
+        "type": "equals",
+        "command": "(Get-ItemProperty -Path 'HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows NT\\Terminal Services' -Name SCClipLevel -ErrorAction SilentlyContinue).SCClipLevel",
+        "expected": "0"
+      },
+      "recommendation": "Configurer 'Restrict clipboard transfer from server to client' selon la valeur recommandee par le benchmark CIS (voir description)."
+    },
+    {
+      "id": "CIS-WIN-18.10.88.1",
+      "cis_rule": "18.10.88.1",
+      "profile": "Level 2 (L2)",
+      "category": "WinRM / PowerShell (accès distant scripté)",
+      "title": "Journalisation des blocs de script PowerShell",
+      "severity": "high",
+      "description": "Active la journalisation de toutes les entrées de script PowerShell dans le journal d'événements Operational.",
+      "rationale": "Essentiel pour les investigations forensiques d'incidents impliquant PowerShell, un vecteur d'attaque très fréquent (fileless malware, mouvement latéral).",
+      "audit_reference": "CIS Microsoft Windows 11 Stand-alone Benchmark v5.0.0, section 18.10.88.1. Valeur de registre : HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\PowerShell\\ScriptBlockLogging:EnableScriptBlockLogging.",
+      "audit_procedure": "Naviguer vers le chemin UI de la remediation et confirmer le reglage, ou verifier la valeur de registre HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\PowerShell\\ScriptBlockLogging:EnableScriptBlockLogging.",
+      "remediation_path": "Computer Configuration\\Policies\\Administrative Templates\\Windows Components\\Windows PowerShell\\Turn on PowerShell Script Block Logging",
+      "default_value": "Activé (PowerShell journalise les blocs de script à leur première utilisation).",
+      "references": [
+        "https://learn.microsoft.com/en-us/windows/win32/winrm/portal"
+      ],
+      "cis_controls": [
+        "CIS Controls v8 3.10 Encrypt Sensitive Data in Transit"
+      ],
+      "check": {
+        "type": "equals",
+        "command": "(Get-ItemProperty -Path 'HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\PowerShell\\ScriptBlockLogging' -Name EnableScriptBlockLogging -ErrorAction SilentlyContinue).EnableScriptBlockLogging",
+        "expected": "1"
+      },
+      "recommendation": "Configurer 'Turn on PowerShell Script Block Logging' selon la valeur recommandee par le benchmark CIS (voir description)."
+    },
+    {
+      "id": "CIS-WIN-18.10.90.1.1",
+      "cis_rule": "18.10.90.1.1",
+      "profile": "Level 1 (L1)",
+      "category": "WinRM / PowerShell (accès distant scripté)",
+      "title": "WinRM (client) : interdiction de l'authentification Basic",
+      "severity": "high",
+      "description": "Contrôle si le client WinRM peut utiliser l'authentification Basic, qui transmet les identifiants en clair.",
+      "rationale": "Un attaquant capturant le trafic réseau peut lire les identifiants transmis en clair par l'authentification Basic.",
+      "audit_reference": "CIS Microsoft Windows 11 Stand-alone Benchmark v5.0.0, section 18.10.90.1.1. Valeur de registre : HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\WinRM\\Client:AllowBasic.",
+      "audit_procedure": "Naviguer vers le chemin UI de la remediation et confirmer le reglage, ou verifier la valeur de registre HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\WinRM\\Client:AllowBasic.",
+      "remediation_path": "Computer Configuration\\Policies\\Administrative Templates\\Windows Components\\Windows Remote Management (WinRM)\\WinRM Client\\Allow Basic authentication",
+      "default_value": "Désactivé (comportement par défaut).",
+      "references": [
+        "https://learn.microsoft.com/en-us/windows/win32/winrm/portal"
+      ],
+      "cis_controls": [
+        "CIS Controls v8 3.10 Encrypt Sensitive Data in Transit"
+      ],
+      "check": {
+        "type": "equals",
+        "command": "(Get-ItemProperty -Path 'HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\WinRM\\Client' -Name AllowBasic -ErrorAction SilentlyContinue).AllowBasic",
+        "expected": "0"
+      },
+      "recommendation": "Configurer 'Allow Basic authentication' selon la valeur recommandee par le benchmark CIS (voir description)."
+    },
+    {
+      "id": "CIS-WIN-18.10.90.1.2",
+      "cis_rule": "18.10.90.1.2",
+      "profile": "Level 1 (L1)",
+      "category": "WinRM / PowerShell (accès distant scripté)",
+      "title": "WinRM (client) : interdiction du trafic non chiffré",
+      "severity": "high",
+      "description": "Contrôle si le client WinRM peut envoyer ou recevoir des messages non chiffrés sur le réseau.",
+      "rationale": "Réduit le risque qu'un attaquant lise ou modifie les messages WinRM en transit sur le réseau.",
+      "audit_reference": "CIS Microsoft Windows 11 Stand-alone Benchmark v5.0.0, section 18.10.90.1.2. Valeur de registre : HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\WinRM\\Client:AllowUnencryptedTraffic.",
+      "audit_procedure": "Naviguer vers le chemin UI de la remediation et confirmer le reglage, ou verifier la valeur de registre HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\WinRM\\Client:AllowUnencryptedTraffic.",
+      "remediation_path": "Computer Configuration\\Policies\\Administrative Templates\\Windows Components\\Windows Remote Management (WinRM)\\WinRM Client\\Allow unencrypted traffic",
+      "default_value": "Désactivé (comportement par défaut).",
+      "references": [
+        "https://learn.microsoft.com/en-us/windows/win32/winrm/portal"
+      ],
+      "cis_controls": [
+        "CIS Controls v8 3.10 Encrypt Sensitive Data in Transit"
+      ],
+      "check": {
+        "type": "equals",
+        "command": "(Get-ItemProperty -Path 'HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\WinRM\\Client' -Name AllowUnencryptedTraffic -ErrorAction SilentlyContinue).AllowUnencryptedTraffic",
+        "expected": "0"
+      },
+      "recommendation": "Configurer 'Allow unencrypted traffic' selon la valeur recommandee par le benchmark CIS (voir description)."
+    },
+    {
+      "id": "CIS-WIN-18.10.90.2.1",
+      "cis_rule": "18.10.90.2.1",
+      "profile": "Level 1 (L1)",
+      "category": "WinRM / PowerShell (accès distant scripté)",
+      "title": "WinRM (service) : interdiction de l'authentification Basic",
+      "severity": "high",
+      "description": "Contrôle si le service WinRM accepte l'authentification Basic d'un client distant.",
+      "rationale": "Un attaquant capturant le trafic réseau peut lire les identifiants transmis en clair par l'authentification Basic.",
+      "audit_reference": "CIS Microsoft Windows 11 Stand-alone Benchmark v5.0.0, section 18.10.90.2.1. Valeur de registre : HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\WinRM\\Service:AllowBasic.",
+      "audit_procedure": "Naviguer vers le chemin UI de la remediation et confirmer le reglage, ou verifier la valeur de registre HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\WinRM\\Service:AllowBasic.",
+      "remediation_path": "Computer Configuration\\Policies\\Administrative Templates\\Windows Components\\Windows Remote Management (WinRM)\\WinRM Service\\Allow Basic authentication",
+      "default_value": "Désactivé (comportement par défaut).",
+      "references": [
+        "https://learn.microsoft.com/en-us/windows/win32/winrm/portal"
+      ],
+      "cis_controls": [
+        "CIS Controls v8 3.10 Encrypt Sensitive Data in Transit"
+      ],
+      "check": {
+        "type": "equals",
+        "command": "(Get-ItemProperty -Path 'HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\WinRM\\Service' -Name AllowBasic -ErrorAction SilentlyContinue).AllowBasic",
+        "expected": "0"
+      },
+      "recommendation": "Configurer 'Allow Basic authentication' selon la valeur recommandee par le benchmark CIS (voir description)."
+    },
+    {
+      "id": "CIS-WIN-18.10.90.2.3",
+      "cis_rule": "18.10.90.2.3",
+      "profile": "Level 1 (L1)",
+      "category": "WinRM / PowerShell (accès distant scripté)",
+      "title": "WinRM (service) : interdiction du trafic non chiffré",
+      "severity": "high",
+      "description": "Contrôle si le service WinRM peut envoyer ou recevoir des messages non chiffrés sur le réseau.",
+      "rationale": "Réduit le risque qu'un attaquant lise ou modifie les messages WinRM en transit sur le réseau.",
+      "audit_reference": "CIS Microsoft Windows 11 Stand-alone Benchmark v5.0.0, section 18.10.90.2.3. Valeur de registre : HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\WinRM\\Service:AllowUnencryptedTraffic.",
+      "audit_procedure": "Naviguer vers le chemin UI de la remediation et confirmer le reglage, ou verifier la valeur de registre HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\WinRM\\Service:AllowUnencryptedTraffic.",
+      "remediation_path": "Computer Configuration\\Policies\\Administrative Templates\\Windows Components\\Windows Remote Management (WinRM)\\WinRM Service\\Allow unencrypted traffic",
+      "default_value": "Désactivé (comportement par défaut).",
+      "references": [
+        "https://learn.microsoft.com/en-us/windows/win32/winrm/portal"
+      ],
+      "cis_controls": [
+        "CIS Controls v8 3.10 Encrypt Sensitive Data in Transit"
+      ],
+      "check": {
+        "type": "equals",
+        "command": "(Get-ItemProperty -Path 'HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\WinRM\\Service' -Name AllowUnencryptedTraffic -ErrorAction SilentlyContinue).AllowUnencryptedTraffic",
+        "expected": "0"
+      },
+      "recommendation": "Configurer 'Allow unencrypted traffic' selon la valeur recommandee par le benchmark CIS (voir description)."
+    },
+    {
+      "id": "CIS-WIN-17.1.1",
+      "cis_rule": "17.1.1",
+      "profile": "Level 1 (L1)",
+      "category": "Journalisation critique (authentification, processus, stratégies)",
+      "title": "Audit de la validation des identifiants",
+      "severity": "high",
+      "description": "Consigne les résultats des tests de validation des identifiants soumis lors d'une demande de connexion.",
+      "rationale": "Sans cette journalisation, les tentatives de connexion invalides ou les attaques par force brute sur les comptes locaux ne laissent aucune trace exploitable.",
+      "audit_reference": "CIS Microsoft Windows 11 Stand-alone Benchmark v5.0.0, section 17.1.1. Sous-catégorie d'audit avancé : Credential Validation.",
+      "audit_procedure": "Executer : auditpol /get /subcategory:\"Credential Validation\" /r et verifier le champ 'Inclusion Setting'.",
+      "remediation_path": "Computer Configuration\\Policies\\Windows Settings\\Security Settings\\Advanced Audit Policy Configuration\\Audit Policies\\...\\Audit Credential Validation",
+      "default_value": "Aucun audit (No Auditing).",
+      "references": [
+        "https://learn.microsoft.com/en-us/windows/security/threat-protection/auditing/"
+      ],
+      "cis_controls": [
+        "CIS Controls v8 8.5 Collect Detailed Audit Logs"
+      ],
+      "check": {
+        "type": "equals",
+        "command": "(auditpol /get /subcategory:\"Credential Validation\" /r | ConvertFrom-Csv).\"Inclusion Setting\"",
+        "expected": "Success and Failure"
+      },
+      "recommendation": "Executer : auditpol /set /subcategory:\"Credential Validation\" /success:enable /failure:enable (ajuster selon la valeur recommandee)."
+    },
+    {
+      "id": "CIS-WIN-17.2.3",
+      "cis_rule": "17.2.3",
+      "profile": "Level 1 (L1)",
+      "category": "Journalisation critique (authentification, processus, stratégies)",
+      "title": "Audit de la gestion des comptes utilisateurs",
+      "severity": "high",
+      "description": "Consigne les événements liés à la gestion des comptes utilisateurs : création, modification, suppression, changement de mot de passe, activation/désactivation.",
+      "rationale": "Essentiel pour détecter la création de comptes non autorisés (persistance) ou la modification suspecte de comptes existants.",
+      "audit_reference": "CIS Microsoft Windows 11 Stand-alone Benchmark v5.0.0, section 17.2.3. Sous-catégorie d'audit avancé : User Account Management.",
+      "audit_procedure": "Executer : auditpol /get /subcategory:\"User Account Management\" /r et verifier le champ 'Inclusion Setting'.",
+      "remediation_path": "Computer Configuration\\Policies\\Windows Settings\\Security Settings\\Advanced Audit Policy Configuration\\Audit Policies\\...\\Audit User Account Management",
+      "default_value": "Aucun audit (No Auditing).",
+      "references": [
+        "https://learn.microsoft.com/en-us/windows/security/threat-protection/auditing/"
+      ],
+      "cis_controls": [
+        "CIS Controls v8 8.5 Collect Detailed Audit Logs"
+      ],
+      "check": {
+        "type": "equals",
+        "command": "(auditpol /get /subcategory:\"User Account Management\" /r | ConvertFrom-Csv).\"Inclusion Setting\"",
+        "expected": "Success and Failure"
+      },
+      "recommendation": "Executer : auditpol /set /subcategory:\"User Account Management\" /success:enable /failure:enable (ajuster selon la valeur recommandee)."
+    },
+    {
+      "id": "CIS-WIN-17.5.4",
+      "cis_rule": "17.5.4",
+      "profile": "Level 1 (L1)",
+      "category": "Journalisation critique (authentification, processus, stratégies)",
+      "title": "Audit des connexions",
+      "severity": "high",
+      "description": "Consigne les tentatives de connexion interactive, réussies et échouées.",
+      "rationale": "Journal fondamental pour détecter les tentatives de connexion par force brute ou l'utilisation de comptes compromis.",
+      "audit_reference": "CIS Microsoft Windows 11 Stand-alone Benchmark v5.0.0, section 17.5.4. Sous-catégorie d'audit avancé : Logon.",
+      "audit_procedure": "Executer : auditpol /get /subcategory:\"Logon\" /r et verifier le champ 'Inclusion Setting'.",
+      "remediation_path": "Computer Configuration\\Policies\\Windows Settings\\Security Settings\\Advanced Audit Policy Configuration\\Audit Policies\\...\\Audit Logon",
+      "default_value": "Aucun audit (No Auditing).",
+      "references": [
+        "https://learn.microsoft.com/en-us/windows/security/threat-protection/auditing/"
+      ],
+      "cis_controls": [
+        "CIS Controls v8 8.5 Collect Detailed Audit Logs"
+      ],
+      "check": {
+        "type": "equals",
+        "command": "(auditpol /get /subcategory:\"Logon\" /r | ConvertFrom-Csv).\"Inclusion Setting\"",
+        "expected": "Success and Failure"
+      },
+      "recommendation": "Executer : auditpol /set /subcategory:\"Logon\" /success:enable /failure:enable (ajuster selon la valeur recommandee)."
+    },
+    {
+      "id": "CIS-WIN-17.7.1",
+      "cis_rule": "17.7.1",
+      "profile": "Level 1 (L1)",
+      "category": "Journalisation critique (authentification, processus, stratégies)",
+      "title": "Audit des modifications de la stratégie d'audit",
+      "severity": "high",
+      "description": "Consigne les modifications apportées à la stratégie d'audit elle-même.",
+      "rationale": "Un attaquant cherchant à masquer ses traces désactive souvent l'audit en premier ; cette catégorie détecte précisément cette tentative.",
+      "audit_reference": "CIS Microsoft Windows 11 Stand-alone Benchmark v5.0.0, section 17.7.1. Sous-catégorie d'audit avancé : Audit Policy Change.",
+      "audit_procedure": "Executer : auditpol /get /subcategory:\"Audit Policy Change\" /r et verifier le champ 'Inclusion Setting'.",
+      "remediation_path": "Computer Configuration\\Policies\\Windows Settings\\Security Settings\\Advanced Audit Policy Configuration\\Audit Policies\\...\\Audit Audit Policy Change",
+      "default_value": "Aucun audit (No Auditing).",
+      "references": [
+        "https://learn.microsoft.com/en-us/windows/security/threat-protection/auditing/"
+      ],
+      "cis_controls": [
+        "CIS Controls v8 8.5 Collect Detailed Audit Logs"
+      ],
+      "check": {
+        "type": "contains",
+        "command": "(auditpol /get /subcategory:\"Audit Policy Change\" /r | ConvertFrom-Csv).\"Inclusion Setting\"",
+        "expected": "Success"
+      },
+      "recommendation": "Executer : auditpol /set /subcategory:\"Audit Policy Change\" /success:enable /failure:enable (ajuster selon la valeur recommandee)."
+    },
+    {
+      "id": "CIS-WIN-17.8.1",
+      "cis_rule": "17.8.1",
+      "profile": "Level 1 (L1)",
+      "category": "Journalisation critique (authentification, processus, stratégies)",
+      "title": "Audit de l'utilisation de privilèges sensibles",
+      "severity": "high",
+      "description": "Consigne l'utilisation de privilèges sensibles tels que 'Agir en tant que partie du système d'exploitation' ou 'Sauvegarder les fichiers et répertoires'.",
+      "rationale": "Ces privilèges permettent de contourner la plupart des contrôles de sécurité ; leur utilisation doit être tracée systématiquement.",
+      "audit_reference": "CIS Microsoft Windows 11 Stand-alone Benchmark v5.0.0, section 17.8.1. Sous-catégorie d'audit avancé : Sensitive Privilege Use.",
+      "audit_procedure": "Executer : auditpol /get /subcategory:\"Sensitive Privilege Use\" /r et verifier le champ 'Inclusion Setting'.",
+      "remediation_path": "Computer Configuration\\Policies\\Windows Settings\\Security Settings\\Advanced Audit Policy Configuration\\Audit Policies\\...\\Audit Sensitive Privilege Use",
+      "default_value": "Aucun audit (No Auditing).",
+      "references": [
+        "https://learn.microsoft.com/en-us/windows/security/threat-protection/auditing/"
+      ],
+      "cis_controls": [
+        "CIS Controls v8 8.5 Collect Detailed Audit Logs"
+      ],
+      "check": {
+        "type": "equals",
+        "command": "(auditpol /get /subcategory:\"Sensitive Privilege Use\" /r | ConvertFrom-Csv).\"Inclusion Setting\"",
+        "expected": "Success"
+      },
+      "recommendation": "Executer : auditpol /set /subcategory:\"Sensitive Privilege Use\" /success:enable /failure:enable (ajuster selon la valeur recommandee)."
+    },
+    {
+      "id": "CIS-WIN-18.4.1",
+      "cis_rule": "18.4.1",
+      "profile": "Level 1 (L1)",
+      "category": "NTLM / SMB / Kerberos (relais et interception)",
+      "title": "Désactivation du pilote client SMBv1",
+      "severity": "high",
+      "description": "Configure le type de démarrage du pilote client SMBv1 (MRxSmb10), qu'il est recommandé de désactiver.",
+      "rationale": "SMBv1 est un protocole vieux de 30 ans, bien plus vulnérable aux attaques que SMBv2/SMBv3 (ex. WannaCry, EternalBlue).",
+      "audit_reference": "CIS Microsoft Windows 11 Stand-alone Benchmark v5.0.0, section 18.4.1.",
+      "audit_procedure": "Naviguer vers le chemin UI de la remediation et confirmer le reglage, ou verifier la valeur de registre / secedit correspondante.",
+      "remediation_path": "Computer Configuration\\Policies\\Windows Settings\\Security Settings\\Local Policies\\Security Options (section 18.4.1)",
+      "default_value": "Voir description du benchmark CIS.",
+      "references": [
+        "https://learn.microsoft.com/en-us/windows/security/threat-protection/security-policy-settings/"
+      ],
+      "cis_controls": [
+        "CIS Controls v8 3.10 Encrypt Sensitive Data in Transit"
+      ],
+      "check": {
+        "type": "equals",
+        "command": "(Get-ItemProperty -Path 'HKLM:\\SYSTEM\\CurrentControlSet\\Services\\mrxsmb10' -Name Start -ErrorAction SilentlyContinue).Start",
+        "expected": "4"
+      },
+      "recommendation": "Configurer le parametre correspondant a la section 18.4.1 selon la valeur recommandee par le benchmark CIS (voir description)."
+    },
+    {
+      "id": "CIS-WIN-18.4.2",
+      "cis_rule": "18.4.2",
+      "profile": "Level 1 (L1)",
+      "category": "NTLM / SMB / Kerberos (relais et interception)",
+      "title": "Désactivation du serveur SMBv1",
+      "severity": "high",
+      "description": "Configure le traitement côté serveur du protocole SMBv1.",
+      "rationale": "SMBv1 est un protocole obsolète et vulnérable ; le désactiver côté serveur empêche son utilisation même si un client le propose.",
+      "audit_reference": "CIS Microsoft Windows 11 Stand-alone Benchmark v5.0.0, section 18.4.2.",
+      "audit_procedure": "Naviguer vers le chemin UI de la remediation et confirmer le reglage, ou verifier la valeur de registre / secedit correspondante.",
+      "remediation_path": "Computer Configuration\\Policies\\Windows Settings\\Security Settings\\Local Policies\\Security Options (section 18.4.2)",
+      "default_value": "Voir description du benchmark CIS.",
+      "references": [
+        "https://learn.microsoft.com/en-us/windows/security/threat-protection/security-policy-settings/"
+      ],
+      "cis_controls": [
+        "CIS Controls v8 3.10 Encrypt Sensitive Data in Transit"
+      ],
+      "check": {
+        "type": "equals",
+        "command": "(Get-ItemProperty -Path 'HKLM:\\SYSTEM\\CurrentControlSet\\Services\\LanManServer\\Parameters' -Name SMB1 -ErrorAction SilentlyContinue).SMB1",
+        "expected": "0"
+      },
+      "recommendation": "Configurer le parametre correspondant a la section 18.4.2 selon la valeur recommandee par le benchmark CIS (voir description)."
+    },
+    {
+      "id": "CIS-WIN-18.4.6",
+      "cis_rule": "18.4.6",
+      "profile": "Level 1 (L1)",
+      "category": "NTLM / SMB / Kerberos (relais et interception)",
+      "title": "Désactivation de l'authentification WDigest",
+      "severity": "high",
+      "description": "Détermine si Lsass.exe conserve en mémoire une copie en clair du mot de passe de l'utilisateur pour l'authentification WDigest.",
+      "rationale": "Si activé, le mot de passe en clair reste exposé en mémoire et peut être extrait par des outils de dump de credentials comme Mimikatz.",
+      "audit_reference": "CIS Microsoft Windows 11 Stand-alone Benchmark v5.0.0, section 18.4.6.",
+      "audit_procedure": "Naviguer vers le chemin UI de la remediation et confirmer le reglage, ou verifier la valeur de registre / secedit correspondante.",
+      "remediation_path": "Computer Configuration\\Policies\\Windows Settings\\Security Settings\\Local Policies\\Security Options (section 18.4.6)",
+      "default_value": "Voir description du benchmark CIS.",
+      "references": [
+        "https://learn.microsoft.com/en-us/windows/security/threat-protection/security-policy-settings/"
+      ],
+      "cis_controls": [
+        "CIS Controls v8 3.10 Encrypt Sensitive Data in Transit"
+      ],
+      "check": {
+        "type": "equals",
+        "command": "(Get-ItemProperty -Path 'HKLM:\\SYSTEM\\CurrentControlSet\\Control\\SecurityProviders\\WDigest' -Name UseLogonCredential -ErrorAction SilentlyContinue).UseLogonCredential",
+        "expected": "0"
+      },
+      "recommendation": "Configurer le parametre correspondant a la section 18.4.6 selon la valeur recommandee par le benchmark CIS (voir description)."
+    },
+    {
+      "id": "CIS-WIN-18.6.7.4",
+      "cis_rule": "18.6.7.4",
+      "profile": "Level 1 (L1)",
+      "category": "NTLM / SMB / Kerberos (relais et interception)",
+      "title": "SMB serveur : activation du limiteur de débit d'authentification",
+      "severity": "high",
+      "description": "Active un délai entre chaque tentative d'authentification NTLM ou PKU2U échouée sur le serveur SMB.",
+      "rationale": "Réduit fortement l'efficacité des attaques par force brute contre le serveur SMB en imposant un délai entre chaque tentative échouée.",
+      "audit_reference": "CIS Microsoft Windows 11 Stand-alone Benchmark v5.0.0, section 18.6.7.4.",
+      "audit_procedure": "Naviguer vers le chemin UI de la remediation et confirmer le reglage, ou verifier la valeur de registre / secedit correspondante.",
+      "remediation_path": "Computer Configuration\\Policies\\Windows Settings\\Security Settings\\Local Policies\\Security Options (section 18.6.7.4)",
+      "default_value": "Voir description du benchmark CIS.",
+      "references": [
+        "https://learn.microsoft.com/en-us/windows/security/threat-protection/security-policy-settings/"
+      ],
+      "cis_controls": [
+        "CIS Controls v8 3.10 Encrypt Sensitive Data in Transit"
+      ],
+      "check": {
+        "type": "equals",
+        "command": "(Get-ItemProperty -Path 'HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\LanmanServer' -Name EnableAuthRateLimiter -ErrorAction SilentlyContinue).EnableAuthRateLimiter",
+        "expected": "1"
+      },
+      "recommendation": "Configurer le parametre correspondant a la section 18.6.7.4 selon la valeur recommandee par le benchmark CIS (voir description)."
+    },
+    {
+      "id": "CIS-WIN-18.6.8.4",
+      "cis_rule": "18.6.8.4",
+      "profile": "Level 1 (L1)",
+      "category": "NTLM / SMB / Kerberos (relais et interception)",
+      "title": "SMB client : interdiction des connexions invité non sécurisées",
+      "severity": "high",
+      "description": "Détermine si le client SMB peut se connecter à un serveur en utilisant une authentification invité non sécurisée.",
+      "rationale": "Une connexion invité non sécurisée n'offre aucune garantie d'authentification ni d'intégrité, exposant l'utilisateur à un serveur usurpé.",
+      "audit_reference": "CIS Microsoft Windows 11 Stand-alone Benchmark v5.0.0, section 18.6.8.4.",
+      "audit_procedure": "Naviguer vers le chemin UI de la remediation et confirmer le reglage, ou verifier la valeur de registre / secedit correspondante.",
+      "remediation_path": "Computer Configuration\\Policies\\Windows Settings\\Security Settings\\Local Policies\\Security Options (section 18.6.8.4)",
+      "default_value": "Voir description du benchmark CIS.",
+      "references": [
+        "https://learn.microsoft.com/en-us/windows/security/threat-protection/security-policy-settings/"
+      ],
+      "cis_controls": [
+        "CIS Controls v8 3.10 Encrypt Sensitive Data in Transit"
+      ],
+      "check": {
+        "type": "equals",
+        "command": "(Get-ItemProperty -Path 'HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\LanmanWorkstation' -Name AllowInsecureGuestAuth -ErrorAction SilentlyContinue).AllowInsecureGuestAuth",
+        "expected": "0"
+      },
+      "recommendation": "Configurer le parametre correspondant a la section 18.6.8.4 selon la valeur recommandee par le benchmark CIS (voir description)."
+    },
+    {
+      "id": "CIS-WIN-18.10.10.1.2",
+      "cis_rule": "18.10.10.1.2",
+      "profile": "BitLocker (BL)",
+      "category": "BitLocker (chiffrement de disque)",
+      "title": "BitLocker (disques fixes) : configuration de la récupération",
+      "severity": "high",
+      "description": "Détermine si les utilisateurs peuvent configurer les options de récupération BitLocker et si des informations de récupération sont sauvegardées dans Active Directory.",
+      "rationale": "Sans politique de récupération définie, une perte de clé BitLocker peut entraîner une perte de données définitive, ou à l'inverse une récupération non maîtrisée par l'organisation.",
+      "audit_reference": "CIS Microsoft Windows 11 Stand-alone Benchmark v5.0.0, section 18.10.10.1.2. Valeur de registre : HKLM:\\SOFTWARE\\Policies\\Microsoft\\FVE:FDVRecovery.",
+      "audit_procedure": "Naviguer vers le chemin UI de la remediation et confirmer le reglage, ou verifier la valeur de registre HKLM:\\SOFTWARE\\Policies\\Microsoft\\FVE:FDVRecovery.",
+      "remediation_path": "Computer Configuration\\Policies\\Administrative Templates\\Windows Components\\BitLocker Drive Encryption (section 18.10.10.1.2)",
+      "default_value": "Voir description du benchmark CIS.",
+      "references": [
+        "https://learn.microsoft.com/en-us/windows/security/information-protection/bitlocker/"
+      ],
+      "cis_controls": [
+        "CIS Controls v8 3.11 Encrypt Sensitive Data at Rest"
+      ],
+      "check": {
+        "type": "equals",
+        "command": "(Get-ItemProperty -Path 'HKLM:\\SOFTWARE\\Policies\\Microsoft\\FVE' -Name FDVRecovery -ErrorAction SilentlyContinue).FDVRecovery",
+        "expected": "1"
+      },
+      "recommendation": "Configurer le parametre BitLocker correspondant a la section 18.10.10.1.2 selon la valeur recommandee par le benchmark CIS (voir description)."
+    },
+    {
+      "id": "CIS-WIN-18.10.10.2.2",
+      "cis_rule": "18.10.10.2.2",
+      "profile": "BitLocker (BL)",
+      "category": "BitLocker (chiffrement de disque)",
+      "title": "BitLocker (disque système) : validation d'intégrité via Secure Boot",
+      "severity": "high",
+      "description": "Détermine si BitLocker utilise la validation Secure Boot pour vérifier l'intégrité de la plateforme au démarrage, plutôt que l'ancien processus BCD/MBR.",
+      "rationale": "Secure Boot offre une validation d'intégrité de démarrage plus robuste et moins contournable que les anciens mécanismes de mesure BCD.",
+      "audit_reference": "CIS Microsoft Windows 11 Stand-alone Benchmark v5.0.0, section 18.10.10.2.2. Valeur de registre : HKLM:\\SOFTWARE\\Policies\\Microsoft\\FVE:OSAllowSecureBootForIntegrity.",
+      "audit_procedure": "Naviguer vers le chemin UI de la remediation et confirmer le reglage, ou verifier la valeur de registre HKLM:\\SOFTWARE\\Policies\\Microsoft\\FVE:OSAllowSecureBootForIntegrity.",
+      "remediation_path": "Computer Configuration\\Policies\\Administrative Templates\\Windows Components\\BitLocker Drive Encryption (section 18.10.10.2.2)",
+      "default_value": "Voir description du benchmark CIS.",
+      "references": [
+        "https://learn.microsoft.com/en-us/windows/security/information-protection/bitlocker/"
+      ],
+      "cis_controls": [
+        "CIS Controls v8 3.11 Encrypt Sensitive Data at Rest"
+      ],
+      "check": {
+        "type": "equals",
+        "command": "(Get-ItemProperty -Path 'HKLM:\\SOFTWARE\\Policies\\Microsoft\\FVE' -Name OSAllowSecureBootForIntegrity -ErrorAction SilentlyContinue).OSAllowSecureBootForIntegrity",
+        "expected": "1"
+      },
+      "recommendation": "Configurer le parametre BitLocker correspondant a la section 18.10.10.2.2 selon la valeur recommandee par le benchmark CIS (voir description)."
+    },
+    {
+      "id": "CIS-WIN-18.10.10.2.3",
+      "cis_rule": "18.10.10.2.3",
+      "profile": "BitLocker (BL)",
+      "category": "BitLocker (chiffrement de disque)",
+      "title": "BitLocker (disque système) : configuration de la récupération",
+      "severity": "high",
+      "description": "Détermine si les utilisateurs peuvent configurer les options de récupération BitLocker pour le disque système et si ces informations sont sauvegardées dans Active Directory.",
+      "rationale": "Sans politique de récupération définie, une perte de clé BitLocker sur le disque système peut rendre la machine définitivement inaccessible.",
+      "audit_reference": "CIS Microsoft Windows 11 Stand-alone Benchmark v5.0.0, section 18.10.10.2.3. Valeur de registre : HKLM:\\SOFTWARE\\Policies\\Microsoft\\FVE:OSRecovery.",
+      "audit_procedure": "Naviguer vers le chemin UI de la remediation et confirmer le reglage, ou verifier la valeur de registre HKLM:\\SOFTWARE\\Policies\\Microsoft\\FVE:OSRecovery.",
+      "remediation_path": "Computer Configuration\\Policies\\Administrative Templates\\Windows Components\\BitLocker Drive Encryption (section 18.10.10.2.3)",
+      "default_value": "Voir description du benchmark CIS.",
+      "references": [
+        "https://learn.microsoft.com/en-us/windows/security/information-protection/bitlocker/"
+      ],
+      "cis_controls": [
+        "CIS Controls v8 3.11 Encrypt Sensitive Data at Rest"
+      ],
+      "check": {
+        "type": "equals",
+        "command": "(Get-ItemProperty -Path 'HKLM:\\SOFTWARE\\Policies\\Microsoft\\FVE' -Name OSRecovery -ErrorAction SilentlyContinue).OSRecovery",
+        "expected": "1"
+      },
+      "recommendation": "Configurer le parametre BitLocker correspondant a la section 18.10.10.2.3 selon la valeur recommandee par le benchmark CIS (voir description)."
+    },
+    {
+      "id": "CIS-WIN-18.10.10.3.11",
+      "cis_rule": "18.10.10.3.11",
+      "profile": "BitLocker (BL)",
+      "category": "BitLocker (chiffrement de disque)",
+      "title": "BitLocker (disques amovibles) : interdiction d'écriture sur les disques non protégés",
+      "severity": "high",
+      "description": "Détermine si l'écriture est refusée sur les disques amovibles qui ne sont pas protégés par BitLocker.",
+      "rationale": "Empêche l'exfiltration de données vers une clé USB non chiffrée, un vecteur fréquent de fuite de données.",
+      "audit_reference": "CIS Microsoft Windows 11 Stand-alone Benchmark v5.0.0, section 18.10.10.3.11. Valeur de registre : HKLM:\\SYSTEM\\CurrentControlSet\\Policies\\Microsoft\\FVE:RDVDenyWriteAccess.",
+      "audit_procedure": "Naviguer vers le chemin UI de la remediation et confirmer le reglage, ou verifier la valeur de registre HKLM:\\SYSTEM\\CurrentControlSet\\Policies\\Microsoft\\FVE:RDVDenyWriteAccess.",
+      "remediation_path": "Computer Configuration\\Policies\\Administrative Templates\\Windows Components\\BitLocker Drive Encryption (section 18.10.10.3.11)",
+      "default_value": "Voir description du benchmark CIS.",
+      "references": [
+        "https://learn.microsoft.com/en-us/windows/security/information-protection/bitlocker/"
+      ],
+      "cis_controls": [
+        "CIS Controls v8 3.11 Encrypt Sensitive Data at Rest"
+      ],
+      "check": {
+        "type": "equals",
+        "command": "(Get-ItemProperty -Path 'HKLM:\\SYSTEM\\CurrentControlSet\\Policies\\Microsoft\\FVE' -Name RDVDenyWriteAccess -ErrorAction SilentlyContinue).RDVDenyWriteAccess",
+        "expected": "1"
+      },
+      "recommendation": "Configurer le parametre BitLocker correspondant a la section 18.10.10.3.11 selon la valeur recommandee par le benchmark CIS (voir description)."
+    },
+    {
+      "id": "CIS-WIN-18.10.10.3.2",
+      "cis_rule": "18.10.10.3.2",
+      "profile": "BitLocker (BL)",
+      "category": "BitLocker (chiffrement de disque)",
+      "title": "BitLocker (disques amovibles) : configuration de la récupération",
+      "severity": "high",
+      "description": "Détermine si les utilisateurs peuvent configurer les options de récupération BitLocker et si des informations de récupération sont sauvegardées dans Active Directory.",
+      "rationale": "Sans politique de récupération définie, une perte de clé BitLocker sur un disque amovible peut entraîner une perte de données définitive.",
+      "audit_reference": "CIS Microsoft Windows 11 Stand-alone Benchmark v5.0.0, section 18.10.10.3.2. Valeur de registre : HKLM:\\SOFTWARE\\Policies\\Microsoft\\FVE:RDVRecovery.",
+      "audit_procedure": "Naviguer vers le chemin UI de la remediation et confirmer le reglage, ou verifier la valeur de registre HKLM:\\SOFTWARE\\Policies\\Microsoft\\FVE:RDVRecovery.",
+      "remediation_path": "Computer Configuration\\Policies\\Administrative Templates\\Windows Components\\BitLocker Drive Encryption (section 18.10.10.3.2)",
+      "default_value": "Voir description du benchmark CIS.",
+      "references": [
+        "https://learn.microsoft.com/en-us/windows/security/information-protection/bitlocker/"
+      ],
+      "cis_controls": [
+        "CIS Controls v8 3.11 Encrypt Sensitive Data at Rest"
+      ],
+      "check": {
+        "type": "equals",
+        "command": "(Get-ItemProperty -Path 'HKLM:\\SOFTWARE\\Policies\\Microsoft\\FVE' -Name RDVRecovery -ErrorAction SilentlyContinue).RDVRecovery",
+        "expected": "1"
+      },
+      "recommendation": "Configurer le parametre BitLocker correspondant a la section 18.10.10.3.2 selon la valeur recommandee par le benchmark CIS (voir description)."
+    },
+    {
+      "id": "CIS-WIN-2.2.1",
+      "cis_rule": "2.2.1",
+      "profile": "Level 1 (L1)",
+      "category": "Attribution des droits utilisateur (User Rights Assignment)",
+      "title": "Droit utilisateur : accès au Gestionnaire d'identification en tant qu'appelant de confiance",
+      "severity": "high",
+      "description": "Détermine quels comptes ou processus peuvent accéder au Gestionnaire d'identification (Credential Manager) en tant qu'appelant de confiance.",
+      "rationale": "Un accès non maîtrisé au Gestionnaire d'identification pourrait permettre la divulgation d'identifiants stockés d'autres utilisateurs.",
+      "audit_reference": "CIS Microsoft Windows 11 Stand-alone Benchmark v5.0.0, section 2.2.1. Droit utilisateur : SeTrustedCredManAccessPrivilege (verifie via secedit /export /areas USER_RIGHTS).",
+      "audit_procedure": "Executer : secedit /export /cfg <fichier> /areas USER_RIGHTS /quiet, puis verifier la ligne SeTrustedCredManAccessPrivilege.",
+      "remediation_path": "Computer Configuration\\Policies\\Windows Settings\\Security Settings\\Local Policies\\User Rights Assignment (section 2.2.1)",
+      "default_value": "Voir description du benchmark CIS.",
+      "references": [
+        "https://learn.microsoft.com/en-us/windows/security/threat-protection/security-policy-settings/user-rights-assignment"
+      ],
+      "cis_controls": [
+        "CIS Controls v8 6.8 Define and Maintain Role-Based Access Control"
+      ],
+      "check": {
+        "type": "equals",
+        "command": "$tmp = [System.IO.Path]::GetTempFileName(); secedit /export /cfg $tmp /areas USER_RIGHTS /quiet | Out-Null; $line = Get-Content $tmp | Select-String -Pattern '^SeTrustedCredManAccessPrivilege\\s*='; Remove-Item $tmp -Force -ErrorAction SilentlyContinue; if ($line) { (($line.Line -split '=')[1].Trim() -split ',' | ForEach-Object { $_.Trim().TrimStart('*') } | Sort-Object) -join ',' } else { '' }",
+        "expected": ""
+      },
+      "recommendation": "Configurer le droit utilisateur correspondant a la section 2.2.1 selon la valeur recommandee par le benchmark CIS (voir description)."
+    },
+    {
+      "id": "CIS-WIN-2.2.10",
+      "cis_rule": "2.2.10",
+      "profile": "Level 1 (L1)",
+      "category": "Attribution des droits utilisateur (User Rights Assignment)",
+      "title": "Droit utilisateur : création d'un jeton (token) d'accès",
+      "severity": "high",
+      "description": "Détermine si un processus peut créer un jeton d'accès qu'il peut ensuite utiliser pour obtenir un accès à n'importe quelle ressource locale.",
+      "rationale": "Un processus disposant de ce droit pourrait créer un jeton avec des privilèges arbitraires, contournant le modèle de sécurité du système.",
+      "audit_reference": "CIS Microsoft Windows 11 Stand-alone Benchmark v5.0.0, section 2.2.10. Droit utilisateur : SeCreateTokenPrivilege (verifie via secedit /export /areas USER_RIGHTS).",
+      "audit_procedure": "Executer : secedit /export /cfg <fichier> /areas USER_RIGHTS /quiet, puis verifier la ligne SeCreateTokenPrivilege.",
+      "remediation_path": "Computer Configuration\\Policies\\Windows Settings\\Security Settings\\Local Policies\\User Rights Assignment (section 2.2.10)",
+      "default_value": "Voir description du benchmark CIS.",
+      "references": [
+        "https://learn.microsoft.com/en-us/windows/security/threat-protection/security-policy-settings/user-rights-assignment"
+      ],
+      "cis_controls": [
+        "CIS Controls v8 6.8 Define and Maintain Role-Based Access Control"
+      ],
+      "check": {
+        "type": "equals",
+        "command": "$tmp = [System.IO.Path]::GetTempFileName(); secedit /export /cfg $tmp /areas USER_RIGHTS /quiet | Out-Null; $line = Get-Content $tmp | Select-String -Pattern '^SeCreateTokenPrivilege\\s*='; Remove-Item $tmp -Force -ErrorAction SilentlyContinue; if ($line) { (($line.Line -split '=')[1].Trim() -split ',' | ForEach-Object { $_.Trim().TrimStart('*') } | Sort-Object) -join ',' } else { '' }",
+        "expected": ""
+      },
+      "recommendation": "Configurer le droit utilisateur correspondant a la section 2.2.10 selon la valeur recommandee par le benchmark CIS (voir description)."
+    },
+    {
+      "id": "CIS-WIN-2.2.12",
+      "cis_rule": "2.2.12",
+      "profile": "Level 1 (L1)",
+      "category": "Attribution des droits utilisateur (User Rights Assignment)",
+      "title": "Droit utilisateur : création d'objets permanents partagés",
+      "severity": "high",
+      "description": "Détermine si un processus peut créer un objet d'annuaire dans le gestionnaire d'objets du noyau, persistant après la fin du processus.",
+      "rationale": "Ce droit très puissant est réservé au noyau lui-même ; l'attribuer à un compte ouvrirait la voie à des manipulations bas niveau du système.",
+      "audit_reference": "CIS Microsoft Windows 11 Stand-alone Benchmark v5.0.0, section 2.2.12. Droit utilisateur : SeCreatePermanentPrivilege (verifie via secedit /export /areas USER_RIGHTS).",
+      "audit_procedure": "Executer : secedit /export /cfg <fichier> /areas USER_RIGHTS /quiet, puis verifier la ligne SeCreatePermanentPrivilege.",
+      "remediation_path": "Computer Configuration\\Policies\\Windows Settings\\Security Settings\\Local Policies\\User Rights Assignment (section 2.2.12)",
+      "default_value": "Voir description du benchmark CIS.",
+      "references": [
+        "https://learn.microsoft.com/en-us/windows/security/threat-protection/security-policy-settings/user-rights-assignment"
+      ],
+      "cis_controls": [
+        "CIS Controls v8 6.8 Define and Maintain Role-Based Access Control"
+      ],
+      "check": {
+        "type": "equals",
+        "command": "$tmp = [System.IO.Path]::GetTempFileName(); secedit /export /cfg $tmp /areas USER_RIGHTS /quiet | Out-Null; $line = Get-Content $tmp | Select-String -Pattern '^SeCreatePermanentPrivilege\\s*='; Remove-Item $tmp -Force -ErrorAction SilentlyContinue; if ($line) { (($line.Line -split '=')[1].Trim() -split ',' | ForEach-Object { $_.Trim().TrimStart('*') } | Sort-Object) -join ',' } else { '' }",
+        "expected": ""
+      },
+      "recommendation": "Configurer le droit utilisateur correspondant a la section 2.2.12 selon la valeur recommandee par le benchmark CIS (voir description)."
+    },
+    {
+      "id": "CIS-WIN-2.2.14",
+      "cis_rule": "2.2.14",
+      "profile": "Level 1 (L1)",
+      "category": "Attribution des droits utilisateur (User Rights Assignment)",
+      "title": "Droit utilisateur : débogage des programmes",
+      "severity": "high",
+      "description": "Détermine si un utilisateur peut attacher un débogueur à n'importe quel processus ou au noyau.",
+      "rationale": "Ce droit permet de lire et modifier la mémoire de n'importe quel processus, y compris LSASS, et est exploité par des outils de dump de credentials comme Mimikatz.",
+      "audit_reference": "CIS Microsoft Windows 11 Stand-alone Benchmark v5.0.0, section 2.2.14. Droit utilisateur : SeDebugPrivilege (verifie via secedit /export /areas USER_RIGHTS).",
+      "audit_procedure": "Executer : secedit /export /cfg <fichier> /areas USER_RIGHTS /quiet, puis verifier la ligne SeDebugPrivilege.",
+      "remediation_path": "Computer Configuration\\Policies\\Windows Settings\\Security Settings\\Local Policies\\User Rights Assignment (section 2.2.14)",
+      "default_value": "Voir description du benchmark CIS.",
+      "references": [
+        "https://learn.microsoft.com/en-us/windows/security/threat-protection/security-policy-settings/user-rights-assignment"
+      ],
+      "cis_controls": [
+        "CIS Controls v8 6.8 Define and Maintain Role-Based Access Control"
+      ],
+      "check": {
+        "type": "equals",
+        "command": "$tmp = [System.IO.Path]::GetTempFileName(); secedit /export /cfg $tmp /areas USER_RIGHTS /quiet | Out-Null; $line = Get-Content $tmp | Select-String -Pattern '^SeDebugPrivilege\\s*='; Remove-Item $tmp -Force -ErrorAction SilentlyContinue; if ($line) { (($line.Line -split '=')[1].Trim() -split ',' | ForEach-Object { $_.Trim().TrimStart('*') } | Sort-Object) -join ',' } else { '' }",
+        "expected": "S-1-5-32-544"
+      },
+      "recommendation": "Configurer le droit utilisateur correspondant a la section 2.2.14 selon la valeur recommandee par le benchmark CIS (voir description)."
+    },
+    {
+      "id": "CIS-WIN-2.2.20",
+      "cis_rule": "2.2.20",
+      "profile": "Level 1 (L1)",
+      "category": "Attribution des droits utilisateur (User Rights Assignment)",
+      "title": "Droit utilisateur : approbation des comptes pour la délégation",
+      "severity": "high",
+      "description": "Détermine si un utilisateur peut définir le paramètre 'De confiance pour délégation' sur un compte ou un ordinateur.",
+      "rationale": "Un compte de confiance pour la délégation peut usurper l'identité d'un autre utilisateur sur d'autres services du réseau, un vecteur majeur de mouvement latéral en environnement Active Directory.",
+      "audit_reference": "CIS Microsoft Windows 11 Stand-alone Benchmark v5.0.0, section 2.2.20. Droit utilisateur : SeEnableDelegationPrivilege (verifie via secedit /export /areas USER_RIGHTS).",
+      "audit_procedure": "Executer : secedit /export /cfg <fichier> /areas USER_RIGHTS /quiet, puis verifier la ligne SeEnableDelegationPrivilege.",
+      "remediation_path": "Computer Configuration\\Policies\\Windows Settings\\Security Settings\\Local Policies\\User Rights Assignment (section 2.2.20)",
+      "default_value": "Voir description du benchmark CIS.",
+      "references": [
+        "https://learn.microsoft.com/en-us/windows/security/threat-protection/security-policy-settings/user-rights-assignment"
+      ],
+      "cis_controls": [
+        "CIS Controls v8 6.8 Define and Maintain Role-Based Access Control"
+      ],
+      "check": {
+        "type": "equals",
+        "command": "$tmp = [System.IO.Path]::GetTempFileName(); secedit /export /cfg $tmp /areas USER_RIGHTS /quiet | Out-Null; $line = Get-Content $tmp | Select-String -Pattern '^SeEnableDelegationPrivilege\\s*='; Remove-Item $tmp -Force -ErrorAction SilentlyContinue; if ($line) { (($line.Line -split '=')[1].Trim() -split ',' | ForEach-Object { $_.Trim().TrimStart('*') } | Sort-Object) -join ',' } else { '' }",
+        "expected": ""
+      },
+      "recommendation": "Configurer le droit utilisateur correspondant a la section 2.2.20 selon la valeur recommandee par le benchmark CIS (voir description)."
+    },
+    {
+      "id": "CIS-WIN-5.10",
+      "cis_rule": "5.10",
+      "profile": "Level 2 (L2)",
+      "category": "Services système à risque désactivés",
+      "title": "Service désactivé : Service FTP Microsoft (FTPSVC)",
+      "severity": "high",
+      "description": "Détermine si le service 'Service FTP Microsoft' (FTPSVC) est désactivé, réduisant la surface d'attaque exposée par les services système non nécessaires.",
+      "rationale": "Tout service en cours d'exécution est un point d'entrée potentiel pour un attaquant ; désactiver les services non utilisés réduit directement la surface d'attaque du système.",
+      "audit_reference": "CIS Microsoft Windows 11 Stand-alone Benchmark v5.0.0, section 5.10. Valeur de registre : HKLM:\\SYSTEM\\CurrentControlSet\\Services\\FTPSVC:Start (4 = Désactivé).",
+      "audit_procedure": "Verifier que le service 'FTPSVC' est arrete et configure en demarrage 'Desactive' (Get-Service FTPSVC ; valeur de registre Start=4).",
+      "remediation_path": "Set-Service -Name FTPSVC -StartupType Disabled",
+      "default_value": "Automatique ou Manuel selon le service et la version de Windows (voir benchmark CIS).",
+      "references": [
+        "https://learn.microsoft.com/en-us/windows-server/administration/windows-commands/sc-config"
+      ],
+      "cis_controls": [
+        "CIS Controls v8 4.8 Uninstall or Disable Unnecessary Services on Enterprise Assets and Software"
+      ],
+      "check": {
+        "type": "regex",
+        "command": "(Get-ItemProperty -Path 'HKLM:\\SYSTEM\\CurrentControlSet\\Services\\FTPSVC' -Name Start -ErrorAction SilentlyContinue).Start",
+        "expected": "^4?$"
+      },
+      "recommendation": "Executer : Set-Service -Name FTPSVC -StartupType Disabled (puis Stop-Service -Name FTPSVC si le service est actif)."
+    },
+    {
+      "id": "CIS-WIN-5.12",
+      "cis_rule": "5.12",
+      "profile": "Level 2 (L2)",
+      "category": "Services système à risque désactivés",
+      "title": "Service désactivé : Serveur SSH OpenSSH (sshd)",
+      "severity": "high",
+      "description": "Détermine si le service 'Serveur SSH OpenSSH' (sshd) est désactivé, réduisant la surface d'attaque exposée par les services système non nécessaires.",
+      "rationale": "Tout service en cours d'exécution est un point d'entrée potentiel pour un attaquant ; désactiver les services non utilisés réduit directement la surface d'attaque du système.",
+      "audit_reference": "CIS Microsoft Windows 11 Stand-alone Benchmark v5.0.0, section 5.12. Valeur de registre : HKLM:\\SYSTEM\\CurrentControlSet\\Services\\sshd:Start (4 = Désactivé).",
+      "audit_procedure": "Verifier que le service 'sshd' est arrete et configure en demarrage 'Desactive' (Get-Service sshd ; valeur de registre Start=4).",
+      "remediation_path": "Set-Service -Name sshd -StartupType Disabled",
+      "default_value": "Automatique ou Manuel selon le service et la version de Windows (voir benchmark CIS).",
+      "references": [
+        "https://learn.microsoft.com/en-us/windows-server/administration/windows-commands/sc-config"
+      ],
+      "cis_controls": [
+        "CIS Controls v8 4.8 Uninstall or Disable Unnecessary Services on Enterprise Assets and Software"
+      ],
+      "check": {
+        "type": "regex",
+        "command": "(Get-ItemProperty -Path 'HKLM:\\SYSTEM\\CurrentControlSet\\Services\\sshd' -Name Start -ErrorAction SilentlyContinue).Start",
+        "expected": "^4?$"
+      },
+      "recommendation": "Executer : Set-Service -Name sshd -StartupType Disabled (puis Stop-Service -Name sshd si le service est actif)."
+    },
+    {
+      "id": "CIS-WIN-5.24",
+      "cis_rule": "5.24",
+      "profile": "Level 1 (L1)",
+      "category": "Services système à risque désactivés",
+      "title": "Service désactivé : Registre distant (RemoteRegistry)",
+      "severity": "high",
+      "description": "Détermine si le service 'Registre distant' (RemoteRegistry) est désactivé, réduisant la surface d'attaque exposée par les services système non nécessaires.",
+      "rationale": "Tout service en cours d'exécution est un point d'entrée potentiel pour un attaquant ; désactiver les services non utilisés réduit directement la surface d'attaque du système.",
+      "audit_reference": "CIS Microsoft Windows 11 Stand-alone Benchmark v5.0.0, section 5.24. Valeur de registre : HKLM:\\SYSTEM\\CurrentControlSet\\Services\\RemoteRegistry:Start (4 = Désactivé).",
+      "audit_procedure": "Verifier que le service 'RemoteRegistry' est arrete et configure en demarrage 'Desactive' (Get-Service RemoteRegistry ; valeur de registre Start=4).",
+      "remediation_path": "Set-Service -Name RemoteRegistry -StartupType Disabled",
+      "default_value": "Automatique ou Manuel selon le service et la version de Windows (voir benchmark CIS).",
+      "references": [
+        "https://learn.microsoft.com/en-us/windows-server/administration/windows-commands/sc-config"
+      ],
+      "cis_controls": [
+        "CIS Controls v8 4.8 Uninstall or Disable Unnecessary Services on Enterprise Assets and Software"
+      ],
+      "check": {
+        "type": "equals",
+        "command": "(Get-ItemProperty -Path 'HKLM:\\SYSTEM\\CurrentControlSet\\Services\\RemoteRegistry' -Name Start -ErrorAction SilentlyContinue).Start",
+        "expected": "4"
+      },
+      "recommendation": "Executer : Set-Service -Name RemoteRegistry -StartupType Disabled (puis Stop-Service -Name RemoteRegistry si le service est actif)."
+    },
+    {
+      "id": "CIS-WIN-5.40",
+      "cis_rule": "5.40",
+      "profile": "Level 2 (L2)",
+      "category": "Services système à risque désactivés",
+      "title": "Service désactivé : Service de publication World Wide Web (W3SVC)",
+      "severity": "high",
+      "description": "Détermine si le service 'Service de publication World Wide Web' (W3SVC) est désactivé, réduisant la surface d'attaque exposée par les services système non nécessaires.",
+      "rationale": "Tout service en cours d'exécution est un point d'entrée potentiel pour un attaquant ; désactiver les services non utilisés réduit directement la surface d'attaque du système.",
+      "audit_reference": "CIS Microsoft Windows 11 Stand-alone Benchmark v5.0.0, section 5.40. Valeur de registre : HKLM:\\SYSTEM\\CurrentControlSet\\Services\\W3SVC:Start (4 = Désactivé).",
+      "audit_procedure": "Verifier que le service 'W3SVC' est arrete et configure en demarrage 'Desactive' (Get-Service W3SVC ; valeur de registre Start=4).",
+      "remediation_path": "Set-Service -Name W3SVC -StartupType Disabled",
+      "default_value": "Automatique ou Manuel selon le service et la version de Windows (voir benchmark CIS).",
+      "references": [
+        "https://learn.microsoft.com/en-us/windows-server/administration/windows-commands/sc-config"
+      ],
+      "cis_controls": [
+        "CIS Controls v8 4.8 Uninstall or Disable Unnecessary Services on Enterprise Assets and Software"
+      ],
+      "check": {
+        "type": "regex",
+        "command": "(Get-ItemProperty -Path 'HKLM:\\SYSTEM\\CurrentControlSet\\Services\\W3SVC' -Name Start -ErrorAction SilentlyContinue).Start",
+        "expected": "^4?$"
+      },
+      "recommendation": "Executer : Set-Service -Name W3SVC -StartupType Disabled (puis Stop-Service -Name W3SVC si le service est actif)."
+    },
+    {
+      "id": "CIS-WIN-5.7",
+      "cis_rule": "5.7",
+      "profile": "Level 2 (L2)",
+      "category": "Services système à risque désactivés",
+      "title": "Service désactivé : Service d'administration IIS (IISADMIN)",
+      "severity": "high",
+      "description": "Détermine si le service 'Service d'administration IIS' (IISADMIN) est désactivé, réduisant la surface d'attaque exposée par les services système non nécessaires.",
+      "rationale": "Tout service en cours d'exécution est un point d'entrée potentiel pour un attaquant ; désactiver les services non utilisés réduit directement la surface d'attaque du système.",
+      "audit_reference": "CIS Microsoft Windows 11 Stand-alone Benchmark v5.0.0, section 5.7. Valeur de registre : HKLM:\\SYSTEM\\CurrentControlSet\\Services\\IISADMIN:Start (4 = Désactivé).",
+      "audit_procedure": "Verifier que le service 'IISADMIN' est arrete et configure en demarrage 'Desactive' (Get-Service IISADMIN ; valeur de registre Start=4).",
+      "remediation_path": "Set-Service -Name IISADMIN -StartupType Disabled",
+      "default_value": "Automatique ou Manuel selon le service et la version de Windows (voir benchmark CIS).",
+      "references": [
+        "https://learn.microsoft.com/en-us/windows-server/administration/windows-commands/sc-config"
+      ],
+      "cis_controls": [
+        "CIS Controls v8 4.8 Uninstall or Disable Unnecessary Services on Enterprise Assets and Software"
+      ],
+      "check": {
+        "type": "regex",
+        "command": "(Get-ItemProperty -Path 'HKLM:\\SYSTEM\\CurrentControlSet\\Services\\IISADMIN' -Name Start -ErrorAction SilentlyContinue).Start",
+        "expected": "^4?$"
+      },
+      "recommendation": "Executer : Set-Service -Name IISADMIN -StartupType Disabled (puis Stop-Service -Name IISADMIN si le service est actif)."
+    },
+    {
+      "id": "CIS-WIN-17.3.2",
+      "cis_rule": "17.3.2",
+      "profile": "Level 1 (L1)",
+      "category": "Journalisation étendue (accès objets, systeme)",
+      "title": "Audit de la création de processus",
+      "severity": "high",
+      "description": "Consigne les événements de création de nouveaux processus sur le système.",
+      "rationale": "Journal fondamental pour la détection d'exécution de code malveillant et pour les investigations forensiques d'incidents.",
+      "audit_reference": "CIS Microsoft Windows 11 Stand-alone Benchmark v5.0.0, section 17.3.2. Sous-categorie d'audit avance : Process Creation.",
+      "audit_procedure": "Executer : auditpol /get /subcategory:\"Process Creation\" /r et verifier le champ 'Inclusion Setting'.",
+      "remediation_path": "Computer Configuration\\Policies\\Windows Settings\\Security Settings\\Advanced Audit Policy Configuration\\Audit Policies\\...\\Audit Process Creation",
+      "default_value": "Aucun audit (No Auditing).",
+      "references": [
+        "https://learn.microsoft.com/en-us/windows/security/threat-protection/auditing/"
+      ],
+      "cis_controls": [
+        "CIS Controls v8 8.5 Collect Detailed Audit Logs"
+      ],
+      "check": {
+        "type": "contains",
+        "command": "(auditpol /get /subcategory:\"Process Creation\" /r | ConvertFrom-Csv).\"Inclusion Setting\"",
+        "expected": "Success"
+      },
+      "recommendation": "Executer : auditpol /set /subcategory:\"Process Creation\" /success:enable /failure:enable (ajuster selon la valeur recommandee)."
+    },
+    {
+      "id": "CIS-WIN-17.9.5",
+      "cis_rule": "17.9.5",
+      "profile": "Level 1 (L1)",
+      "category": "Journalisation étendue (accès objets, systeme)",
+      "title": "Audit de l'intégrité du système",
+      "severity": "high",
+      "description": "Consigne les violations de l'intégrité du sous-système de sécurité, telles qu'une désynchronisation des séquences d'audit ou un processus non fiable usurpant un composant système.",
+      "rationale": "Détecte des tentatives directes de compromission du sous-système de sécurité de Windows lui-même, un signal de compromission de haute gravité.",
+      "audit_reference": "CIS Microsoft Windows 11 Stand-alone Benchmark v5.0.0, section 17.9.5. Sous-categorie d'audit avance : System Integrity.",
+      "audit_procedure": "Executer : auditpol /get /subcategory:\"System Integrity\" /r et verifier le champ 'Inclusion Setting'.",
+      "remediation_path": "Computer Configuration\\Policies\\Windows Settings\\Security Settings\\Advanced Audit Policy Configuration\\Audit Policies\\...\\Audit System Integrity",
+      "default_value": "Aucun audit (No Auditing).",
+      "references": [
+        "https://learn.microsoft.com/en-us/windows/security/threat-protection/auditing/"
+      ],
+      "cis_controls": [
+        "CIS Controls v8 8.5 Collect Detailed Audit Logs"
+      ],
+      "check": {
+        "type": "equals",
+        "command": "(auditpol /get /subcategory:\"System Integrity\" /r | ConvertFrom-Csv).\"Inclusion Setting\"",
+        "expected": "Success and Failure"
+      },
+      "recommendation": "Executer : auditpol /set /subcategory:\"System Integrity\" /success:enable /failure:enable (ajuster selon la valeur recommandee)."
+    },
+    {
+      "id": "CIS-WIN-17.6.2",
+      "cis_rule": "17.6.2",
+      "profile": "Level 1 (L1)",
+      "category": "Journalisation étendue (accès objets, systeme)",
+      "title": "Audit des accès aux partages de fichiers",
+      "severity": "medium",
+      "description": "Consigne les tentatives d'accès à un partage de fichiers, réussies et échouées.",
+      "rationale": "Permet de tracer les accès aux ressources partagées du réseau, essentiel pour détecter une exfiltration ou un accès non autorisé.",
+      "audit_reference": "CIS Microsoft Windows 11 Stand-alone Benchmark v5.0.0, section 17.6.2. Sous-categorie d'audit avance : File Share.",
+      "audit_procedure": "Executer : auditpol /get /subcategory:\"File Share\" /r et verifier le champ 'Inclusion Setting'.",
+      "remediation_path": "Computer Configuration\\Policies\\Windows Settings\\Security Settings\\Advanced Audit Policy Configuration\\Audit Policies\\...\\Audit File Share",
+      "default_value": "Aucun audit (No Auditing).",
+      "references": [
+        "https://learn.microsoft.com/en-us/windows/security/threat-protection/auditing/"
+      ],
+      "cis_controls": [
+        "CIS Controls v8 8.5 Collect Detailed Audit Logs"
+      ],
+      "check": {
+        "type": "equals",
+        "command": "(auditpol /get /subcategory:\"File Share\" /r | ConvertFrom-Csv).\"Inclusion Setting\"",
+        "expected": "Success and Failure"
+      },
+      "recommendation": "Executer : auditpol /set /subcategory:\"File Share\" /success:enable /failure:enable (ajuster selon la valeur recommandee)."
+    },
+    {
+      "id": "CIS-WIN-17.6.4",
+      "cis_rule": "17.6.4",
+      "profile": "Level 1 (L1)",
+      "category": "Journalisation étendue (accès objets, systeme)",
+      "title": "Audit des accès au stockage amovible",
+      "severity": "medium",
+      "description": "Consigne les tentatives d'accès aux fichiers et dossiers situés sur un périphérique de stockage amovible.",
+      "rationale": "Permet de détecter l'utilisation de supports amovibles pour l'exfiltration de données, un vecteur de fuite d'information fréquent.",
+      "audit_reference": "CIS Microsoft Windows 11 Stand-alone Benchmark v5.0.0, section 17.6.4. Sous-categorie d'audit avance : Removable Storage.",
+      "audit_procedure": "Executer : auditpol /get /subcategory:\"Removable Storage\" /r et verifier le champ 'Inclusion Setting'.",
+      "remediation_path": "Computer Configuration\\Policies\\Windows Settings\\Security Settings\\Advanced Audit Policy Configuration\\Audit Policies\\...\\Audit Removable Storage",
+      "default_value": "Aucun audit (No Auditing).",
+      "references": [
+        "https://learn.microsoft.com/en-us/windows/security/threat-protection/auditing/"
+      ],
+      "cis_controls": [
+        "CIS Controls v8 8.5 Collect Detailed Audit Logs"
+      ],
+      "check": {
+        "type": "equals",
+        "command": "(auditpol /get /subcategory:\"Removable Storage\" /r | ConvertFrom-Csv).\"Inclusion Setting\"",
+        "expected": "Success and Failure"
+      },
+      "recommendation": "Executer : auditpol /set /subcategory:\"Removable Storage\" /success:enable /failure:enable (ajuster selon la valeur recommandee)."
+    },
+    {
+      "id": "CIS-WIN-17.9.2",
+      "cis_rule": "17.9.2",
+      "profile": "Level 1 (L1)",
+      "category": "Journalisation étendue (accès objets, systeme)",
+      "title": "Audit des autres événements système",
+      "severity": "medium",
+      "description": "Consigne d'autres événements système, notamment le démarrage et l'arrêt du pare-feu Windows.",
+      "rationale": "Permet de détecter l'arrêt ou le redémarrage inattendu de composants de sécurité système comme le pare-feu.",
+      "audit_reference": "CIS Microsoft Windows 11 Stand-alone Benchmark v5.0.0, section 17.9.2. Sous-categorie d'audit avance : Other System Events.",
+      "audit_procedure": "Executer : auditpol /get /subcategory:\"Other System Events\" /r et verifier le champ 'Inclusion Setting'.",
+      "remediation_path": "Computer Configuration\\Policies\\Windows Settings\\Security Settings\\Advanced Audit Policy Configuration\\Audit Policies\\...\\Audit Other System Events",
+      "default_value": "Aucun audit (No Auditing).",
+      "references": [
+        "https://learn.microsoft.com/en-us/windows/security/threat-protection/auditing/"
+      ],
+      "cis_controls": [
+        "CIS Controls v8 8.5 Collect Detailed Audit Logs"
+      ],
+      "check": {
+        "type": "equals",
+        "command": "(auditpol /get /subcategory:\"Other System Events\" /r | ConvertFrom-Csv).\"Inclusion Setting\"",
+        "expected": "Success and Failure"
+      },
+      "recommendation": "Executer : auditpol /set /subcategory:\"Other System Events\" /success:enable /failure:enable (ajuster selon la valeur recommandee)."
+    },
+    {
+      "id": "CIS-WIN-18.10.43.3",
+      "cis_rule": "18.10.43.3",
+      "profile": "Level 2 (L2)",
+      "category": "Application Guard / Windows Sandbox",
+      "title": "Application Guard : interdiction de la persistance des données",
+      "severity": "high",
+      "description": "Détermine si les données de la session Application Guard (cookies, favoris, fichiers) sont conservées entre les sessions.",
+      "rationale": "La persistance des données annule l'intérêt principal d'Application Guard, qui est d'isoler et de réinitialiser complètement chaque session à risque.",
+      "audit_reference": "CIS Microsoft Windows 11 Stand-alone Benchmark v5.0.0, section 18.10.43.3. Valeur de registre : HKLM:\\SOFTWARE\\Policies\\Microsoft\\AppHVSI:AllowPersistence.",
+      "audit_procedure": "Naviguer vers le chemin UI de la remediation et confirmer le reglage, ou verifier la valeur de registre HKLM:\\SOFTWARE\\Policies\\Microsoft\\AppHVSI:AllowPersistence.",
+      "remediation_path": "Computer Configuration\\Policies\\Administrative Templates\\Windows Components (section 18.10.43.3)",
+      "default_value": "Voir description du benchmark CIS.",
+      "references": [
+        "https://learn.microsoft.com/en-us/windows/security/application-security/application-isolation/"
+      ],
+      "cis_controls": [
+        "CIS Controls v8 4.1 Establish and Maintain a Secure Configuration Process"
+      ],
+      "check": {
+        "type": "equals",
+        "command": "(Get-ItemProperty -Path 'HKLM:\\SOFTWARE\\Policies\\Microsoft\\AppHVSI' -Name AllowPersistence -ErrorAction SilentlyContinue).AllowPersistence",
+        "expected": "0"
+      },
+      "recommendation": "Configurer le parametre correspondant a la section 18.10.43.3 selon la valeur recommandee par le benchmark CIS (voir description)."
+    },
+    {
+      "id": "CIS-WIN-18.10.43.4",
+      "cis_rule": "18.10.43.4",
+      "profile": "Level 2 (L2)",
+      "category": "Application Guard / Windows Sandbox",
+      "title": "Application Guard : interdiction du téléchargement vers l'hôte",
+      "severity": "high",
+      "description": "Détermine si les fichiers téléchargés dans la session isolée Application Guard peuvent être enregistrés sur le système d'exploitation hôte.",
+      "rationale": "Autoriser le transfert de fichiers vers l'hôte crée un point de sortie pour un contenu potentiellement malveillant téléchargé dans l'environnement isolé.",
+      "audit_reference": "CIS Microsoft Windows 11 Stand-alone Benchmark v5.0.0, section 18.10.43.4. Valeur de registre : HKLM:\\SOFTWARE\\Policies\\Microsoft\\AppHVSI:SaveFilesToHost.",
+      "audit_procedure": "Naviguer vers le chemin UI de la remediation et confirmer le reglage, ou verifier la valeur de registre HKLM:\\SOFTWARE\\Policies\\Microsoft\\AppHVSI:SaveFilesToHost.",
+      "remediation_path": "Computer Configuration\\Policies\\Administrative Templates\\Windows Components (section 18.10.43.4)",
+      "default_value": "Voir description du benchmark CIS.",
+      "references": [
+        "https://learn.microsoft.com/en-us/windows/security/application-security/application-isolation/"
+      ],
+      "cis_controls": [
+        "CIS Controls v8 4.1 Establish and Maintain a Secure Configuration Process"
+      ],
+      "check": {
+        "type": "equals",
+        "command": "(Get-ItemProperty -Path 'HKLM:\\SOFTWARE\\Policies\\Microsoft\\AppHVSI' -Name SaveFilesToHost -ErrorAction SilentlyContinue).SaveFilesToHost",
+        "expected": "0"
+      },
+      "recommendation": "Configurer le parametre correspondant a la section 18.10.43.4 selon la valeur recommandee par le benchmark CIS (voir description)."
+    },
+    {
+      "id": "CIS-WIN-18.10.43.6",
+      "cis_rule": "18.10.43.6",
+      "profile": "Level 2 (L2)",
+      "category": "Application Guard / Windows Sandbox",
+      "title": "Application Guard : activation en mode géré",
+      "severity": "high",
+      "description": "Active Microsoft Defender Application Guard en mode géré, isolant la navigation vers des sites non approuvés dans un conteneur Hyper-V dédié.",
+      "rationale": "Application Guard isole la navigation à risque du système d'exploitation principal, empêchant qu'un site compromis n'affecte directement la machine hôte.",
+      "audit_reference": "CIS Microsoft Windows 11 Stand-alone Benchmark v5.0.0, section 18.10.43.6. Valeur de registre : HKLM:\\SOFTWARE\\Policies\\Microsoft\\AppHVSI:AllowAppHVSI_ProviderSet.",
+      "audit_procedure": "Naviguer vers le chemin UI de la remediation et confirmer le reglage, ou verifier la valeur de registre HKLM:\\SOFTWARE\\Policies\\Microsoft\\AppHVSI:AllowAppHVSI_ProviderSet.",
+      "remediation_path": "Computer Configuration\\Policies\\Administrative Templates\\Windows Components (section 18.10.43.6)",
+      "default_value": "Voir description du benchmark CIS.",
+      "references": [
+        "https://learn.microsoft.com/en-us/windows/security/application-security/application-isolation/"
+      ],
+      "cis_controls": [
+        "CIS Controls v8 4.1 Establish and Maintain a Secure Configuration Process"
+      ],
+      "check": {
+        "type": "equals",
+        "command": "(Get-ItemProperty -Path 'HKLM:\\SOFTWARE\\Policies\\Microsoft\\AppHVSI' -Name AllowAppHVSI_ProviderSet -ErrorAction SilentlyContinue).AllowAppHVSI_ProviderSet",
+        "expected": "1"
+      },
+      "recommendation": "Configurer le parametre correspondant a la section 18.10.43.6 selon la valeur recommandee par le benchmark CIS (voir description)."
+    },
+    {
+      "id": "CIS-WIN-18.10.43.2",
+      "cis_rule": "18.10.43.2",
+      "profile": "Level 2 (L2)",
+      "category": "Application Guard / Windows Sandbox",
+      "title": "Application Guard : interdiction de l'accès caméra/micro",
+      "severity": "medium",
+      "description": "Détermine si les applications exécutées dans le conteneur isolé Application Guard peuvent accéder à la caméra et au microphone de l'hôte.",
+      "rationale": "Un site web malveillant ouvert dans la session isolée ne devrait pas pouvoir accéder aux périphériques audio/vidéo de la machine hôte.",
+      "audit_reference": "CIS Microsoft Windows 11 Stand-alone Benchmark v5.0.0, section 18.10.43.2. Valeur de registre : HKLM:\\SOFTWARE\\Policies\\Microsoft\\AppHVSI:AllowCameraMicrophoneRedirection.",
+      "audit_procedure": "Naviguer vers le chemin UI de la remediation et confirmer le reglage, ou verifier la valeur de registre HKLM:\\SOFTWARE\\Policies\\Microsoft\\AppHVSI:AllowCameraMicrophoneRedirection.",
+      "remediation_path": "Computer Configuration\\Policies\\Administrative Templates\\Windows Components (section 18.10.43.2)",
+      "default_value": "Voir description du benchmark CIS.",
+      "references": [
+        "https://learn.microsoft.com/en-us/windows/security/application-security/application-isolation/"
+      ],
+      "cis_controls": [
+        "CIS Controls v8 4.1 Establish and Maintain a Secure Configuration Process"
+      ],
+      "check": {
+        "type": "equals",
+        "command": "(Get-ItemProperty -Path 'HKLM:\\SOFTWARE\\Policies\\Microsoft\\AppHVSI' -Name AllowCameraMicrophoneRedirection -ErrorAction SilentlyContinue).AllowCameraMicrophoneRedirection",
+        "expected": "0"
+      },
+      "recommendation": "Configurer le parametre correspondant a la section 18.10.43.2 selon la valeur recommandee par le benchmark CIS (voir description)."
+    },
+    {
+      "id": "CIS-WIN-18.10.43.5",
+      "cis_rule": "18.10.43.5",
+      "profile": "Level 2 (L2)",
+      "category": "Application Guard / Windows Sandbox",
+      "title": "Application Guard : configuration du presse-papiers (isolé vers hôte uniquement)",
+      "severity": "medium",
+      "description": "Détermine le sens autorisé du partage du presse-papiers entre la session isolée Application Guard et l'hôte.",
+      "rationale": "Limiter le sens du partage du presse-papiers réduit le risque qu'un contenu malveillant copié dans la session isolée ne se propage vers l'hôte.",
+      "audit_reference": "CIS Microsoft Windows 11 Stand-alone Benchmark v5.0.0, section 18.10.43.5. Valeur de registre : HKLM:\\SOFTWARE\\Policies\\Microsoft\\AppHVSI:AppHVSIClipboardSettings.",
+      "audit_procedure": "Naviguer vers le chemin UI de la remediation et confirmer le reglage, ou verifier la valeur de registre HKLM:\\SOFTWARE\\Policies\\Microsoft\\AppHVSI:AppHVSIClipboardSettings.",
+      "remediation_path": "Computer Configuration\\Policies\\Administrative Templates\\Windows Components (section 18.10.43.5)",
+      "default_value": "Voir description du benchmark CIS.",
+      "references": [
+        "https://learn.microsoft.com/en-us/windows/security/application-security/application-isolation/"
+      ],
+      "cis_controls": [
+        "CIS Controls v8 4.1 Establish and Maintain a Secure Configuration Process"
+      ],
+      "check": {
+        "type": "equals",
+        "command": "(Get-ItemProperty -Path 'HKLM:\\SOFTWARE\\Policies\\Microsoft\\AppHVSI' -Name AppHVSIClipboardSettings -ErrorAction SilentlyContinue).AppHVSIClipboardSettings",
+        "expected": "1"
+      },
+      "recommendation": "Configurer le parametre correspondant a la section 18.10.43.5 selon la valeur recommandee par le benchmark CIS (voir description)."
+    },
+    {
+      "id": "CIS-WIN-18.10.77.1.2",
+      "cis_rule": "18.10.77.1.2",
+      "profile": "Level 1 (L1)",
+      "category": "SmartScreen / exécution de contenu non fiable",
+      "title": "Protection anti-hameçonnage renforcée : notification de site malveillant",
+      "severity": "high",
+      "description": "Avertit l'utilisateur lorsqu'il saisit son mot de passe Windows sur un site identifié comme malveillant.",
+      "rationale": "Alerte immédiatement l'utilisateur lorsqu'il est sur le point de divulguer son mot de passe Windows à un site de phishing connu.",
+      "audit_reference": "CIS Microsoft Windows 11 Stand-alone Benchmark v5.0.0, section 18.10.77.1.2.",
+      "audit_procedure": "Naviguer vers le chemin UI de la remediation et confirmer le reglage, ou verifier la ou les valeurs de registre correspondantes.",
+      "remediation_path": "Computer Configuration\\Policies\\Administrative Templates\\Windows Components (section 18.10.77.1.2)",
+      "default_value": "Voir description du benchmark CIS.",
+      "references": [
+        "https://learn.microsoft.com/en-us/windows/security/operating-system-security/virus-and-threat-protection/microsoft-defender-smartscreen/"
+      ],
+      "cis_controls": [
+        "CIS Controls v8 9.2 Use DNS Filtering Services"
+      ],
+      "check": {
+        "type": "equals",
+        "command": "(Get-ItemProperty -Path 'HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\WTDS\\Components' -Name NotifyMalicious -ErrorAction SilentlyContinue).NotifyMalicious",
+        "expected": "1"
+      },
+      "recommendation": "Configurer le parametre correspondant a la section 18.10.77.1.2 selon la valeur recommandee par le benchmark CIS (voir description)."
+    },
+    {
+      "id": "CIS-WIN-18.10.77.1.3",
+      "cis_rule": "18.10.77.1.3",
+      "profile": "Level 1 (L1)",
+      "category": "SmartScreen / exécution de contenu non fiable",
+      "title": "Protection anti-hameçonnage renforcée : notification de réutilisation de mot de passe",
+      "severity": "high",
+      "description": "Avertit l'utilisateur lorsqu'il réutilise son mot de passe Windows sur une application ou un site tiers.",
+      "rationale": "La réutilisation du mot de passe Windows sur des sites tiers expose le compte Windows en cas de fuite de données du site tiers.",
+      "audit_reference": "CIS Microsoft Windows 11 Stand-alone Benchmark v5.0.0, section 18.10.77.1.3.",
+      "audit_procedure": "Naviguer vers le chemin UI de la remediation et confirmer le reglage, ou verifier la ou les valeurs de registre correspondantes.",
+      "remediation_path": "Computer Configuration\\Policies\\Administrative Templates\\Windows Components (section 18.10.77.1.3)",
+      "default_value": "Voir description du benchmark CIS.",
+      "references": [
+        "https://learn.microsoft.com/en-us/windows/security/operating-system-security/virus-and-threat-protection/microsoft-defender-smartscreen/"
+      ],
+      "cis_controls": [
+        "CIS Controls v8 9.2 Use DNS Filtering Services"
+      ],
+      "check": {
+        "type": "equals",
+        "command": "(Get-ItemProperty -Path 'HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\WTDS\\Components' -Name NotifyPasswordReuse -ErrorAction SilentlyContinue).NotifyPasswordReuse",
+        "expected": "1"
+      },
+      "recommendation": "Configurer le parametre correspondant a la section 18.10.77.1.3 selon la valeur recommandee par le benchmark CIS (voir description)."
+    },
+    {
+      "id": "CIS-WIN-18.10.77.1.5",
+      "cis_rule": "18.10.77.1.5",
+      "profile": "Level 1 (L1)",
+      "category": "SmartScreen / exécution de contenu non fiable",
+      "title": "Activation de la protection anti-hameçonnage renforcée",
+      "severity": "high",
+      "description": "Active globalement le service de protection anti-hameçonnage renforcée (Enhanced Phishing Protection) intégré à Windows.",
+      "rationale": "Interrupteur principal de la fonctionnalité ; sans son activation, aucune des sous-protections de détection de hameçonnage n'est opérationnelle.",
+      "audit_reference": "CIS Microsoft Windows 11 Stand-alone Benchmark v5.0.0, section 18.10.77.1.5.",
+      "audit_procedure": "Naviguer vers le chemin UI de la remediation et confirmer le reglage, ou verifier la ou les valeurs de registre correspondantes.",
+      "remediation_path": "Computer Configuration\\Policies\\Administrative Templates\\Windows Components (section 18.10.77.1.5)",
+      "default_value": "Voir description du benchmark CIS.",
+      "references": [
+        "https://learn.microsoft.com/en-us/windows/security/operating-system-security/virus-and-threat-protection/microsoft-defender-smartscreen/"
+      ],
+      "cis_controls": [
+        "CIS Controls v8 9.2 Use DNS Filtering Services"
+      ],
+      "check": {
+        "type": "equals",
+        "command": "(Get-ItemProperty -Path 'HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\WTDS\\Components' -Name ServiceEnabled -ErrorAction SilentlyContinue).ServiceEnabled",
+        "expected": "1"
+      },
+      "recommendation": "Configurer le parametre correspondant a la section 18.10.77.1.5 selon la valeur recommandee par le benchmark CIS (voir description)."
+    },
+    {
+      "id": "CIS-WIN-18.10.77.2.1",
+      "cis_rule": "18.10.77.2.1",
+      "profile": "Level 1 (L1)",
+      "category": "SmartScreen / exécution de contenu non fiable",
+      "title": "SmartScreen configuré en blocage avec interdiction de contournement",
+      "severity": "high",
+      "description": "Détermine si Microsoft Defender SmartScreen est activé pour les applications et fichiers exécutés depuis l'Explorateur Windows, et si le niveau est réglé pour bloquer sans permettre à l'utilisateur de passer outre.",
+      "rationale": "SmartScreen protège contre l'exécution d'exécutables malveillants téléchargés ; interdire le contournement empêche un utilisateur (ou un attaquant l'y incitant par ingénierie sociale) de désactiver la protection au moment critique.",
+      "audit_reference": "CIS Microsoft Windows 11 Stand-alone Benchmark v5.0.0, section 18.10.77.2.1.",
+      "audit_procedure": "Naviguer vers le chemin UI de la remediation et confirmer le reglage, ou verifier la ou les valeurs de registre correspondantes.",
+      "remediation_path": "Computer Configuration\\Policies\\Administrative Templates\\Windows Components (section 18.10.77.2.1)",
+      "default_value": "Voir description du benchmark CIS.",
+      "references": [
+        "https://learn.microsoft.com/en-us/windows/security/operating-system-security/virus-and-threat-protection/microsoft-defender-smartscreen/"
+      ],
+      "cis_controls": [
+        "CIS Controls v8 9.2 Use DNS Filtering Services"
+      ],
+      "check": {
+        "type": "regex",
+        "command": "$e = (Get-ItemProperty -Path 'HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\System' -Name EnableSmartScreen -ErrorAction SilentlyContinue).EnableSmartScreen; $l = (Get-ItemProperty -Path 'HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\System' -Name ShellSmartScreenLevel -ErrorAction SilentlyContinue).ShellSmartScreenLevel; \"$e;$l\"",
+        "expected": "^1;Block$"
+      },
+      "recommendation": "Configurer le parametre correspondant a la section 18.10.77.2.1 selon la valeur recommandee par le benchmark CIS (voir description)."
+    },
+    {
+      "id": "CIS-WIN-18.10.29.4",
+      "cis_rule": "18.10.29.4",
+      "profile": "Level 1 (L1)",
+      "category": "SmartScreen / exécution de contenu non fiable",
+      "title": "Marquage 'Mark of the Web' conservé lors de copies depuis des chemins non sécurisés",
+      "severity": "medium",
+      "description": "Détermine si le marqueur de sécurité 'Mark of the Web' (identifiant un fichier comme provenant d'Internet) est retiré lors de la copie d'un fichier depuis un chemin réseau ou distant non sécurisé.",
+      "rationale": "Le marqueur Mark of the Web déclenche les vérifications SmartScreen et les avertissements Office ; le retirer permettrait à un fichier malveillant copié depuis un partage réseau de contourner ces protections.",
+      "audit_reference": "CIS Microsoft Windows 11 Stand-alone Benchmark v5.0.0, section 18.10.29.4.",
+      "audit_procedure": "Naviguer vers le chemin UI de la remediation et confirmer le reglage, ou verifier la ou les valeurs de registre correspondantes.",
+      "remediation_path": "Computer Configuration\\Policies\\Administrative Templates\\Windows Components (section 18.10.29.4)",
+      "default_value": "Voir description du benchmark CIS.",
+      "references": [
+        "https://learn.microsoft.com/en-us/windows/security/operating-system-security/virus-and-threat-protection/microsoft-defender-smartscreen/"
+      ],
+      "cis_controls": [
+        "CIS Controls v8 9.2 Use DNS Filtering Services"
+      ],
+      "check": {
+        "type": "equals",
+        "command": "(Get-ItemProperty -Path 'HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\Explorer' -Name DisableMotWOnInsecurePathCopy -ErrorAction SilentlyContinue).DisableMotWOnInsecurePathCopy",
+        "expected": "0"
+      },
+      "recommendation": "Configurer le parametre correspondant a la section 18.10.29.4 selon la valeur recommandee par le benchmark CIS (voir description)."
+    },
+    {
+      "id": "CIS-WIN-18.10.94.2.1",
+      "cis_rule": "18.10.94.2.1",
+      "profile": "Level 1 (L1)",
+      "category": "Mise à jour Windows",
+      "title": "Activation des mises à jour automatiques",
+      "severity": "high",
+      "description": "Détermine si les mises à jour Windows sont téléchargées et installées automatiquement.",
+      "rationale": "Sans mises à jour automatiques, les correctifs de sécurité critiques risquent de ne jamais être appliqués, laissant le système exposé à des vulnérabilités connues et exploitées.",
+      "audit_reference": "CIS Microsoft Windows 11 Stand-alone Benchmark v5.0.0, section 18.10.94.2.1.",
+      "audit_procedure": "Naviguer vers le chemin UI de la remediation et confirmer le reglage, ou verifier la ou les valeurs de registre correspondantes.",
+      "remediation_path": "Computer Configuration\\Policies\\Administrative Templates\\Windows Components\\Windows Update (section 18.10.94.2.1)",
+      "default_value": "Voir description du benchmark CIS.",
+      "references": [
+        "https://learn.microsoft.com/en-us/windows/deployment/update/"
+      ],
+      "cis_controls": [
+        "CIS Controls v8 7.3 Perform Automated Operating System Patch Management"
+      ],
+      "check": {
+        "type": "equals",
+        "command": "(Get-ItemProperty -Path 'HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\WindowsUpdate\\AU' -Name NoAutoUpdate -ErrorAction SilentlyContinue).NoAutoUpdate",
+        "expected": "0"
+      },
+      "recommendation": "Configurer le parametre correspondant a la section 18.10.94.2.1 selon la valeur recommandee par le benchmark CIS (voir description)."
+    },
+    {
+      "id": "CIS-WIN-18.10.94.2.4",
+      "cis_rule": "18.10.94.2.4",
+      "profile": "Level 1 (L1)",
+      "category": "Mise à jour Windows",
+      "title": "Suppression de l'accès à la fonctionnalité de pause des mises à jour",
+      "severity": "medium",
+      "description": "Détermine si l'utilisateur final peut suspendre l'installation des mises à jour Windows depuis les paramètres.",
+      "rationale": "Un utilisateur pouvant indéfiniment repousser les mises à jour de sécurité laisse son poste exposé à des vulnérabilités corrigées mais non appliquées.",
+      "audit_reference": "CIS Microsoft Windows 11 Stand-alone Benchmark v5.0.0, section 18.10.94.2.4.",
+      "audit_procedure": "Naviguer vers le chemin UI de la remediation et confirmer le reglage, ou verifier la ou les valeurs de registre correspondantes.",
+      "remediation_path": "Computer Configuration\\Policies\\Administrative Templates\\Windows Components\\Windows Update (section 18.10.94.2.4)",
+      "default_value": "Voir description du benchmark CIS.",
+      "references": [
+        "https://learn.microsoft.com/en-us/windows/deployment/update/"
+      ],
+      "cis_controls": [
+        "CIS Controls v8 7.3 Perform Automated Operating System Patch Management"
+      ],
+      "check": {
+        "type": "equals",
+        "command": "(Get-ItemProperty -Path 'HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\WindowsUpdate' -Name SetDisablePauseUXAccess -ErrorAction SilentlyContinue).SetDisablePauseUXAccess",
+        "expected": "1"
+      },
+      "recommendation": "Configurer le parametre correspondant a la section 18.10.94.2.4 selon la valeur recommandee par le benchmark CIS (voir description)."
+    },
+    {
+      "id": "CIS-WIN-18.10.94.4.1",
+      "cis_rule": "18.10.94.4.1",
+      "profile": "Level 1 (L1)",
+      "category": "Mise à jour Windows",
+      "title": "Interdiction des versions préliminaires (preview builds)",
+      "severity": "medium",
+      "description": "Détermine si l'appareil peut recevoir des versions préliminaires (preview builds) de Windows, issues de canaux de développement non stabilisés.",
+      "rationale": "Les versions préliminaires peuvent introduire des bugs et des failles de sécurité non corrigées, augmentant le risque en environnement de production.",
+      "audit_reference": "CIS Microsoft Windows 11 Stand-alone Benchmark v5.0.0, section 18.10.94.4.1.",
+      "audit_procedure": "Naviguer vers le chemin UI de la remediation et confirmer le reglage, ou verifier la ou les valeurs de registre correspondantes.",
+      "remediation_path": "Computer Configuration\\Policies\\Administrative Templates\\Windows Components\\Windows Update (section 18.10.94.4.1)",
+      "default_value": "Voir description du benchmark CIS.",
+      "references": [
+        "https://learn.microsoft.com/en-us/windows/deployment/update/"
+      ],
+      "cis_controls": [
+        "CIS Controls v8 7.3 Perform Automated Operating System Patch Management"
+      ],
+      "check": {
+        "type": "equals",
+        "command": "(Get-ItemProperty -Path 'HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\WindowsUpdate' -Name ManagePreviewBuildsPolicyValue -ErrorAction SilentlyContinue).ManagePreviewBuildsPolicyValue",
+        "expected": "1"
+      },
+      "recommendation": "Configurer le parametre correspondant a la section 18.10.94.4.1 selon la valeur recommandee par le benchmark CIS (voir description)."
+    },
+    {
+      "id": "CIS-WIN-18.10.94.4.2",
+      "cis_rule": "18.10.94.4.2",
+      "profile": "Level 1 (L1)",
+      "category": "Mise à jour Windows",
+      "title": "Réception des mises à jour qualité sans délai de report",
+      "severity": "medium",
+      "description": "Détermine si les mises à jour de qualité (correctifs) sont différées, et sur quelle durée en jours.",
+      "rationale": "Reporter indéfiniment l'installation des correctifs de sécurité laisse le système exposé à des vulnérabilités déjà publiquement connues et potentiellement exploitées.",
+      "audit_reference": "CIS Microsoft Windows 11 Stand-alone Benchmark v5.0.0, section 18.10.94.4.2.",
+      "audit_procedure": "Naviguer vers le chemin UI de la remediation et confirmer le reglage, ou verifier la ou les valeurs de registre correspondantes.",
+      "remediation_path": "Computer Configuration\\Policies\\Administrative Templates\\Windows Components\\Windows Update (section 18.10.94.4.2)",
+      "default_value": "Voir description du benchmark CIS.",
+      "references": [
+        "https://learn.microsoft.com/en-us/windows/deployment/update/"
+      ],
+      "cis_controls": [
+        "CIS Controls v8 7.3 Perform Automated Operating System Patch Management"
+      ],
+      "check": {
+        "type": "regex",
+        "command": "$a=((Get-ItemProperty -Path 'HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\WindowsUpdate' -Name DeferQualityUpdates -ErrorAction SilentlyContinue).DeferQualityUpdates); $b=((Get-ItemProperty -Path 'HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\WindowsUpdate' -Name DeferQualityUpdatesPeriodInDays -ErrorAction SilentlyContinue).DeferQualityUpdatesPeriodInDays); \"$a;$b\"",
+        "expected": "^1;0$"
+      },
+      "recommendation": "Configurer le parametre correspondant a la section 18.10.94.4.2 selon la valeur recommandee par le benchmark CIS (voir description)."
+    },
+    {
+      "id": "CIS-WIN-18.10.94.1.1",
+      "cis_rule": "18.10.94.1.1",
+      "profile": "Level 1 (L1)",
+      "category": "Mise à jour Windows",
+      "title": "Pas de redémarrage automatique forcé si des utilisateurs sont connectés",
+      "severity": "low",
+      "description": "Détermine si Windows attend qu'un utilisateur connecté redémarre lui-même après une mise à jour, plutôt que de redémarrer automatiquement.",
+      "rationale": "Un redémarrage automatique forcé sans planification peut interrompre le travail en cours et retarder l'application effective des correctifs si les utilisateurs le contournent systématiquement.",
+      "audit_reference": "CIS Microsoft Windows 11 Stand-alone Benchmark v5.0.0, section 18.10.94.1.1.",
+      "audit_procedure": "Naviguer vers le chemin UI de la remediation et confirmer le reglage, ou verifier la ou les valeurs de registre correspondantes.",
+      "remediation_path": "Computer Configuration\\Policies\\Administrative Templates\\Windows Components\\Windows Update (section 18.10.94.1.1)",
+      "default_value": "Voir description du benchmark CIS.",
+      "references": [
+        "https://learn.microsoft.com/en-us/windows/deployment/update/"
+      ],
+      "cis_controls": [
+        "CIS Controls v8 7.3 Perform Automated Operating System Patch Management"
+      ],
+      "check": {
+        "type": "equals",
+        "command": "(Get-ItemProperty -Path 'HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\WindowsUpdate\\AU' -Name NoAutoRebootWithLoggedOnUsers -ErrorAction SilentlyContinue).NoAutoRebootWithLoggedOnUsers",
+        "expected": "0"
+      },
+      "recommendation": "Configurer le parametre correspondant a la section 18.10.94.1.1 selon la valeur recommandee par le benchmark CIS (voir description)."
+    }
+  ]
+}

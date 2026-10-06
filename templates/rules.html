@@ -1,0 +1,121 @@
+{% extends "base.html" %}
+
+{% block title %}Règles - RAM Security Audit{% endblock %}
+
+{% block content %}
+  <section class="section-head">
+    <div>
+      <p class="eyebrow">Base de règles</p>
+      <h1>Règles CIS</h1>
+    </div>
+    <form class="inline-form" method="get">
+      <select name="os" onchange="this.form.submit()">
+        {% for item in rule_sets %}
+          <option value="{{ item.id }}" {% if item.id == os_type %}selected{% endif %}>{{ item.label }}</option>
+        {% endfor %}
+      </select>
+    </form>
+  </section>
+
+  {% set categories = rules | map(attribute='category') | unique | list %}
+  <nav class="category-filter" id="category-filter">
+    <button type="button" class="category-tab active" data-category="all">Toutes ({{ rules | length }})</button>
+    {% for category in categories %}
+      <button type="button" class="category-tab" data-category="{{ category }}">
+        {{ category }} ({{ rules | selectattr('category', 'equalto', category) | list | length }})
+      </button>
+    {% endfor %}
+  </nav>
+
+  <div class="groups-actions">
+    <button type="button" class="button" id="groups-expand">Tout déplier</button>
+    <button type="button" class="button" id="groups-collapse">Tout replier</button>
+  </div>
+
+  {% for category, category_rules in rules | groupby('category') %}
+    <section class="rules-group" data-category="{{ category }}">
+      <details open>
+        <summary class="rules-group-title">{{ category }}<span class="rules-group-count">{{ category_rules | length }}</span></summary>
+        <div class="rules-list">
+        {% for rule in category_rules %}
+          <article class="rule-item">
+            <div>
+              <span class="rule-id">{{ rule.id }} · CIS {{ rule.cis_rule }} · {{ rule.profile }}</span>
+              {% if rule.id in disabled_ids %}
+                <span class="pill fail">Désactivée</span>
+              {% endif %}
+              <h2>{{ rule.title }}</h2>
+              <p>{{ rule.description }}</p>
+              {% if rule.audit_reference %}
+                <p class="rule-meta"><strong>Référence audit :</strong> {{ rule.audit_reference }}</p>
+              {% endif %}
+              {% if rule.remediation_path %}
+                <p class="rule-meta"><strong>Remédiation :</strong> {{ rule.remediation_path }}</p>
+              {% endif %}
+              {% if rule.default_value %}
+                <p class="rule-meta"><strong>Valeur par défaut :</strong> {{ rule.default_value }}</p>
+              {% endif %}
+              {% if rule.explanation %}
+                <details class="rule-explain">
+                  <summary>Expliquer simplement</summary>
+                  <div class="explain-body">
+                    <p><span class="explain-tag">En simple</span>{{ rule.explanation.simple }}</p>
+                    {% if rule.explanation.exemple %}
+                      <p><span class="explain-tag">Exemple</span>{{ rule.explanation.exemple }}</p>
+                    {% endif %}
+                    <p><span class="explain-tag">Pourquoi</span>{{ rule.explanation.pourquoi }}</p>
+                    <p class="explain-keep"><span class="explain-tag">À retenir</span>{{ rule.explanation.retenir }}</p>
+                    <p><span class="explain-tag">L'audit vérifie</span>{{ rule.explanation.audit }}</p>
+                  </div>
+                </details>
+              {% endif %}
+            </div>
+            <div class="rule-command">
+              {% if rule.check.type == 'manual' %}
+                <span class="pill manual">Manuel</span>
+              {% else %}
+                <code>{{ rule.check.command }}</code>
+              {% endif %}
+            </div>
+            </article>
+          {% endfor %}
+        </div>
+      </details>
+    </section>
+  {% endfor %}
+
+  <script>
+    (function () {
+      var bar = document.getElementById("category-filter");
+      if (!bar) return;
+      var tabs = bar.querySelectorAll(".category-tab");
+      var groups = document.querySelectorAll(".rules-group");
+
+      bar.addEventListener("click", function (event) {
+        var tab = event.target.closest(".category-tab");
+        if (!tab) return;
+
+        tabs.forEach(function (t) { t.classList.remove("active"); });
+        tab.classList.add("active");
+
+        var selected = tab.getAttribute("data-category");
+        groups.forEach(function (group) {
+          var match = selected === "all" || group.getAttribute("data-category") === selected;
+          group.style.display = match ? "" : "none";
+          // Choisir une categorie precise l'ouvre : sinon on filtre et on
+          // tombe sur un bloc replie, ce qui donne l'impression d'un bug.
+          if (match && selected !== "all") {
+            group.querySelector("details").open = true;
+          }
+        });
+      });
+
+      document.getElementById("groups-expand").addEventListener("click", function () {
+        groups.forEach(function (g) { g.querySelector("details").open = true; });
+      });
+      document.getElementById("groups-collapse").addEventListener("click", function () {
+        groups.forEach(function (g) { g.querySelector("details").open = false; });
+      });
+    })();
+  </script>
+{% endblock %}

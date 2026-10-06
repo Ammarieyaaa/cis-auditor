@@ -1,0 +1,109 @@
+{% extends "base.html" %}
+
+{% block title %}Périmètre des règles - RAM Security{% endblock %}
+
+{% block content %}
+  <section class="section-head compact">
+    <div>
+      <p class="eyebrow">Gouvernance</p>
+      <h1>Périmètre des règles auditées</h1>
+      <p class="muted">Active ou désactive les règles CIS prises en compte lors des prochains audits.</p>
+    </div>
+    <form class="inline-form" method="get">
+      <select name="os" onchange="this.form.submit()">
+        {% for item in rule_sets %}
+          <option value="{{ item.id }}" {% if item.id == os_type %}selected{% endif %}>{{ item.label }}</option>
+        {% endfor %}
+      </select>
+    </form>
+  </section>
+
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% for category, message in messages %}
+      <div class="flash {{ 'flash-success' if category == 'success' else 'flash-error' }}">
+        <p>{{ message }}</p>
+      </div>
+    {% endfor %}
+  {% endwith %}
+
+  {% set categories = rules | map(attribute='category') | unique | list %}
+  <nav class="category-filter" id="category-filter">
+    <button type="button" class="category-tab active" data-category="all">Toutes ({{ rules | length }})</button>
+    {% for cat in categories %}
+      <button type="button" class="category-tab" data-category="{{ cat }}">
+        {{ cat }} ({{ rules | selectattr('category', 'equalto', cat) | list | length }})
+      </button>
+    {% endfor %}
+  </nav>
+
+  {% for rule_category, category_rules in rules | groupby('category') %}
+    <section class="panel rules-group" data-category="{{ rule_category }}">
+      <details open>
+        <summary class="rules-group-title">{{ rule_category }}</summary>
+        <div class="table-wrap">
+          <table class="table-align-middle scope-table">
+            <thead>
+              <tr>
+                <th>Règle</th>
+                <th>Statut</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for rule in category_rules %}
+                {% set is_enabled = rule.id not in disabled_ids %}
+                <tr>
+                  <td>
+                    <strong>{{ rule.id }}</strong>
+                    <span class="row-title">{{ rule.title }}</span>
+                  </td>
+                  <td>
+                    <span class="pill {{ 'pass' if is_enabled else 'fail' }}">
+                      {{ 'Active' if is_enabled else 'Désactivée' }}
+                    </span>
+                  </td>
+                  <td>
+                    <form method="post">
+                      <input type="hidden" name="rule_id" value="{{ rule.id }}">
+                      <input type="hidden" name="os_type" value="{{ os_type }}">
+                      <input type="hidden" name="enabled" value="{{ '0' if is_enabled else '1' }}">
+                      <button class="button button-sm {{ 'danger' if is_enabled else 'primary' }}" type="submit">
+                        {{ 'Désactiver' if is_enabled else 'Activer' }}
+                      </button>
+                    </form>
+                  </td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </details>
+    </section>
+  {% endfor %}
+
+  <script>
+    (function () {
+      var bar = document.getElementById("category-filter");
+      if (!bar) return;
+      var tabs = bar.querySelectorAll(".category-tab");
+      var groups = document.querySelectorAll(".rules-group");
+
+      bar.addEventListener("click", function (event) {
+        var tab = event.target.closest(".category-tab");
+        if (!tab) return;
+
+        tabs.forEach(function (t) { t.classList.remove("active"); });
+        tab.classList.add("active");
+
+        var selected = tab.getAttribute("data-category");
+        groups.forEach(function (group) {
+          var match = selected === "all" || group.getAttribute("data-category") === selected;
+          group.style.display = match ? "" : "none";
+          if (match && selected !== "all") {
+            group.querySelector("details").open = true;
+          }
+        });
+      });
+    })();
+  </script>
+{% endblock %}

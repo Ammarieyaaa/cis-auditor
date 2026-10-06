@@ -1,0 +1,93 @@
+Explication des regles CIS utilisees
+
+
+Perimetre retenu : Comptes et mots de passe
+--------------------------------------------
+Sur remarque du tuteur, les regles du prototype ont ete resserrees sur une
+seule categorie coherente avec une mission d'audit de securite : la gestion
+des comptes et des mots de passe. Ce perimetre couvre la robustesse des mots
+de passe, leur duree de vie, le blocage des comptes en cas d'attaque par
+force brute et la limitation des comptes a privileges.
+
+
+1. Regles Windows
+-----------------
+
+Benchmark utilise :
+CIS Microsoft Windows 11 Stand-alone Benchmark v5.0.0
+
+1.1 Regle CIS 1.1.1 - Enforce password history (24 ou plus)
+Commande : net accounts (champ "Length of password history maintained")
+Utilite : empeche la reutilisation rapide d'anciens mots de passe.
+
+1.2 Regle CIS 1.1.2 - Maximum password age (365 jours ou moins, hors 0)
+Commande : net accounts (champ "Maximum password age")
+Utilite : limite la duree de vie d'un mot de passe compromis.
+
+1.3 Regle CIS 1.1.4 - Minimum password length (14 caracteres ou plus)
+Commande : net accounts (champ "Minimum password length")
+Utilite : rend les attaques par dictionnaire et force brute plus couteuses.
+
+1.4 Regle CIS 1.2.1 - Account lockout duration (15 minutes ou plus)
+Commande : net accounts (champ "Lockout duration")
+Utilite : limite les tentatives repetees apres un verrouillage.
+
+1.5 Regle CIS 1.2.2 - Account lockout threshold (5 tentatives ou moins, hors 0)
+Commande : net accounts (champ "Lockout threshold")
+Utilite : bloque un compte apres un nombre limite d'echecs de connexion.
+
+1.6 Regle CIS 2.3.1.1 - Guest account status (Disabled)
+Commande : Get-LocalUser sur le compte SID se terminant par -501
+Utilite : empeche un acces non authentifie via le compte Invite.
+
+1.7 Regle CIS 2.3.1.2 - Limit local account use of blank passwords (Enabled)
+Commande : lecture de HKLM\SYSTEM\CurrentControlSet\Control\Lsa:LimitBlankPasswordUse
+Utilite : empeche la connexion distante avec un compte sans mot de passe.
+
+
+2. Regles Linux
+---------------
+
+Benchmark utilise :
+CIS Ubuntu Linux 20.04 LTS STIG Benchmark v2.0.0
+
+2.1 Regle CIS 4.4.1.2 - Password creation requirements (minlen = 14)
+Commande : grep minlen /etc/security/pwquality.conf
+Utilite : impose une longueur minimale de mot de passe via pam_pwquality.
+
+2.2 Regle CIS 4.4.2.1 - Password reuse is limited (pam_pwhistory, remember=)
+Commande : grep pam_pwhistory.so /etc/pam.d/common-password
+Utilite : empeche la reutilisation des derniers mots de passe.
+
+2.3 Regle CIS 4.4.3.1 - Lockout for failed password attempts (pam_faillock)
+Commande : grep pam_faillock.so /etc/pam.d/common-auth
+Utilite : verrouille un compte apres plusieurs echecs de connexion consecutifs.
+
+2.4 Regle CIS 4.4.4.1 - Strong password hashing algorithm (SHA512)
+Commande : grep ENCRYPT_METHOD /etc/login.defs
+Utilite : garantit un algorithme de hachage robuste pour les mots de passe stockes.
+
+2.5 Regle CIS 4.5.1.2 - Password expiration is 365 days or less
+Commande : grep PASS_MAX_DAYS /etc/login.defs
+Utilite : force le renouvellement periodique des mots de passe.
+
+2.6 Regle CIS 6.2.10 - Root is the only UID 0 account
+Commande : awk -F: '($3 == 0) { print $1 }' /etc/passwd
+Utilite : detecte des comptes caches disposant de privileges superutilisateur.
+
+
+Conclusion
+----------
+
+Ces 13 regles couvrent, pour Windows et Linux, les aspects suivants de la
+gestion des comptes et mots de passe :
+
+- robustesse et duree de vie des mots de passe ;
+- historique et non-reutilisation des mots de passe ;
+- verrouillage des comptes apres echecs de connexion ;
+- algorithme de hachage des mots de passe (Linux) ;
+- reduction des comptes a privileges ou dangereux (Invite, UID 0).
+
+Elles sont adaptees a un prototype car elles sont simples a auditer, faciles
+a expliquer et directement liees a des recommandations CIS reconnues, tout en
+restant centrees sur un seul theme coherent pour une mission d'audit.

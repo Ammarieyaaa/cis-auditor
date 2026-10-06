@@ -1,0 +1,1157 @@
+{
+  "CIS-UBU-1.1.1.1": {
+    "audit": "Il exécute modprobe en simulation sur cramfs et vérifie que le chargement est bien refusé.",
+    "exemple": "Une clé USB formatée en cramfs est branchée. Le noyau refuse de charger le pilote, donc le disque n'est pas monté.",
+    "pourquoi": "Chaque pilote de système de fichiers est du code qui tourne dans le noyau. Ceux dont on ne se sert jamais ajoutent des failles potentielles sans aucun bénéfice.",
+    "retenir": "Pilote inutilisé désactivé → une surface d'attaque de moins dans le noyau.",
+    "simple": "Cette règle empêche Linux de charger le pilote du système de fichiers cramfs."
+  },
+  "CIS-UBU-1.1.1.2": {
+    "audit": "Il exécute modprobe en simulation sur freevxfs et vérifie que le chargement est refusé.",
+    "exemple": "Un disque au format Veritas est présenté au système. Le pilote ne se charge pas.",
+    "pourquoi": "Ce format ne se rencontre plus sur un serveur Ubuntu moderne. Le pilote reste pourtant du code noyau exploitable s'il est chargeable.",
+    "retenir": "Pilote hérité désactivé → moins de code noyau atteignable par un attaquant.",
+    "simple": "Cette règle empêche le chargement du pilote freevxfs, un système de fichiers d'anciens systèmes Unix."
+  },
+  "CIS-UBU-1.1.1.3": {
+    "audit": "Il exécute modprobe en simulation sur hfs et vérifie que le chargement est refusé.",
+    "exemple": "Un disque formaté sous macOS est branché. Le système ne le monte pas.",
+    "pourquoi": "Les pilotes de systèmes de fichiers ont historiquement produit beaucoup de failles exploitables par un simple branchement de disque.",
+    "retenir": "Pilote Mac désactivé → un disque piégé ne peut pas être monté.",
+    "simple": "Cette règle empêche le chargement du pilote hfs, le système de fichiers des anciens Mac."
+  },
+  "CIS-UBU-1.1.1.4": {
+    "audit": "Il exécute modprobe en simulation sur hfsplus et vérifie que le chargement est refusé.",
+    "exemple": "Un disque externe formaté sous macOS récent ne peut pas être monté sur le serveur.",
+    "pourquoi": "Même raisonnement que pour hfs : sur un serveur Linux, ce format n'a aucune raison d'apparaître, et le pilote reste attaquable.",
+    "retenir": "Pilote Mac récent désactivé → cohérent avec la désactivation de hfs.",
+    "simple": "Cette règle empêche le chargement du pilote hfsplus, la version moderne du système de fichiers Mac."
+  },
+  "CIS-UBU-1.1.1.5": {
+    "audit": "Il exécute modprobe en simulation sur jffs2 et vérifie que le chargement est refusé.",
+    "exemple": "Ce format s'utilise sur des routeurs ou des objets connectés, jamais sur un serveur classique.",
+    "pourquoi": "Un pilote présent mais inutile est une porte laissée ouverte sur une pièce dont personne ne se sert.",
+    "retenir": "Pilote embarqué désactivé → le noyau ne charge que ce dont il a besoin.",
+    "simple": "Cette règle empêche le chargement du pilote jffs2, destiné aux mémoires flash embarquées."
+  },
+  "CIS-UBU-1.1.2.1.3": {
+    "audit": "Il lit les options de montage de /tmp avec findmnt et cherche nosuid.",
+    "exemple": "Un attaquant dépose dans /tmp un programme marqué pour s'exécuter en root. L'option nosuid annule ce marquage.",
+    "pourquoi": "/tmp est le seul répertoire où tout le monde peut écrire. C'est donc le point de départ naturel d'une élévation de privilège.",
+    "retenir": "nosuid sur /tmp → un fichier déposé là ne peut pas obtenir les droits root.",
+    "simple": "Cette règle empêche les programmes déposés dans /tmp de s'exécuter avec les droits de leur propriétaire."
+  },
+  "CIS-UBU-1.1.2.1.4": {
+    "audit": "Il lit les options de montage de /tmp avec findmnt et cherche noexec.",
+    "exemple": "Un script malveillant est téléchargé dans /tmp. Toute tentative de l'exécuter échoue.",
+    "pourquoi": "Presque toutes les attaques automatisées déposent leur charge dans /tmp avant de l'exécuter. Cette option casse l'enchaînement.",
+    "retenir": "noexec sur /tmp → rien ne s'exécute depuis le répertoire ouvert à tous.",
+    "simple": "Cette règle interdit purement et simplement l'exécution de programmes depuis /tmp."
+  },
+  "CIS-UBU-1.1.2.2.3": {
+    "audit": "Il lit les options de montage de /dev/shm avec findmnt et cherche nosuid.",
+    "exemple": "Un attaquant contourne noexec sur /tmp en déposant son programme dans /dev/shm, qui est tout aussi accessible.",
+    "pourquoi": "/dev/shm est le /tmp qu'on oublie de protéger. Le durcir sans lui laisse le contournement évident.",
+    "retenir": "nosuid sur /dev/shm → pas d'élévation par la mémoire partagée.",
+    "simple": "Cette règle applique la même protection à /dev/shm, la mémoire partagée accessible comme un dossier."
+  },
+  "CIS-UBU-1.1.2.2.4": {
+    "audit": "Il lit les options de montage de /dev/shm avec findmnt et cherche noexec.",
+    "exemple": "Un programme déposé en mémoire partagée, qui ne laisse aucune trace sur disque, ne peut pas être lancé.",
+    "pourquoi": "L'exécution depuis la mémoire est l'une des techniques les plus discrètes, parce qu'elle ne touche jamais le disque.",
+    "retenir": "noexec sur /dev/shm → pas d'exécution sans passage par le disque.",
+    "simple": "Cette règle interdit l'exécution de programmes depuis la mémoire partagée /dev/shm."
+  },
+  "CIS-UBU-1.1.2.3.3": {
+    "audit": "Il lit les options de montage de /home avec findmnt et cherche nosuid.",
+    "exemple": "Un utilisateur dépose dans son dossier personnel un programme marqué pour s'exécuter en root. Le marquage est ignoré.",
+    "pourquoi": "Les répertoires personnels sont modifiables par leurs propriétaires : un fichier privilégié y est vite déposé, par erreur ou par malveillance.",
+    "retenir": "nosuid sur /home → pas d'élévation depuis un dossier personnel.",
+    "simple": "Cette règle empêche les fichiers des répertoires personnels d'obtenir les droits de leur propriétaire à l'exécution."
+  },
+  "CIS-UBU-1.2.4": {
+    "audit": "Il cherche AllowUnauthenticated réglé à true dans la configuration APT.",
+    "exemple": "Un dépôt compromis propose un paquet modifié. Sans signature valide, l'installation est refusée.",
+    "pourquoi": "La signature garantit que le paquet vient bien de son éditeur et n'a pas été altéré en route. C'est la défense contre l'attaque sur la chaîne d'approvisionnement.",
+    "retenir": "Paquets non signés refusés → seul du code authentifié s'installe.",
+    "simple": "Cette règle interdit d'installer un paquet dont la signature n'est pas vérifiée."
+  },
+  "CIS-UBU-1.3.1": {
+    "audit": "Il cherche un superutilisateur et une directive password_pbkdf2 dans grub.cfg.",
+    "exemple": "Quelqu'un avec un accès physique modifie les paramètres de démarrage pour ouvrir un shell root sans mot de passe.",
+    "pourquoi": "Sans cette protection, un accès physique de trente secondes donne un accès root complet, chiffrement du disque mis à part.",
+    "retenir": "Menu de démarrage protégé → un accès physique ne suffit plus à devenir root.",
+    "simple": "Cette règle protège par mot de passe le menu de démarrage du système."
+  },
+  "CIS-UBU-1.3.2": {
+    "audit": "Il lit le mode et le propriétaire de /boot/grub/grub.cfg avec stat.",
+    "exemple": "Ce fichier contient l'empreinte du mot de passe du menu de démarrage. Lisible, elle peut être attaquée hors ligne.",
+    "pourquoi": "Protéger le menu par un mot de passe puis laisser son empreinte lisible par tous annule la protection.",
+    "retenir": "grub.cfg en 0600 root → l'empreinte du mot de passe de démarrage reste protégée.",
+    "simple": "Cette règle vérifie que le fichier de configuration du démarrage n'est lisible que par root."
+  },
+  "CIS-UBU-1.3.3": {
+    "audit": "Il vérifie que le compte root possède une empreinte de mot de passe valide dans /etc/shadow.",
+    "exemple": "Le mode mono-utilisateur sert à réparer un système en panne — et donne un accès root direct s'il n'est pas protégé.",
+    "pourquoi": "Ce mode contourne les protections normales par conception. Sans mot de passe root valide, il devient un accès libre.",
+    "retenir": "Authentification exigée en mode dépannage → pas d'accès root par le mode de secours.",
+    "simple": "Cette règle vérifie que le mode de dépannage à un seul utilisateur demande bien un mot de passe."
+  },
+  "CIS-UBU-1.4.2": {
+    "audit": "Il lit kernel.randomize_va_space avec sysctl et attend 2.",
+    "exemple": "Un exploit doit connaître l'adresse exacte de sa cible en mémoire. Avec l'ASLR, cette adresse change à chaque lancement.",
+    "pourquoi": "L'ASLR ne corrige aucune faille : il rend leur exploitation nettement plus difficile, en obligeant l'attaquant à deviner.",
+    "retenir": "ASLR complet activé → les failles mémoire deviennent bien plus dures à exploiter.",
+    "simple": "Cette règle fait placer les programmes à des adresses mémoire différentes à chaque exécution."
+  },
+  "CIS-UBU-1.5.1.1": {
+    "audit": "Il vérifie la présence des paquets apparmor et apparmor-utils.",
+    "exemple": "Un serveur web compromis tente de lire /etc/shadow. AppArmor le lui interdit, quels que soient ses droits Unix.",
+    "pourquoi": "Les permissions Unix décrivent ce qu'un utilisateur peut faire. AppArmor décrit ce qu'un programme peut faire — ce qui contient les dégâts d'une compromission.",
+    "retenir": "AppArmor installé → un programme compromis reste dans son périmètre.",
+    "simple": "Cette règle vérifie qu'AppArmor, qui limite ce que chaque programme a le droit de faire, est installé."
+  },
+  "CIS-UBU-1.5.1.2": {
+    "audit": "Il vérifie que les lignes linux de grub.cfg contiennent apparmor=1 et security=apparmor.",
+    "exemple": "AppArmor est installé mais absent des paramètres de démarrage : il ne s'active jamais.",
+    "pourquoi": "AppArmor doit être activé au niveau du noyau. Installé sans ce paramètre, il ne protège rien du tout.",
+    "retenir": "AppArmor activé au démarrage → la protection est réellement en place.",
+    "simple": "Cette règle vérifie qu'AppArmor est activé dès le démarrage du noyau."
+  },
+  "CIS-UBU-1.5.1.3": {
+    "audit": "Il vérifie que le paquet apparmor est installé et que apparmor.service est enabled et active.",
+    "exemple": "Le paquet est installé et le noyau configuré, mais le service qui charge les profils est arrêté.",
+    "pourquoi": "Trois conditions doivent être réunies : le paquet, le paramètre noyau et le service. Cette règle contrôle la dernière.",
+    "retenir": "Service AppArmor actif → les profils de restriction sont chargés.",
+    "simple": "Cette règle vérifie que le service AppArmor est activé et fonctionne."
+  },
+  "CIS-UBU-1.7.11": {
+    "audit": "Il vérifie qu'XDMCP n'est pas activé dans /etc/gdm3/custom.conf.",
+    "exemple": "XDMCP transmet l'affichage et les saisies clavier en clair : mot de passe compris.",
+    "pourquoi": "Ce protocole date d'une époque où les réseaux étaient considérés comme fiables. Il n'a aucune protection.",
+    "retenir": "XDMCP désactivé → pas de session graphique distante en clair.",
+    "simple": "Cette règle vérifie que l'accès graphique distant non chiffré XDMCP est désactivé."
+  },
+  "CIS-UBU-2.1.1.1": {
+    "audit": "Il compte les services chrony, ntp et systemd-timesyncd actifs et attend exactement un.",
+    "exemple": "Deux services concurrents ajustent l'horloge chacun de leur côté : l'heure devient instable et incohérente.",
+    "pourquoi": "Sans heure fiable, les journaux de plusieurs machines ne peuvent plus être corrélés — et une investigation devient impossible.",
+    "retenir": "Un seul service de temps → une heure cohérente, donc des journaux exploitables.",
+    "simple": "Cette règle vérifie qu'un seul service de synchronisation de l'heure est actif."
+  },
+  "CIS-UBU-2.1.2.2": {
+    "audit": "Il vérifie que le processus chronyd s'exécute sous l'utilisateur _chrony.",
+    "exemple": "Une faille dans chrony donnerait les droits root si le service tournait sous ce compte.",
+    "pourquoi": "C'est le principe du moindre privilège : un service n'a besoin que des droits strictement nécessaires à sa fonction.",
+    "retenir": "chrony sous compte dédié → une faille du service ne donne pas root.",
+    "simple": "Cette règle vérifie que le service de temps chrony s'exécute sous un compte dédié, pas sous root."
+  },
+  "CIS-UBU-2.1.2.3": {
+    "audit": "Il vérifie que le service chrony est enabled et active.",
+    "exemple": "chrony est installé mais jamais démarré : l'horloge dérive sans que personne s'en aperçoive.",
+    "pourquoi": "Un service installé mais inactif donne l'illusion d'une fonction assurée. Il faut vérifier l'exécution réelle.",
+    "retenir": "chrony activé et actif → l'heure est réellement synchronisée.",
+    "simple": "Cette règle vérifie que le service de temps chrony est activé au démarrage et actuellement actif."
+  },
+  "CIS-UBU-2.1.3.1": {
+    "audit": "Il cherche une directive NTP= ou FallbackNTP= dans timesyncd.conf.",
+    "exemple": "Le service de synchronisation tourne mais ne sait pas à qui demander l'heure : il ne sert à rien.",
+    "pourquoi": "Sans source de référence, le service fonctionne à vide et l'horloge dérive tout de même.",
+    "retenir": "Serveur de temps configuré → la synchronisation a une référence.",
+    "simple": "Cette règle vérifie qu'un serveur de temps de référence est bien configuré."
+  },
+  "CIS-UBU-2.1.4.1": {
+    "audit": "Il cherche des directives « restrict default » incluant noquery dans la configuration ntp.",
+    "exemple": "Un service de temps ouvert peut être détourné pour amplifier une attaque par saturation contre un tiers.",
+    "pourquoi": "Ces services sont un vecteur d'amplification classique : une petite requête provoque une grosse réponse envoyée à la victime.",
+    "retenir": "Accès NTP restreint → le serveur ne sert pas de relais d'amplification.",
+    "simple": "Cette règle limite ce que des machines distantes peuvent demander au service de temps."
+  },
+  "CIS-UBU-2.2.11": {
+    "audit": "Il vérifie que le paquet samba n'est pas installé.",
+    "exemple": "Un serveur Linux qui n'a jamais à parler à des postes Windows n'a aucun besoin de Samba.",
+    "pourquoi": "Samba a connu plusieurs failles critiques exploitables à distance. Non installé, il ne peut pas en souffrir.",
+    "retenir": "Samba absent → une surface d'attaque réseau de moins.",
+    "simple": "Cette règle vérifie que le service de partage de fichiers Windows n'est pas installé."
+  },
+  "CIS-UBU-2.2.14": {
+    "audit": "Il vérifie que le paquet nis n'est pas installé.",
+    "exemple": "NIS transmet les informations de comptes sur le réseau sans aucun chiffrement.",
+    "pourquoi": "NIS a été remplacé par LDAP il y a des décennies, précisément à cause de son absence de sécurité.",
+    "retenir": "NIS absent → pas d'annuaire de comptes circulant en clair.",
+    "simple": "Cette règle vérifie que le serveur d'annuaire NIS n'est pas installé."
+  },
+  "CIS-UBU-2.2.17": {
+    "audit": "Il vérifie que le paquet telnetd n'est pas installé.",
+    "exemple": "telnet transmet le mot de passe en clair : n'importe qui sur le réseau peut le lire au passage.",
+    "pourquoi": "telnet est l'ancêtre de SSH, sans aucun chiffrement. Il n'existe aucune raison de l'utiliser aujourd'hui.",
+    "retenir": "telnet absent → pas de mot de passe en clair sur le réseau.",
+    "simple": "Cette règle vérifie que le serveur telnet n'est pas installé."
+  },
+  "CIS-UBU-2.2.19": {
+    "audit": "Il vérifie que le paquet rsh-server n'est pas installé.",
+    "exemple": "rsh authentifie par simple confiance entre machines, sans mot de passe ni chiffrement.",
+    "pourquoi": "Ces services reposent sur un modèle de confiance des années 1980, trivial à usurper aujourd'hui.",
+    "retenir": "rsh absent → pas d'accès distant fondé sur une confiance usurpable.",
+    "simple": "Cette règle vérifie que les anciens services d'accès distant rsh ne sont pas installés."
+  },
+  "CIS-UBU-2.2.6": {
+    "audit": "Il vérifie que le paquet nfs-kernel-server n'est pas installé.",
+    "exemple": "Un partage NFS mal configuré expose des fichiers entiers en écriture à tout le réseau.",
+    "pourquoi": "NFS accorde traditionnellement sa confiance à l'adresse réseau, pas à l'utilisateur. Mal réglé, il ouvre largement.",
+    "retenir": "NFS absent → pas de partage de fichiers réseau non maîtrisé.",
+    "simple": "Cette règle vérifie que le serveur de partage de fichiers NFS n'est pas installé."
+  },
+  "CIS-UBU-3.3.1": {
+    "audit": "Il lit net.ipv4.ip_forward avec sysctl et attend 0.",
+    "exemple": "Un serveur compromis, connecté à deux réseaux, sert de passerelle pour atteindre le réseau interne.",
+    "pourquoi": "Un serveur qui route devient un pont entre zones réseau. C'est exactement ce qu'un attaquant cherche pour progresser.",
+    "retenir": "Routage désactivé → le serveur n'est pas un pont vers le réseau interne.",
+    "simple": "Cette règle empêche le serveur de faire transiter des paquets d'un réseau à un autre."
+  },
+  "CIS-UBU-3.3.5": {
+    "audit": "Il lit net.ipv4.conf.all.accept_redirects avec sysctl et attend 0.",
+    "exemple": "Un attaquant envoie une redirection ICMP pour faire passer le trafic du serveur par sa propre machine.",
+    "pourquoi": "Ces messages permettent de détourner le trafic sans toucher au serveur. Les ignorer supprime la manœuvre.",
+    "retenir": "Redirections ICMP ignorées → le trafic ne peut pas être détourné depuis le réseau.",
+    "simple": "Cette règle fait ignorer au serveur les messages qui tentent de modifier sa table de routage."
+  },
+  "CIS-UBU-3.3.7": {
+    "audit": "Il lit net.ipv4.conf.all.rp_filter avec sysctl et attend 1.",
+    "exemple": "Un paquet prétend venir d'une adresse interne mais arrive par l'interface Internet. Il est rejeté.",
+    "pourquoi": "C'est la protection de base contre l'usurpation d'adresse : un attaquant ne peut plus se faire passer pour une machine interne.",
+    "retenir": "Filtrage par chemin inverse actif → les adresses usurpées sont rejetées.",
+    "simple": "Cette règle fait vérifier au serveur que chaque paquet arrive bien par l'interface attendue."
+  },
+  "CIS-UBU-3.3.8": {
+    "audit": "Il lit net.ipv4.tcp_syncookies avec sysctl et attend 1.",
+    "exemple": "Un attaquant envoie des milliers de demandes de connexion sans jamais les terminer, jusqu'à épuiser la mémoire du serveur.",
+    "pourquoi": "Les cookies SYN permettent au serveur de traiter ces demandes sans réserver de ressources, ce qui rend l'attaque inefficace.",
+    "retenir": "Cookies SYN activés → la saturation par demandes incomplètes échoue.",
+    "simple": "Cette règle protège le serveur contre la saturation par demandes de connexion incomplètes."
+  },
+  "CIS-UBU-3.3.9": {
+    "audit": "Il lit net.ipv4.conf.all.accept_source_route avec sysctl et attend 0.",
+    "exemple": "Un paquet indique la route qu'il doit suivre, contournant les équipements de filtrage placés sur le trajet normal.",
+    "pourquoi": "Le routage par la source permet de contourner pare-feu et segmentation réseau. Aucun usage légitime ne subsiste.",
+    "retenir": "Routage par la source refusé → pas de contournement du filtrage réseau.",
+    "simple": "Cette règle fait rejeter les paquets qui imposent eux-mêmes leur chemin sur le réseau."
+  },
+  "CIS-UBU-4.1.1.1": {
+    "audit": "Il vérifie que le service cron est enabled et active.",
+    "exemple": "Les sauvegardes, la rotation des journaux et les analyses de sécurité passent par cron. Arrêté, plus rien ne s'exécute.",
+    "pourquoi": "Beaucoup de mesures de sécurité sont des tâches planifiées. Sans cron, elles cessent silencieusement.",
+    "retenir": "cron actif → les tâches de sécurité planifiées s'exécutent.",
+    "simple": "Cette règle vérifie que le planificateur de tâches est actif."
+  },
+  "CIS-UBU-4.1.1.2": {
+    "audit": "Il lit le mode et le propriétaire de /etc/crontab avec stat.",
+    "exemple": "Un utilisateur ajoute une ligne dans crontab : sa commande s'exécutera en root, à l'heure de son choix.",
+    "pourquoi": "Écrire dans ce fichier revient à obtenir une exécution root planifiée. C'est une élévation de privilège directe.",
+    "retenir": "/etc/crontab en 0600 root → pas de tâche root ajoutée par un tiers.",
+    "simple": "Cette règle vérifie que le fichier des tâches planifiées système n'est modifiable que par root."
+  },
+  "CIS-UBU-4.1.1.3": {
+    "audit": "Il lit le mode et le propriétaire de /etc/cron.hourly avec stat.",
+    "exemple": "Un script déposé dans ce répertoire s'exécutera en root dans l'heure qui suit.",
+    "pourquoi": "Le répertoire est aussi sensible que le fichier crontab : y déposer un script suffit à obtenir une exécution privilégiée.",
+    "retenir": "cron.hourly en 0700 root → pas de script root déposé par un tiers.",
+    "simple": "Cette règle protège le répertoire des tâches exécutées toutes les heures."
+  },
+  "CIS-UBU-4.1.1.4": {
+    "audit": "Il lit le mode et le propriétaire de /etc/cron.daily avec stat.",
+    "exemple": "Un script malveillant déposé ici s'exécute chaque jour en root, ce qui assure à l'attaquant un accès persistant.",
+    "pourquoi": "Les tâches planifiées sont un moyen classique de conserver un accès : elles se relancent toutes seules après un redémarrage.",
+    "retenir": "cron.daily en 0700 root → pas de persistance par tâche quotidienne.",
+    "simple": "Cette règle protège le répertoire des tâches quotidiennes."
+  },
+  "CIS-UBU-4.1.1.5": {
+    "audit": "Il lit le mode et le propriétaire de /etc/cron.weekly avec stat.",
+    "exemple": "Une tâche hebdomadaire malveillante est encore plus discrète : elle ne se déclenche qu'une fois par semaine.",
+    "pourquoi": "Plus l'intervalle est long, moins l'activité est visible dans les journaux et plus la persistance dure.",
+    "retenir": "cron.weekly en 0700 root → pas de persistance discrète à long intervalle.",
+    "simple": "Cette règle protège le répertoire des tâches hebdomadaires."
+  },
+  "CIS-UBU-4.2.1": {
+    "audit": "Il vérifie la présence du paquet openssh-server et l'état actif du service sshd.",
+    "exemple": "Sans SSH actif, aucune administration à distance n'est possible sur un serveur qui n'a pas d'écran.",
+    "pourquoi": "C'est la règle préalable : toutes les autres règles SSH n'ont de sens que si le service existe réellement.",
+    "retenir": "SSH installé et actif → le socle de l'administration distante est en place.",
+    "simple": "Cette règle vérifie que le service SSH, qui permet l'administration à distance, est bien installé et actif."
+  },
+  "CIS-UBU-4.2.10": {
+    "audit": "Il lit PermitEmptyPasswords dans la configuration SSH effective, qui doit valoir « no ».",
+    "exemple": "Un compte sans mot de passe pourrait être atteint depuis Internet par n'importe qui connaissant son nom.",
+    "pourquoi": "Un compte sans mot de passe est déjà grave localement ; exposé sur le réseau, il devient une compromission immédiate.",
+    "retenir": "Mots de passe vides refusés en SSH → aucun accès distant sans authentification.",
+    "simple": "Cette règle interdit de se connecter en SSH avec un mot de passe vide."
+  },
+  "CIS-UBU-4.2.14": {
+    "audit": "Il liste les Ciphers actifs et vérifie qu'aucun algorithme faible n'y figure.",
+    "exemple": "Les algorithmes 3DES et les modes CBC présentent des faiblesses connues et exploitables. Ils sont retirés de la liste.",
+    "pourquoi": "Un chiffrement obsolète donne une fausse impression de sécurité : la connexion est chiffrée, mais le chiffrement est cassable.",
+    "retenir": "Seuls des chiffrements robustes → la session est réellement protégée, pas seulement en apparence.",
+    "simple": "Cette règle vérifie que SSH n'utilise que des algorithmes de chiffrement encore sûrs."
+  },
+  "CIS-UBU-4.2.15": {
+    "audit": "Il liste les MACs actifs et vérifie qu'aucun algorithme faible n'y figure.",
+    "exemple": "MD5 et SHA-1 sont cassés : un attaquant peut modifier des données en transit sans que l'altération soit détectée.",
+    "pourquoi": "Le chiffrement protège la confidentialité, l'algorithme d'intégrité garantit que rien n'a été modifié. Les deux sont nécessaires.",
+    "retenir": "Seuls des algorithmes d'intégrité solides → les données ne peuvent pas être altérées en chemin.",
+    "simple": "Cette règle vérifie que SSH n'utilise que des algorithmes d'intégrité solides."
+  },
+  "CIS-UBU-4.2.16": {
+    "audit": "Il liste les KexAlgorithms actifs et vérifie qu'aucun algorithme faible n'y figure.",
+    "exemple": "Les échanges Diffie-Hellman de groupe 1 sont cassables par un attaquant disposant de ressources suffisantes.",
+    "pourquoi": "L'échange de clés est le moment où le secret de session est établi. S'il est faible, tout le reste de la connexion l'est aussi.",
+    "retenir": "Seuls des échanges de clés robustes → le secret de session ne peut pas être reconstitué.",
+    "simple": "Cette règle vérifie que l'échange de clés SSH utilise des méthodes encore sûres."
+  },
+  "CIS-UBU-4.3.1": {
+    "audit": "Il vérifie la présence du paquet sudo ou sudo-ldap.",
+    "exemple": "Sans sudo, il faut se connecter directement en root pour administrer — et plus rien n'est nominatif.",
+    "pourquoi": "sudo permet d'accorder des droits ponctuels et de savoir qui a fait quoi. C'est le socle de la traçabilité des actions privilégiées.",
+    "retenir": "sudo installé → les actions d'administration deviennent nominatives.",
+    "simple": "Cette règle vérifie que sudo est installé sur le système."
+  },
+  "CIS-UBU-4.3.2": {
+    "audit": "Il cherche la directive « Defaults use_pty » dans la configuration sudo.",
+    "exemple": "Un programme malveillant tente de piloter sudo en arrière-plan, sans terminal. L'exécution est refusée.",
+    "pourquoi": "Sans terminal réel, un programme peut détourner une session sudo déjà authentifiée pour exécuter ses propres commandes.",
+    "retenir": "sudo limité à un vrai terminal → pas de détournement de session par un programme.",
+    "simple": "Cette règle force sudo à n'exécuter les commandes que depuis un vrai terminal."
+  },
+  "CIS-UBU-4.3.3": {
+    "audit": "Il cherche la directive « Defaults logfile= » dans la configuration sudo.",
+    "exemple": "Une commande destructrice est exécutée en sudo. Le journal dédié indique qui l'a lancée et quand.",
+    "pourquoi": "Un journal séparé résiste mieux à l'effacement et se relit plus facilement que le journal système général.",
+    "retenir": "Journal sudo dédié → les actions privilégiées sont traçables individuellement.",
+    "simple": "Cette règle vérifie qu'un fichier journal dédié enregistre les commandes lancées avec sudo."
+  },
+  "CIS-UBU-4.3.5": {
+    "audit": "Il cherche la balise NOPASSWD dans /etc/sudoers et /etc/sudoers.d.",
+    "exemple": "Une entrée NOPASSWD permet de devenir root sans rien saisir. Un simple accès au terminal suffit alors.",
+    "pourquoi": "Sans mot de passe, une session laissée ouverte devient un accès root complet. La barrière n'existe plus.",
+    "retenir": "Mot de passe toujours exigé pour sudo → une session ouverte ne donne pas root.",
+    "simple": "Cette règle vérifie qu'aucune configuration ne dispense de saisir son mot de passe pour utiliser sudo."
+  },
+  "CIS-UBU-4.3.6": {
+    "audit": "Il cherche la balise !authenticate dans /etc/sudoers et /etc/sudoers.d.",
+    "exemple": "La balise !authenticate produit le même effet que NOPASSWD, par un autre chemin.",
+    "pourquoi": "Contrôler NOPASSWD sans contrôler !authenticate laisse une porte équivalente ouverte, plus discrète.",
+    "retenir": "Ré-authentification jamais désactivée → pas de contournement par une autre syntaxe.",
+    "simple": "Cette règle vérifie qu'aucune configuration ne désactive globalement la ré-authentification sudo."
+  },
+  "CIS-UBU-4.4.1.1": {
+    "audit": "Il vérifie la présence de pam_pwquality.so en « requisite » dans common-password.",
+    "exemple": "Un utilisateur tente de choisir « azerty123 ». Le module refuse le mot de passe avant qu'il soit enregistré.",
+    "pourquoi": "C'est le module qui applique toutes les exigences de qualité. Sans lui, les règles de longueur et de complexité ne sont jamais évaluées.",
+    "retenir": "pam_pwquality actif → les exigences de mot de passe sont réellement appliquées.",
+    "simple": "Cette règle active le module qui contrôle la qualité des nouveaux mots de passe."
+  },
+  "CIS-UBU-4.4.1.11": {
+    "audit": "Il lit minlen dans pwquality.conf et attend au moins 15.",
+    "exemple": "C'est une exigence militaire américaine (STIG), plus stricte que la recommandation générale de 14.",
+    "pourquoi": "Chaque caractère supplémentaire multiplie le coût d'une attaque hors ligne. Sur des systèmes sensibles, l'écart se justifie.",
+    "retenir": "15 caractères minimum → exigence renforcée par rapport au socle CIS.",
+    "simple": "Cette règle porte la longueur minimale des mots de passe à 15 caractères."
+  },
+  "CIS-UBU-4.4.1.2": {
+    "audit": "Il lit minlen dans pwquality.conf et attend au moins 14.",
+    "exemple": "Un mot de passe de 8 caractères, même complexe, se casse hors ligne en un temps raisonnable.",
+    "pourquoi": "C'est le socle recommandé par le CIS. La longueur reste le facteur le plus déterminant face au cassage hors ligne.",
+    "retenir": "14 caractères minimum → socle de résistance au cassage.",
+    "simple": "Cette règle fixe la longueur minimale des mots de passe à 14 caractères."
+  },
+  "CIS-UBU-4.4.2.1": {
+    "audit": "Il vérifie que pam_pwhistory.so est configuré avec remember=5 ou plus.",
+    "exemple": "Après une fuite, un utilisateur change son mot de passe puis remet l'ancien au changement suivant.",
+    "pourquoi": "Sans mémoire des anciens mots de passe, l'obligation de changer régulièrement ne produit aucun effet réel.",
+    "retenir": "5 anciens mots de passe mémorisés → le changement est effectif, pas cosmétique.",
+    "simple": "Cette règle empêche de réutiliser ses cinq derniers mots de passe."
+  },
+  "CIS-UBU-4.4.3.1": {
+    "audit": "Il lit le paramètre deny dans faillock.conf et attend une valeur inférieure ou égale à 4.",
+    "exemple": "Un attaquant teste des mots de passe. Au quatrième échec, le compte se verrouille et la tentative s'arrête.",
+    "pourquoi": "C'est l'équivalent Linux du verrouillage Windows : il rend impossible l'essai systématique de milliers de combinaisons.",
+    "retenir": "4 tentatives maximum → l'attaque en ligne est stoppée.",
+    "simple": "Cette règle bloque un compte après quatre échecs de connexion consécutifs."
+  },
+  "CIS-UBU-4.5.1.1": {
+    "audit": "Il vérifie qu'aucun compte de /etc/shadow n'a un délai minimal inférieur à 1 jour.",
+    "exemple": "Un utilisateur change son mot de passe cinq fois de suite pour épuiser l'historique et revenir à son mot de passe favori.",
+    "pourquoi": "Sans délai minimal, l'historique des mots de passe se contourne en quelques minutes.",
+    "retenir": "1 jour minimum entre deux changements → l'historique ne peut pas être vidé d'un coup.",
+    "simple": "Cette règle impose d'attendre au moins un jour avant de changer à nouveau son mot de passe."
+  },
+  "CIS-UBU-4.5.1.2": {
+    "audit": "Il vérifie qu'aucun compte de /etc/shadow n'a une durée de validité supérieure à 365 jours.",
+    "exemple": "Un mot de passe inchangé depuis cinq ans a eu le temps d'apparaître dans plusieurs fuites publiques.",
+    "pourquoi": "Une rotation trop fréquente pousse aux mots de passe faibles ; une absence totale de rotation laisse durer les compromissions. 365 jours est le compromis retenu.",
+    "retenir": "365 jours maximum → un mot de passe compromis ne le reste pas indéfiniment.",
+    "simple": "Cette règle impose de changer son mot de passe au moins une fois par an."
+  },
+  "CIS-UBU-4.5.1.4": {
+    "audit": "Il vérifie qu'aucun compte de /etc/shadow n'a un délai d'inactivité supérieur à 30 jours.",
+    "exemple": "Un salarié quitte l'entreprise. Son compte, oublié dans la procédure de départ, se désactive tout seul au bout d'un mois.",
+    "pourquoi": "Les comptes oubliés sont une cible de choix : personne ne les surveille et personne ne remarque qu'ils servent.",
+    "retenir": "30 jours d'inactivité → le compte se désactive de lui-même.",
+    "simple": "Cette règle désactive automatiquement un compte inutilisé depuis 30 jours."
+  },
+  "CIS-UBU-4.5.1.6": {
+    "audit": "Il lit ENCRYPT_METHOD dans /etc/login.defs et attend SHA512.",
+    "exemple": "Les anciens algorithmes comme MD5 se cassent avec du matériel grand public en quelques heures.",
+    "pourquoi": "Le choix de l'algorithme détermine le coût d'une attaque hors ligne après un vol de la base des comptes.",
+    "retenir": "SHA-512 pour les empreintes → un vol de la base ne livre pas les mots de passe rapidement.",
+    "simple": "Cette règle impose SHA-512 pour le calcul des empreintes de mots de passe."
+  },
+  "CIS-UBU-4.5.1.8": {
+    "audit": "Il lit le statut du compte root avec passwd -S et attend « L » (verrouillé).",
+    "exemple": "Impossible de se connecter en tant que root : il faut ouvrir une session nominative puis passer par sudo.",
+    "pourquoi": "Une connexion root directe est anonyme : on sait ce qui a été fait, jamais par qui. Passer par sudo rétablit la traçabilité.",
+    "retenir": "Connexion root directe interdite → toute action privilégiée est nominative.",
+    "simple": "Cette règle verrouille le compte root pour interdire toute connexion directe avec lui."
+  },
+  "CIS-UBU-5.1.1.1.4": {
+    "audit": "Il vérifie que systemd-journal-remote.socket est désactivé.",
+    "exemple": "Un attaquant envoie de faux événements pour noyer les vrais ou fabriquer une fausse piste.",
+    "pourquoi": "Recevoir des journaux distants sans besoin ajoute une entrée réseau et permet la pollution des traces.",
+    "retenir": "Réception de journaux distants désactivée → pas d'injection de fausses traces.",
+    "simple": "Cette règle empêche le serveur de recevoir les journaux d'autres machines."
+  },
+  "CIS-UBU-5.1.1.2": {
+    "audit": "Il vérifie que systemd-journald.service est à l'état static.",
+    "exemple": "Sans journald, plus aucun événement système n'est enregistré : une intrusion ne laisse aucune trace.",
+    "pourquoi": "C'est le service qui collecte tout. S'il est arrêté, toutes les autres règles de journalisation deviennent sans objet.",
+    "retenir": "journald actif → les événements système sont collectés.",
+    "simple": "Cette règle vérifie que le service de journalisation du système est actif."
+  },
+  "CIS-UBU-5.1.1.4": {
+    "audit": "Il cherche Storage=persistent dans journald.conf.",
+    "exemple": "Les journaux sont conservés en mémoire. Le serveur redémarre, et toute la trace de l'incident disparaît.",
+    "pourquoi": "Un attaquant provoque souvent un redémarrage. Sans persistance sur disque, cela efface les preuves gratuitement.",
+    "retenir": "Journaux persistants sur disque → un redémarrage n'efface pas les traces.",
+    "simple": "Cette règle fait écrire les journaux sur le disque plutôt qu'en mémoire."
+  },
+  "CIS-UBU-5.1.2.1": {
+    "audit": "Il vérifie la présence du paquet rsyslog.",
+    "exemple": "rsyslog permet notamment d'envoyer les journaux vers un serveur distant, hors de portée de l'attaquant.",
+    "pourquoi": "Des journaux stockés uniquement sur la machine compromise peuvent être effacés par l'attaquant lui-même.",
+    "retenir": "rsyslog installé → les journaux peuvent être centralisés ailleurs.",
+    "simple": "Cette règle vérifie que rsyslog est installé."
+  },
+  "CIS-UBU-5.1.2.2": {
+    "audit": "Il vérifie que le service rsyslog est enabled.",
+    "exemple": "rsyslog est installé mais désactivé : rien n'est transmis, et personne ne s'en aperçoit.",
+    "pourquoi": "Un service de journalisation qui ne démarre pas laisse un angle mort dont on ne découvre l'existence qu'après l'incident.",
+    "retenir": "rsyslog activé au démarrage → la journalisation reprend à chaque redémarrage.",
+    "simple": "Cette règle vérifie que le service rsyslog démarre automatiquement avec le système."
+  },
+  "CIS-UBU-5.2.1.1": {
+    "audit": "Il vérifie la présence du paquet auditd.",
+    "exemple": "auditd enregistre les appels système : quel programme a lu quel fichier, quel utilisateur a lancé quelle commande.",
+    "pourquoi": "C'est le niveau de détail nécessaire à une investigation sérieuse, bien au-delà des journaux applicatifs classiques.",
+    "retenir": "auditd installé → traçabilité au niveau des appels système.",
+    "simple": "Cette règle vérifie qu'auditd, le système d'audit détaillé de Linux, est installé."
+  },
+  "CIS-UBU-5.2.1.2": {
+    "audit": "Il vérifie que le service auditd est enabled et active.",
+    "exemple": "auditd est installé mais arrêté : aucune règle d'audit n'est appliquée, et rien n'est collecté.",
+    "pourquoi": "Toutes les règles d'audit qui suivent dépendent de ce service. S'il est arrêté, elles ne produisent rien.",
+    "retenir": "auditd activé et actif → les règles d'audit sont réellement appliquées.",
+    "simple": "Cette règle vérifie qu'auditd est activé au démarrage et actuellement en fonctionnement."
+  },
+  "CIS-UBU-5.2.1.3": {
+    "audit": "Il cherche le paramètre audit=1 dans la configuration GRUB.",
+    "exemple": "Un programme malveillant démarre très tôt, avant auditd, et échappe ainsi entièrement à l'audit.",
+    "pourquoi": "Sans ce paramètre, il existe une fenêtre au démarrage pendant laquelle rien n'est enregistré — et c'est là qu'un attaquant se place.",
+    "retenir": "audit=1 au démarrage → pas de fenêtre aveugle au boot.",
+    "simple": "Cette règle permet d'auditer les processus lancés avant même le démarrage d'auditd."
+  },
+  "CIS-UBU-5.2.2.2": {
+    "audit": "Il lit max_log_file_action dans auditd.conf et attend keep_logs.",
+    "exemple": "Les journaux atteignent leur taille maximale et les plus anciens sont effacés — y compris ceux de l'intrusion à analyser.",
+    "pourquoi": "Un attaquant peut générer volontairement du bruit pour faire tourner les journaux et effacer ses traces.",
+    "retenir": "Journaux d'audit conservés → l'historique ne s'efface pas de lui-même.",
+    "simple": "Cette règle empêche la suppression automatique des journaux d'audit quand ils sont pleins."
+  },
+  "CIS-UBU-5.2.2.3": {
+    "audit": "Il lit admin_space_left_action dans auditd.conf et attend halt ou single.",
+    "exemple": "Plus de place pour les journaux : le système s'arrête plutôt que de continuer à fonctionner sans traces.",
+    "pourquoi": "C'est un arbitrage assumé entre disponibilité et traçabilité. Sur un système sensible, fonctionner sans journal est jugé plus risqué qu'être indisponible.",
+    "retenir": "Arrêt si les journaux sont pleins → jamais de fonctionnement sans traçabilité.",
+    "simple": "Cette règle arrête le système lorsque l'espace disque des journaux d'audit est épuisé."
+  },
+  "CIS-UBU-5.2.3.1": {
+    "audit": "Il vérifie qu'une règle auditd surveille /etc/sudoers et /etc/sudoers.d.",
+    "exemple": "Un attaquant s'ajoute discrètement aux sudoers. La modification est enregistrée immédiatement.",
+    "pourquoi": "Modifier les sudoers est le moyen le plus direct de conserver un accès privilégié après une intrusion.",
+    "retenir": "Modifications des sudoers auditées → les ajouts de droits se voient.",
+    "simple": "Cette règle surveille toute modification de la configuration qui définit qui peut devenir administrateur."
+  },
+  "CIS-UBU-5.2.3.19": {
+    "audit": "Il vérifie qu'une règle audite init_module, delete_module ou l'exécution de kmod.",
+    "exemple": "Un rootkit se charge comme module noyau pour se rendre invisible au système lui-même.",
+    "pourquoi": "Un module noyau s'exécute au niveau le plus privilégié et peut mentir au système sur sa propre présence. Sa trace de chargement est parfois le seul indice.",
+    "retenir": "Chargements de modules audités → les rootkits laissent une trace.",
+    "simple": "Cette règle surveille le chargement et le déchargement de modules du noyau."
+  },
+  "CIS-UBU-5.2.3.2": {
+    "audit": "Il vérifie qu'une règle audite les appels execve où l'UID effectif diffère de l'UID réel.",
+    "exemple": "Un utilisateur passe par sudo ou su : la commande réellement exécutée est enregistrée avec son identité d'origine.",
+    "pourquoi": "C'est ce qui relie une action privilégiée à la personne qui l'a lancée, et non au seul compte root.",
+    "retenir": "Actions sous une autre identité auditées → chaque action privilégiée a un auteur.",
+    "simple": "Cette règle enregistre toute commande exécutée sous une identité différente de la sienne."
+  },
+  "CIS-UBU-5.2.3.20": {
+    "audit": "Il vérifie qu'une règle auditd surveille l'exécution de /bin/su.",
+    "exemple": "Des tentatives répétées de passage en root échouent : la trace révèle une tentative d'élévation.",
+    "pourquoi": "Les échecs sont aussi instructifs que les réussites : ils montrent une tentative en cours plutôt qu'un fait accompli.",
+    "retenir": "Usage de su audité → les tentatives d'élévation se voient, même ratées.",
+    "simple": "Cette règle enregistre chaque utilisation de la commande su, réussie comme échouée."
+  },
+  "CIS-UBU-5.2.3.25": {
+    "audit": "Il vérifie qu'une règle auditd surveille l'exécution de /usr/bin/sudo.",
+    "exemple": "Un compte tente d'utiliser sudo sans y être autorisé. L'échec est enregistré.",
+    "pourquoi": "sudo est la voie normale d'élévation : c'est donc là que se concentrent aussi bien l'usage légitime que les tentatives abusives.",
+    "retenir": "Usage de sudo audité → toutes les élévations sont tracées.",
+    "simple": "Cette règle enregistre chaque utilisation de sudo, réussie comme échouée."
+  },
+  "CIS-UBU-5.2.4.1": {
+    "audit": "Il lit le mode du répertoire des journaux défini dans auditd.conf.",
+    "exemple": "Les fichiers sont bien protégés, mais le répertoire est ouvert : on peut y lister, voire y supprimer des fichiers.",
+    "pourquoi": "Protéger les fichiers sans protéger le répertoire qui les contient laisse la possibilité de les supprimer.",
+    "retenir": "Répertoire en 0750 → pas de suppression ni de listage par un tiers.",
+    "simple": "Cette règle vérifie que le répertoire contenant les journaux d'audit est protégé."
+  },
+  "CIS-UBU-5.2.4.10": {
+    "audit": "Il vérifie que tous les outils auditd ont root pour propriétaire.",
+    "exemple": "Un utilisateur propriétaire d'un outil d'audit peut le remplacer par un programme qui ne rapporte rien.",
+    "pourquoi": "Si l'outil qui produit les traces peut être remplacé, les traces elles-mêmes ne valent plus rien.",
+    "retenir": "Outils d'audit appartenant à root → ils ne peuvent pas être remplacés.",
+    "simple": "Cette règle vérifie que les outils d'audit appartiennent bien à root."
+  },
+  "CIS-UBU-5.2.4.11": {
+    "audit": "Il vérifie que tous les outils auditd ont root pour groupe propriétaire.",
+    "exemple": "Un membre d'un autre groupe propriétaire pourrait modifier l'outil, même sans en être le propriétaire direct.",
+    "pourquoi": "Le groupe est la seconde voie d'accès aux permissions Unix. La contrôler ferme le contournement.",
+    "retenir": "Groupe root sur les outils d'audit → pas de modification par un autre groupe.",
+    "simple": "Cette règle vérifie que les outils d'audit appartiennent au groupe root."
+  },
+  "CIS-UBU-5.2.4.2": {
+    "audit": "Il vérifie qu'aucun journal d'audit n'accorde de droit d'exécution ni d'écriture au groupe ou aux autres.",
+    "exemple": "Un journal modifiable permet de réécrire l'histoire : on efface la ligne gênante et l'incident disparaît.",
+    "pourquoi": "Un journal qu'on peut modifier ne prouve plus rien. Son intérêt tient entièrement à son intégrité.",
+    "retenir": "Journaux non modifiables → les traces font foi.",
+    "simple": "Cette règle vérifie que les journaux d'audit ne sont ni exécutables, ni modifiables par le groupe ou les autres."
+  },
+  "CIS-UBU-5.2.4.3": {
+    "audit": "Il vérifie qu'aucun fichier journal d'audit n'est accessible au groupe ni aux autres.",
+    "exemple": "Un utilisateur ordinaire lit les journaux d'audit et y découvre quels fichiers sensibles existent et qui y accède.",
+    "pourquoi": "Les journaux d'audit décrivent l'activité du système : les lire renseigne un attaquant sur sa cible et sur ce qui est surveillé.",
+    "retenir": "Journaux en 0600 → seul le propriétaire peut les lire.",
+    "simple": "Cette règle vérifie que les journaux d'audit ne sont accessibles qu'à leur propriétaire."
+  },
+  "CIS-UBU-5.3.1": {
+    "audit": "Il vérifie la présence des paquets aide et aide-common.",
+    "exemple": "Un attaquant remplace un binaire système par une version piégée. AIDE compare avec sa référence et signale l'écart.",
+    "pourquoi": "C'est ce qui permet de détecter une compromission durable, quand l'attaquant a modifié le système lui-même.",
+    "retenir": "AIDE installé → les modifications de fichiers système sont détectables.",
+    "simple": "Cette règle vérifie qu'AIDE, l'outil qui détecte les modifications de fichiers système, est installé."
+  },
+  "CIS-UBU-6.1.5": {
+    "audit": "Il lit le mode et le propriétaire de /etc/shadow avec stat.",
+    "exemple": "Un utilisateur ordinaire tente d'ouvrir /etc/shadow. L'accès est refusé.",
+    "pourquoi": "Ce fichier contient les empreintes de tous les mots de passe. Lisible, il permet une attaque hors ligne, sans limite de tentatives ni verrouillage.",
+    "retenir": "/etc/shadow en 0640 root → les empreintes de mots de passe restent inaccessibles.",
+    "simple": "Cette règle vérifie que le fichier contenant les mots de passe chiffrés n'est lisible que par root."
+  },
+  "CIS-UBU-6.1.6": {
+    "audit": "Il lit le mode et le propriétaire de /etc/shadow- avec stat.",
+    "exemple": "Le fichier principal est bien protégé, mais /etc/shadow- traîne en lecture pour tous : les empreintes fuitent quand même.",
+    "pourquoi": "Protéger l'original en oubliant sa sauvegarde ne protège rien. C'est une erreur de configuration classique.",
+    "retenir": "La sauvegarde est protégée comme l'original → pas de fuite par la copie.",
+    "simple": "Cette règle applique la même protection à la copie de sauvegarde du fichier des mots de passe."
+  },
+  "CIS-UBU-6.2.1": {
+    "audit": "Il vérifie que le champ mot de passe de chaque ligne de /etc/passwd vaut « x ».",
+    "exemple": "Un compte porte son empreinte de mot de passe directement dans /etc/passwd, que n'importe quel utilisateur peut lire.",
+    "pourquoi": "Historiquement, les mots de passe étaient dans ce fichier lisible. Ils ont été déplacés vers /etc/shadow précisément pour cette raison.",
+    "retenir": "Tous les comptes délèguent vers shadow → aucune empreinte dans un fichier public.",
+    "simple": "Cette règle vérifie qu'aucun mot de passe n'est stocké dans /etc/passwd, un fichier lisible par tous."
+  },
+  "CIS-UBU-6.2.10": {
+    "audit": "Il compte les lignes de /etc/passwd dont le troisième champ vaut 0.",
+    "exemple": "Un compte discret nommé « backup » porte l'UID 0 : il possède exactement les mêmes pouvoirs que root, sans en avoir l'air.",
+    "pourquoi": "Sous Linux, ce n'est pas le nom qui donne les droits, c'est le numéro. Un second UID 0 est un accès root caché.",
+    "retenir": "root seul avec l'UID 0 → pas de compte administrateur dissimulé.",
+    "simple": "Cette règle vérifie qu'un seul compte détient l'identifiant 0, celui de l'administrateur absolu."
+  },
+  "CIS-UBU-6.2.2": {
+    "audit": "Il cherche dans /etc/shadow les lignes dont le deuxième champ est vide.",
+    "exemple": "Un compte au champ mot de passe vide accepte n'importe qui, sans rien demander.",
+    "pourquoi": "C'est une porte grande ouverte : ni mot de passe à deviner, ni verrouillage à contourner.",
+    "retenir": "Aucun champ de mot de passe vide → pas de compte sans authentification.",
+    "simple": "Cette règle vérifie qu'aucun compte ne peut se connecter sans mot de passe."
+  },
+  "CIS-WIN-1.1.1": {
+    "audit": "Il lit « Length of password history maintained » dans net accounts et attend au moins 24.",
+    "exemple": "Vous changez de mot de passe. Sans historique, vous remettez immédiatement le précédent — le changement n'aura servi à rien.",
+    "pourquoi": "Un mot de passe qui reste utilisable longtemps finit par être deviné. Mémoriser les 24 derniers empêche de tourner en rond entre deux mots de passe.",
+    "retenir": "24 mots de passe mémorisés → impossible de recycler l'ancien au prochain changement.",
+    "simple": "Cette règle vérifie combien de mots de passe différents un utilisateur doit employer avant de pouvoir réutiliser un ancien."
+  },
+  "CIS-WIN-1.1.4": {
+    "audit": "Il lit « Minimum password length » dans net accounts et attend 14 ou plus.",
+    "exemple": "Un mot de passe de 8 caractères se casse hors ligne en quelques heures. À 14 caractères, le même calcul demande des années.",
+    "pourquoi": "Chaque caractère supplémentaire multiplie le nombre de combinaisons à tester. La longueur protège davantage que la complexité.",
+    "retenir": "14 caractères minimum → l'attaque par force brute devient trop coûteuse pour aboutir.",
+    "simple": "Cette règle fixe le nombre minimum de caractères d'un mot de passe."
+  },
+  "CIS-WIN-1.1.5": {
+    "audit": "Il exporte la stratégie locale avec secedit et lit PasswordComplexity, qui doit valoir 1.",
+    "exemple": "« motdepasse2024 » est refusé. « M0t2-P@sse! » est accepté.",
+    "pourquoi": "Un mot de passe purement alphabétique figure dans les dictionnaires d'attaque publics. Mélanger les catégories fait exploser l'espace de recherche.",
+    "retenir": "Au moins 3 catégories sur 4, et jamais le nom du compte → mot de passe hors dictionnaire.",
+    "simple": "Cette règle impose de mélanger plusieurs types de caractères dans un mot de passe : majuscules, minuscules, chiffres, symboles."
+  },
+  "CIS-WIN-1.1.7": {
+    "audit": "Il exporte la stratégie locale avec secedit et lit ClearTextPassword, qui doit valoir 0.",
+    "exemple": "Avec le chiffrement réversible activé, quelqu'un qui accède à la base des comptes peut retrouver les mots de passe en clair.",
+    "pourquoi": "Le chiffrement réversible équivaut à un stockage en clair : la clé de déchiffrement est présente sur le système. Il ne subsiste que pour de très vieux protocoles.",
+    "retenir": "Chiffrement réversible désactivé → un vol de la base ne livre pas les mots de passe.",
+    "simple": "Cette règle vérifie que Windows ne stocke pas les mots de passe sous une forme qu'on peut déchiffrer."
+  },
+  "CIS-WIN-1.2.2": {
+    "audit": "Il lit « Lockout threshold » dans net accounts et attend une valeur entre 1 et 5.",
+    "exemple": "Un attaquant essaie des mots de passe en série. Au 5ᵉ échec, le compte se verrouille et la tentative s'arrête là.",
+    "pourquoi": "Sans seuil, rien n'empêche d'essayer des milliers de combinaisons. La valeur 0 est un piège : elle désactive complètement la protection.",
+    "retenir": "5 tentatives maximum, et surtout jamais 0 → l'attaque en ligne est stoppée net.",
+    "simple": "Cette règle définit après combien d'échecs de connexion un compte se bloque."
+  },
+  "CIS-WIN-17.1.1": {
+    "audit": "Il lit la stratégie d'audit avec auditpol et attend « Success and Failure ».",
+    "exemple": "Cent échecs de validation en une minute sur des comptes différents : la trace révèle une attaque par pulvérisation de mots de passe.",
+    "pourquoi": "C'est le journal qui rend visible une attaque sur les mots de passe. Sans lui, les tentatives ne laissent aucune trace exploitable.",
+    "retenir": "Succès et échecs journalisés → les attaques sur les identifiants deviennent détectables.",
+    "simple": "Cette règle enregistre chaque vérification de mot de passe effectuée par le système, réussie comme échouée."
+  },
+  "CIS-WIN-17.2.3": {
+    "audit": "Il lit la stratégie d'audit avec auditpol et attend « Success and Failure ».",
+    "exemple": "Un attaquant crée un compte discret pour revenir plus tard. La création apparaît dans le journal.",
+    "pourquoi": "Créer un compte est la façon la plus courante de conserver un accès après une intrusion. Cette trace le révèle.",
+    "retenir": "Toute modification de compte est tracée → les comptes créés en douce se voient.",
+    "simple": "Cette règle enregistre toute création, modification ou suppression de compte utilisateur."
+  },
+  "CIS-WIN-17.3.2": {
+    "audit": "Il lit la stratégie d'audit avec auditpol et attend au moins « Success ».",
+    "exemple": "Un programme inconnu s'exécute depuis un dossier temporaire. Son lancement et son chemin figurent dans le journal.",
+    "pourquoi": "C'est la trace la plus utile pour reconstituer une attaque : elle montre exactement ce qui a été exécuté, dans quel ordre.",
+    "retenir": "Créations de processus journalisées → le déroulé d'une attaque est reconstituable.",
+    "simple": "Cette règle enregistre chaque lancement de programme sur le poste."
+  },
+  "CIS-WIN-17.5.4": {
+    "audit": "Il lit la stratégie d'audit avec auditpol et attend « Success and Failure ».",
+    "exemple": "Une connexion réussie à 3 h du matin sur un poste de bureau : l'horaire seul justifie une vérification.",
+    "pourquoi": "C'est la trace de base de toute investigation : qui s'est connecté, quand, depuis où.",
+    "retenir": "Connexions journalisées → on sait qui est entré et quand.",
+    "simple": "Cette règle enregistre les ouvertures de session sur le poste, réussies et échouées."
+  },
+  "CIS-WIN-17.6.2": {
+    "audit": "Il lit la stratégie d'audit avec auditpol et attend « Success and Failure ».",
+    "exemple": "Un compte parcourt méthodiquement tous les partages du réseau : la trace révèle une reconnaissance en cours.",
+    "pourquoi": "Les partages sont le principal vecteur de propagation latérale dans un réseau. Leur consultation est un signal précoce.",
+    "retenir": "Accès aux partages journalisés → la propagation dans le réseau devient visible.",
+    "simple": "Cette règle enregistre les accès aux dossiers partagés du poste."
+  },
+  "CIS-WIN-17.6.4": {
+    "audit": "Il lit la stratégie d'audit avec auditpol et attend « Success and Failure ».",
+    "exemple": "Une clé USB est branchée et des centaines de fichiers y sont copiés. L'opération laisse une trace.",
+    "pourquoi": "Le support amovible est le moyen d'exfiltration qui échappe entièrement à la surveillance réseau.",
+    "retenir": "Accès au stockage amovible journalisés → l'exfiltration par clé USB est traçable.",
+    "simple": "Cette règle enregistre les accès aux fichiers situés sur une clé USB ou un disque externe."
+  },
+  "CIS-WIN-17.7.1": {
+    "audit": "Il lit la stratégie d'audit avec auditpol et attend au moins « Success ».",
+    "exemple": "Un attaquant désactive les journaux pour effacer ses traces. Cette désactivation est elle-même journalisée.",
+    "pourquoi": "C'est la trace qui protège toutes les autres : sans elle, il suffirait de couper la journalisation pour devenir invisible.",
+    "retenir": "Les changements de politique d'audit sont tracés → on ne peut pas éteindre les journaux discrètement.",
+    "simple": "Cette règle enregistre les modifications apportées à la politique de journalisation elle-même."
+  },
+  "CIS-WIN-17.8.1": {
+    "audit": "Il lit la stratégie d'audit avec auditpol et attend au moins « Success ».",
+    "exemple": "Un compte utilise le privilège de sauvegarde pour lire des fichiers auxquels il n'a normalement pas accès. L'usage est tracé.",
+    "pourquoi": "Ces privilèges permettent de contourner les permissions habituelles. Leur usage légitime est rare, donc leur trace est significative.",
+    "retenir": "Usage des privilèges sensibles journalisé → les contournements de permissions se voient.",
+    "simple": "Cette règle enregistre l'usage des privilèges les plus puissants du système."
+  },
+  "CIS-WIN-17.9.2": {
+    "audit": "Il lit la stratégie d'audit avec auditpol et attend « Success and Failure ».",
+    "exemple": "Le pare-feu est arrêté à 2 h du matin puis redémarré vingt minutes plus tard. La fenêtre d'ouverture est datée.",
+    "pourquoi": "Un attaquant coupe souvent le pare-feu le temps d'une opération. Sans cette trace, l'interruption passe inaperçue.",
+    "retenir": "Arrêts du pare-feu journalisés → les fenêtres d'exposition sont datées.",
+    "simple": "Cette règle enregistre certains événements système, dont le démarrage et l'arrêt du pare-feu."
+  },
+  "CIS-WIN-17.9.5": {
+    "audit": "Il lit la stratégie d'audit avec auditpol et attend « Success and Failure ».",
+    "exemple": "Des événements d'audit manquent dans la séquence : le journal signale l'incohérence.",
+    "pourquoi": "Ces anomalies signalent souvent une tentative de manipulation des mécanismes de sécurité, pas une simple erreur.",
+    "retenir": "Intégrité du système surveillée → les manipulations du sous-système de sécurité remontent.",
+    "simple": "Cette règle enregistre les anomalies du sous-système de sécurité lui-même."
+  },
+  "CIS-WIN-18.10.10.1.2": {
+    "audit": "Il lit FDVRecovery dans la stratégie BitLocker, qui doit valoir 1.",
+    "exemple": "Le disque est chiffré et la clé perdue : sans clé de récupération sauvegardée, les données sont définitivement irrécupérables.",
+    "pourquoi": "Le chiffrement sans plan de récupération transforme une panne banale en perte de données définitive.",
+    "retenir": "Récupération encadrée par l'entreprise → chiffrement sans risque de perte définitive.",
+    "simple": "Cette règle encadre la sauvegarde des clés de récupération pour les disques de données internes."
+  },
+  "CIS-WIN-18.10.10.2.2": {
+    "audit": "Il lit OSUseSecureBootForIntegrityValidation, qui doit valoir 1.",
+    "exemple": "Quelqu'un modifie le programme de démarrage pour intercepter la clé. Secure Boot détecte la modification et bloque le déverrouillage.",
+    "pourquoi": "Sans cette validation, une attaque physique sur le démarrage peut récupérer la clé de chiffrement.",
+    "retenir": "Intégrité vérifiée par Secure Boot → un démarrage modifié ne déverrouille pas le disque.",
+    "simple": "Cette règle fait vérifier à BitLocker l'intégrité du démarrage via Secure Boot plutôt que par l'ancien mécanisme."
+  },
+  "CIS-WIN-18.10.10.2.3": {
+    "audit": "Il lit OSRecovery dans la stratégie BitLocker, qui doit valoir 1.",
+    "exemple": "Le module de sécurité de la carte mère tombe en panne : sans clé sauvegardée, le poste ne redémarre plus jamais.",
+    "pourquoi": "C'est le disque le plus critique : sans lui, la machine entière est inutilisable, pas seulement les données.",
+    "retenir": "Clé du disque système sauvegardée → une panne matérielle ne condamne pas le poste.",
+    "simple": "Cette règle encadre la sauvegarde de la clé de récupération du disque système, celui qui contient Windows."
+  },
+  "CIS-WIN-18.10.10.3.11": {
+    "audit": "Il lit RDVDenyWriteAccess, qui doit valoir 1.",
+    "exemple": "Un utilisateur copie des documents sur une clé personnelle non chiffrée, puis la perd dans le train.",
+    "pourquoi": "Une clé USB perdue est l'une des causes de fuite de données les plus banales. Le chiffrement rend la perte sans conséquence.",
+    "retenir": "Écriture refusée sur support non chiffré → une clé perdue reste illisible.",
+    "simple": "Cette règle interdit d'écrire sur une clé USB qui n'est pas chiffrée."
+  },
+  "CIS-WIN-18.10.10.3.2": {
+    "audit": "Il lit RDVRecovery dans la stratégie BitLocker, qui doit valoir 1.",
+    "exemple": "Une clé USB chiffrée est confiée à un collègue qui n'a pas le mot de passe : la clé de récupération permet d'y accéder.",
+    "pourquoi": "Sans procédure de récupération, chaque support chiffré devient une perte potentielle de données pour l'entreprise.",
+    "retenir": "Récupération encadrée sur les supports amovibles → chiffrement sans blocage définitif.",
+    "simple": "Cette règle encadre la sauvegarde des clés de récupération pour les supports amovibles chiffrés."
+  },
+  "CIS-WIN-18.10.29.4": {
+    "audit": "Il lit SaveZoneInformation, qui doit valoir 0 (conservation du marqueur).",
+    "exemple": "Un document téléchargé est copié dans un dossier partagé. Il reste marqué comme venant d'Internet, donc ouvert en mode protégé.",
+    "pourquoi": "Sans ce marqueur, une simple copie transforme un fichier suspect en fichier local de confiance, et les protections d'ouverture sautent.",
+    "retenir": "Marquage conservé après copie → l'origine Internet ne se perd pas en chemin.",
+    "simple": "Cette règle conserve le marqueur qui identifie un fichier comme provenant d'Internet, même après copie."
+  },
+  "CIS-WIN-18.10.43.2": {
+    "audit": "Il lit AllowCameraMicrophoneRedirection, qui doit valoir 0.",
+    "exemple": "Un site ouvert dans le conteneur demande la caméra. La demande est refusée par la stratégie, pas par l'utilisateur.",
+    "pourquoi": "Ces périphériques permettent une surveillance directe. Un site non approuvé n'a aucune raison d'y accéder.",
+    "retenir": "Caméra et micro inaccessibles depuis le conteneur → pas de surveillance par un site inconnu.",
+    "simple": "Cette règle interdit aux sites isolés d'accéder à la caméra et au microphone."
+  },
+  "CIS-WIN-18.10.43.3": {
+    "audit": "Il lit AllowPersistence, qui doit valoir 0.",
+    "exemple": "Cookies, favoris et fichiers créés dans le conteneur disparaissent à la fermeture, sans persister d'une session à l'autre.",
+    "pourquoi": "Si les données persistent, un site malveillant peut s'installer durablement dans le conteneur et attendre.",
+    "retenir": "Aucune persistance entre sessions → chaque navigation isolée repart d'un état sain.",
+    "simple": "Cette règle efface les données de la session isolée à chaque fermeture."
+  },
+  "CIS-WIN-18.10.43.4": {
+    "audit": "Il lit SaveFilesToHost, qui doit valoir 0.",
+    "exemple": "Un fichier téléchargé dans le conteneur ne peut pas être déposé sur le disque de la machine.",
+    "pourquoi": "Autoriser le téléchargement vers l'hôte annule l'isolation : le fichier suspect sort du conteneur et atteint le système.",
+    "retenir": "Pas de téléchargement vers l'hôte → l'isolation n'est pas contournée par un fichier.",
+    "simple": "Cette règle empêche d'enregistrer sur le poste un fichier téléchargé dans la session isolée."
+  },
+  "CIS-WIN-18.10.43.5": {
+    "audit": "Il lit AllowAppHVSIClipboard, qui doit valoir 1.",
+    "exemple": "Vous pouvez coller une adresse depuis le poste vers le conteneur, mais pas ramener du contenu du conteneur vers le poste.",
+    "pourquoi": "Un presse-papiers bidirectionnel permet de faire sortir du conteneur exactement ce qu'on voulait y enfermer.",
+    "retenir": "Presse-papiers à sens unique → l'isolation tient dans les deux directions utiles.",
+    "simple": "Cette règle limite le presse-papiers à un seul sens entre le conteneur isolé et le poste."
+  },
+  "CIS-WIN-18.10.43.6": {
+    "audit": "Il lit AllowAppHVSI_ProviderSet, qui doit valoir 1.",
+    "exemple": "Vous ouvrez un site inconnu. Il s'exécute dans un conteneur isolé : même piégé, il n'atteint pas le système.",
+    "pourquoi": "Le navigateur est la principale porte d'entrée des attaques. L'isoler contient les dégâts d'un site malveillant.",
+    "retenir": "Navigation non approuvée isolée → un site piégé n'atteint pas le poste.",
+    "simple": "Cette règle active l'isolation de la navigation vers les sites non approuvés dans un conteneur séparé."
+  },
+  "CIS-WIN-18.10.57.3.3.8": {
+    "audit": "Il lit fDisableClip, qui doit valoir 0 dans la configuration attendue.",
+    "exemple": "Un fichier sensible sur le serveur distant ne peut pas être ramené sur le poste local par un simple copier-coller.",
+    "pourquoi": "Le presse-papiers est un canal d'exfiltration discret, qui contourne toutes les règles de partage de fichiers.",
+    "retenir": "Presse-papiers bloqué du serveur vers le client → pas de fuite de données par copier-coller.",
+    "simple": "Cette règle empêche de copier des données depuis la session distante vers votre poste local."
+  },
+  "CIS-WIN-18.10.57.3.9.1": {
+    "audit": "Il lit fPromptForPassword dans la clé des services Terminal Server, qui doit valoir 1.",
+    "exemple": "Un client RDP a mémorisé les identifiants. Le serveur les refuse et redemande le mot de passe.",
+    "pourquoi": "Un identifiant enregistré sur un poste compromis ouvre directement la session distante. Redemander le mot de passe casse cet enchaînement.",
+    "retenir": "Mot de passe redemandé à chaque connexion → un poste compromis ne donne pas accès au serveur.",
+    "simple": "Cette règle oblige à saisir le mot de passe à chaque connexion Bureau à distance, sans réutiliser un identifiant enregistré."
+  },
+  "CIS-WIN-18.10.57.3.9.2": {
+    "audit": "Il lit fEncryptRPCTraffic, qui doit valoir 1.",
+    "exemple": "Un client qui ne sait pas établir un canal RPC sécurisé se voit simplement refuser la connexion.",
+    "pourquoi": "Sans canal sécurisé, les échanges de contrôle de la session circulent en clair et peuvent être modifiés en transit.",
+    "retenir": "Communication RPC sécurisée obligatoire → pas de session RDP en clair.",
+    "simple": "Cette règle exige que les échanges internes du Bureau à distance soient chiffrés et authentifiés."
+  },
+  "CIS-WIN-18.10.57.3.9.3": {
+    "audit": "Il lit SecurityLayer, qui doit valoir 2 (TLS exigé).",
+    "exemple": "Sans TLS, quelqu'un sur le réseau peut observer le contenu de la session distante.",
+    "pourquoi": "TLS authentifie le serveur en plus de chiffrer : vous savez à quelle machine vous vous connectez réellement.",
+    "retenir": "TLS obligatoire → la session est chiffrée et le serveur est authentifié.",
+    "simple": "Cette règle impose TLS pour chiffrer la session Bureau à distance, comme le HTTPS d'un site web."
+  },
+  "CIS-WIN-18.10.57.3.9.4": {
+    "audit": "Il lit UserAuthentication, qui doit valoir 1.",
+    "exemple": "Sans NLA, le serveur ouvre une session graphique puis demande le mot de passe. Avec NLA, l'authentification passe d'abord.",
+    "pourquoi": "Ouvrir une session avant l'authentification consomme des ressources et expose la surface d'attaque du service à n'importe qui.",
+    "retenir": "Authentification avant ouverture de session → pas de dialogue avec un inconnu.",
+    "simple": "Cette règle exige que l'utilisateur s'authentifie avant même que la session distante ne s'ouvre."
+  },
+  "CIS-WIN-18.10.77.1.2": {
+    "audit": "Il lit NotifyMalicious dans la stratégie WTDS, qui doit valoir 1.",
+    "exemple": "Un faux portail interne demande vos identifiants. Une alerte apparaît au moment précis de la saisie.",
+    "pourquoi": "L'avertissement arrive à l'instant utile, avant la validation, et non dans une formation suivie six mois plus tôt.",
+    "retenir": "Alerte à la saisie sur un site malveillant → l'utilisateur est prévenu au bon moment.",
+    "simple": "Cette règle avertit l'utilisateur lorsqu'il saisit son mot de passe Windows sur un site identifié comme malveillant."
+  },
+  "CIS-WIN-18.10.77.1.3": {
+    "audit": "Il lit NotifyPasswordReuse dans la stratégie WTDS, qui doit valoir 1.",
+    "exemple": "Vous employez votre mot de passe professionnel pour créer un compte sur un site tiers. Windows vous alerte.",
+    "pourquoi": "Si ce site est un jour compromis, le mot de passe de l'entreprise se retrouve dans une fuite publique.",
+    "retenir": "Alerte à la réutilisation → le mot de passe de l'entreprise reste dans l'entreprise.",
+    "simple": "Cette règle avertit l'utilisateur lorsqu'il réutilise son mot de passe Windows ailleurs."
+  },
+  "CIS-WIN-18.10.77.1.5": {
+    "audit": "Il lit ServiceEnabled dans la stratégie WTDS, qui doit valoir 1.",
+    "exemple": "Vous saisissez votre mot de passe Windows sur un site qui imite la page de connexion de l'entreprise. Windows le détecte.",
+    "pourquoi": "L'hameçonnage vise l'utilisateur, pas la machine : aucune protection technique classique ne l'arrête. Ce mécanisme surveille l'usage du mot de passe lui-même.",
+    "retenir": "Protection anti-hameçonnage activée → l'usage du mot de passe Windows est surveillé.",
+    "simple": "Cette règle active la protection anti-hameçonnage intégrée à Windows."
+  },
+  "CIS-WIN-18.10.77.2.1": {
+    "audit": "Il lit EnableSmartScreen et ShellSmartScreenLevel, attendus à 1 et « Block ».",
+    "exemple": "Un exécutable téléchargé et jamais vu ailleurs est bloqué, et l'utilisateur ne peut pas cliquer sur « Exécuter quand même ».",
+    "pourquoi": "Sans l'interdiction de contournement, l'avertissement devient une simple formalité qu'on écarte d'un clic.",
+    "retenir": "Blocage sans contournement possible → l'avertissement n'est pas une simple formalité.",
+    "simple": "Cette règle fait bloquer par SmartScreen les applications non reconnues, sans possibilité de passer outre."
+  },
+  "CIS-WIN-18.10.88.1": {
+    "audit": "Il lit EnableScriptBlockLogging, qui doit valoir 1.",
+    "exemple": "Un script malveillant s'exécute puis s'efface. Son contenu reste tout de même dans le journal d'événements.",
+    "pourquoi": "PowerShell est l'outil privilégié des attaquants sur Windows, précisément parce qu'il ne laisse pas de fichier. La journalisation supprime cet avantage.",
+    "retenir": "Tous les scripts sont journalisés → l'analyse après incident redevient possible.",
+    "simple": "Cette règle enregistre dans le journal Windows le contenu de tous les scripts PowerShell exécutés."
+  },
+  "CIS-WIN-18.10.90.1.1": {
+    "audit": "Il lit AllowBasic dans la clé du client WinRM, qui doit valoir 0.",
+    "exemple": "Le poste se connecte à un serveur distant. Avec Basic, le mot de passe traverse le réseau lisible par tous.",
+    "pourquoi": "Basic n'est pas une authentification faible, c'est une absence de protection : le mot de passe circule tel quel.",
+    "retenir": "Authentification Basic interdite côté client → le mot de passe ne circule jamais en clair.",
+    "simple": "Cette règle interdit au client d'administration à distance d'utiliser l'authentification Basic, qui transmet le mot de passe en clair."
+  },
+  "CIS-WIN-18.10.90.1.2": {
+    "audit": "Il lit AllowUnencryptedTraffic dans la clé du client WinRM, qui doit valoir 0.",
+    "exemple": "Une commande d'administration envoyée sans chiffrement peut être lue et modifiée en chemin.",
+    "pourquoi": "Les commandes d'administration contiennent des ordres privilégiés. Les laisser en clair permet de les observer et de les altérer.",
+    "retenir": "Trafic non chiffré interdit côté client → les commandes restent confidentielles et intègres.",
+    "simple": "Cette règle interdit au client d'administration à distance d'envoyer des messages non chiffrés."
+  },
+  "CIS-WIN-18.10.90.2.1": {
+    "audit": "Il lit AllowBasic dans la clé du service WinRM, qui doit valoir 0.",
+    "exemple": "Un client tente de s'authentifier en Basic sur ce poste. Le service refuse la méthode.",
+    "pourquoi": "C'est le pendant serveur de la règle client : refuser d'accepter est aussi important que refuser d'envoyer.",
+    "retenir": "Authentification Basic refusée côté service → aucun mot de passe en clair n'est accepté.",
+    "simple": "Cette règle interdit au service d'administration à distance d'accepter une authentification Basic venue d'un client."
+  },
+  "CIS-WIN-18.10.90.2.3": {
+    "audit": "Il lit AllowUnencryptedTraffic dans la clé du service WinRM, qui doit valoir 0.",
+    "exemple": "Une commande arrive sans chiffrement. Le service la rejette au lieu de l'exécuter.",
+    "pourquoi": "Accepter du trafic en clair permet à un attaquant du réseau d'injecter des commandes d'administration.",
+    "retenir": "Trafic non chiffré refusé côté service → pas d'injection de commandes depuis le réseau.",
+    "simple": "Cette règle interdit au service d'administration à distance d'accepter du trafic non chiffré."
+  },
+  "CIS-WIN-18.10.94.1.1": {
+    "audit": "Il lit NoAutoRebootWithLoggedOnUsers, qui doit valoir 0 dans la configuration attendue.",
+    "exemple": "Une mise à jour s'installe pendant une réunion. Sans cette règle, le poste redémarre au milieu de la présentation.",
+    "pourquoi": "Un redémarrage forcé fait perdre du travail et pousse les utilisateurs à désactiver les mises à jour. La sécurité y perd davantage qu'elle n'y gagne.",
+    "retenir": "Pas de redémarrage forcé en session → les mises à jour restent acceptables pour l'utilisateur.",
+    "simple": "Cette règle empêche Windows de redémarrer de force pendant qu'un utilisateur travaille."
+  },
+  "CIS-WIN-18.10.94.2.1": {
+    "audit": "Il lit NoAutoUpdate dans la stratégie Windows Update, qui doit valoir 0 (automatique actif).",
+    "exemple": "Un correctif de sécurité critique paraît. Il s'installe sans attendre une action de l'utilisateur.",
+    "pourquoi": "La majorité des attaques exploitent des failles déjà corrigées. Le délai d'installation est la véritable fenêtre de risque.",
+    "retenir": "Mises à jour automatiques → les correctifs s'appliquent sans dépendre de l'utilisateur.",
+    "simple": "Cette règle active le téléchargement et l'installation automatiques des mises à jour."
+  },
+  "CIS-WIN-18.10.94.2.4": {
+    "audit": "Il lit SetDisablePauseUXAccess, qui doit valoir 1.",
+    "exemple": "Un utilisateur repousse les mises à jour semaine après semaine pour ne pas être interrompu.",
+    "pourquoi": "La possibilité de reporter est systématiquement utilisée, et le poste accumule des mois de retard sur les correctifs.",
+    "retenir": "Pause des mises à jour retirée → pas de report indéfini des correctifs.",
+    "simple": "Cette règle retire à l'utilisateur la possibilité de suspendre les mises à jour."
+  },
+  "CIS-WIN-18.10.94.4.1": {
+    "audit": "Il lit ManagePreviewBuilds, qui doit valoir 1 (désactivation).",
+    "exemple": "Une version de test s'installe sur un poste de production et rend une application métier inutilisable.",
+    "pourquoi": "Les versions préliminaires contiennent des défauts connus et des composants de sécurité non finalisés. Elles n'ont pas leur place en production.",
+    "retenir": "Pas de versions préliminaires → le poste reste sur une version stable et supportée.",
+    "simple": "Cette règle empêche le poste de recevoir les versions préliminaires de Windows."
+  },
+  "CIS-WIN-18.10.94.4.2": {
+    "audit": "Il lit DeferQualityUpdates et DeferQualityUpdatesPeriodInDays, attendus à 1 et 0.",
+    "exemple": "Un correctif publié aujourd'hui s'installe aujourd'hui, et non dans quinze jours.",
+    "pourquoi": "Chaque jour de report est un jour d'exposition à une faille désormais publique, donc largement exploitée.",
+    "retenir": "Aucun report des correctifs → la fenêtre d'exposition est réduite au minimum.",
+    "simple": "Cette règle supprime tout délai de report sur les correctifs de sécurité."
+  },
+  "CIS-WIN-18.4.1": {
+    "audit": "Il lit le type de démarrage du pilote MRxSmb10, qui doit valoir 4 (désactivé).",
+    "exemple": "C'est le protocole exploité par WannaCry en 2017 pour se propager sur des dizaines de milliers de machines.",
+    "pourquoi": "SMBv1 date de 1983 et n'a aucune protection moderne. Il n'existe plus de raison légitime de l'utiliser.",
+    "retenir": "Client SMBv1 désactivé → le poste ne peut plus être infecté par cette voie.",
+    "simple": "Cette règle désactive la partie cliente de SMBv1, la version obsolète du protocole de partage de fichiers."
+  },
+  "CIS-WIN-18.4.2": {
+    "audit": "Il lit SMB1 dans la configuration du serveur LanmanServer, qui doit valoir 0.",
+    "exemple": "Une machine infectée du réseau tente de se propager en SMBv1. Le poste ne répond simplement pas.",
+    "pourquoi": "Désactiver le client protège le poste ; désactiver le serveur l'empêche d'être une cible. Les deux sont nécessaires.",
+    "retenir": "Serveur SMBv1 désactivé → le poste n'est plus une cible pour cette famille d'attaques.",
+    "simple": "Cette règle désactive la partie serveur de SMBv1 : le poste cesse de répondre en SMBv1."
+  },
+  "CIS-WIN-18.4.6": {
+    "audit": "Il lit UseLogonCredential dans la clé WDigest, qui doit valoir 0.",
+    "exemple": "Avec WDigest actif, un outil de vol d'identifiants lit directement le mot de passe en clair dans la mémoire du système.",
+    "pourquoi": "WDigest servait à un protocole d'authentification ancien. Tant qu'il est actif, tout accès à la mémoire livre les mots de passe sans effort.",
+    "retenir": "WDigest désactivé → plus de mot de passe en clair dans la mémoire.",
+    "simple": "Cette règle empêche Windows de conserver votre mot de passe en clair dans la mémoire."
+  },
+  "CIS-WIN-18.6.7.4": {
+    "audit": "Il lit AuditClientDoesNotSupportEncryption dans la configuration SMB serveur, qui doit valoir 1.",
+    "exemple": "Un attaquant teste des mots de passe en série. Chaque échec impose une attente, ce qui rend l'attaque interminable.",
+    "pourquoi": "Sans ce frein, des milliers de tentatives par minute sont possibles. Le délai ne bloque pas l'attaque, il la rend inutilisable.",
+    "retenir": "Délai après chaque échec → l'attaque par force brute devient trop lente pour aboutir.",
+    "simple": "Cette règle ajoute un délai après chaque échec d'authentification sur le service de partage de fichiers."
+  },
+  "CIS-WIN-18.6.8.4": {
+    "audit": "Il lit AllowInsecureGuestAuth dans la configuration SMB client, qui doit valoir 0.",
+    "exemple": "Un serveur hostile accepte les connexions invité et sert des fichiers piégés. Le poste refuse de s'y connecter.",
+    "pourquoi": "Une connexion invité n'authentifie ni l'utilisateur ni le serveur : vous ignorez à qui vous parlez et il ignore qui vous êtes.",
+    "retenir": "Connexions invité refusées → toute connexion à un partage est authentifiée.",
+    "simple": "Cette règle empêche le poste de se connecter à un partage de fichiers en tant qu'invité, sans authentification."
+  },
+  "CIS-WIN-18.7.1": {
+    "audit": "Il lit RegisterSpoolerRemoteRpcEndPoint, qui doit valoir 2 (désactivé).",
+    "exemple": "Une machine distante envoie une requête d'impression piégée. Le service refuse simplement la connexion.",
+    "pourquoi": "C'est la contre-mesure à la famille de failles PrintNightmare, qui permettait de prendre le contrôle d'un poste via le service d'impression.",
+    "retenir": "Service d'impression fermé au réseau → la voie d'attaque PrintNightmare est coupée.",
+    "simple": "Cette règle empêche le service d'impression d'accepter des connexions venues d'autres machines."
+  },
+  "CIS-WIN-18.7.10": {
+    "audit": "Il lit RestrictDriverInstallationToAdministrators, qui doit valoir 1.",
+    "exemple": "Un utilisateur installe une imprimante. Le pilote fourni contient du code malveillant qui s'exécute avec les droits du système.",
+    "pourquoi": "Un pilote d'impression s'exécute au niveau du noyau. L'installer revient à donner les pleins pouvoirs au code qu'il contient.",
+    "retenir": "Installation de pilotes réservée aux administrateurs → pas d'élévation de privilège par l'imprimante.",
+    "simple": "Cette règle réserve l'installation de pilotes d'impression aux administrateurs."
+  },
+  "CIS-WIN-18.7.11": {
+    "audit": "Il lit CopyFilesPolicy, qui doit valoir 1.",
+    "exemple": "L'installation d'une imprimante tente de copier un fichier exécutable. Seuls les fichiers de profil colorimétrique sont acceptés.",
+    "pourquoi": "Le mécanisme d'installation d'imprimante peut servir à déposer des fichiers arbitraires sur le système. Le restreindre ferme cette porte.",
+    "retenir": "Seuls les profils de couleur sont copiables → l'imprimante ne sert pas à déposer du code.",
+    "simple": "Cette règle limite les fichiers qu'une imprimante peut déposer sur le poste aux seuls profils de couleur."
+  },
+  "CIS-WIN-18.7.12": {
+    "audit": "Il lit NoWarningNoElevationOnInstall, qui doit valoir 0 (avertissement actif).",
+    "exemple": "Vous ajoutez une imprimante partagée. Windows prévient qu'un pilote va être téléchargé depuis le serveur et demande votre accord.",
+    "pourquoi": "Se connecter à une imprimante télécharge et exécute son pilote. Sans confirmation, un serveur hostile installe son code sans un mot.",
+    "retenir": "Avertissement à chaque nouvelle connexion d'imprimante → aucun pilote n'arrive en silence.",
+    "simple": "Cette règle impose un avertissement et une confirmation quand on se connecte à une nouvelle imprimante réseau."
+  },
+  "CIS-WIN-18.7.13": {
+    "audit": "Il lit UpdatePromptSettings, qui doit valoir 0.",
+    "exemple": "L'imprimante que vous utilisez depuis des mois propose une mise à jour de pilote. Une confirmation est demandée.",
+    "pourquoi": "Sans ce contrôle, un serveur d'impression compromis pousse un pilote malveillant en le présentant comme une simple mise à jour.",
+    "retenir": "Confirmation aussi sur les mises à jour → la connexion établie ne devient pas un passe-droit permanent.",
+    "simple": "Cette règle impose la même confirmation lors de la mise à jour du pilote d'une imprimante déjà connectée."
+  },
+  "CIS-WIN-18.9.13.1": {
+    "audit": "Il lit DriverLoadPolicy dans la clé EarlyLaunch, qui doit valoir 3.",
+    "exemple": "Un pilote malveillant tente de se charger avant l'antivirus pour rester invisible. Il est refusé dès le départ.",
+    "pourquoi": "Un code qui démarre avant les défenses peut les neutraliser. Ce contrôle intervient plus tôt que tout le reste.",
+    "retenir": "Pilotes malveillants bloqués au démarrage → l'antivirus démarre en terrain sain.",
+    "simple": "Cette règle empêche le chargement des pilotes identifiés comme malveillants au tout premier instant du démarrage."
+  },
+  "CIS-WIN-18.9.27.1": {
+    "audit": "Il lit AllowCustomSSPsAPs, qui doit valoir 0.",
+    "exemple": "Un module malveillant se greffe sur LSASS et lit chaque mot de passe au moment où l'utilisateur se connecte.",
+    "pourquoi": "LSASS est le processus qui manipule les identifiants. Tout ce qui s'y greffe voit passer les mots de passe en clair.",
+    "retenir": "Seuls les modules signés Microsoft entrent dans LSASS → pas d'espion sur le chemin des mots de passe.",
+    "simple": "Cette règle interdit à LSASS de charger des modules d'authentification non signés par Microsoft."
+  },
+  "CIS-WIN-18.9.27.2": {
+    "audit": "Il lit RunAsPPL, qui doit valoir 1.",
+    "exemple": "Un outil de vol d'identifiants comme Mimikatz tente de lire la mémoire de LSASS. L'accès est refusé par le système lui-même.",
+    "pourquoi": "C'est la contre-mesure directe aux outils de vol d'identifiants, qui sont l'étape suivante de presque toute compromission de poste.",
+    "retenir": "LSASS en processus protégé → la mémoire des identifiants devient illisible.",
+    "simple": "Cette règle place LSASS sous une protection spéciale qui interdit aux autres programmes de lire sa mémoire."
+  },
+  "CIS-WIN-18.9.4.1": {
+    "audit": "Il lit AllowEncryptionOracle, qui doit valoir 0 (Force Updated Clients).",
+    "exemple": "Un attaquant placé entre vous et le serveur exploite la faille CVE-2018-0886 pour exécuter du code à distance.",
+    "pourquoi": "La faille permet une exécution de code à distance. Le correctif refuse de dialoguer avec les versions non corrigées.",
+    "retenir": "Clients vulnérables refusés → la faille CredSSP ne peut plus être exploitée.",
+    "simple": "Cette règle applique le correctif d'une faille de CredSSP, le mécanisme qui transmet vos identifiants au Bureau à distance."
+  },
+  "CIS-WIN-18.9.5.1": {
+    "audit": "Il lit EnableVirtualizationBasedSecurity dans la clé DeviceGuard, qui doit valoir 1.",
+    "exemple": "Même si le noyau Windows est compromis, les secrets Kerberos et NTLM restent hors de portée dans un compartiment séparé.",
+    "pourquoi": "Sans cette isolation, les secrets vivent dans la mémoire ordinaire : qui compromet le noyau les obtient tous.",
+    "retenir": "Secrets isolés par l'hyperviseur → une compromission du système ne donne pas les identifiants.",
+    "simple": "Cette règle active la sécurité basée sur la virtualisation, qui range les secrets d'authentification dans un espace isolé par l'hyperviseur."
+  },
+  "CIS-WIN-2.2.1": {
+    "audit": "Il lit le droit SeTrustedCredManAccessPrivilege et attend une liste vide.",
+    "exemple": "Un programme demande au gestionnaire d'identifiants de lui livrer les mots de passe enregistrés. Aucun compte n'ayant ce droit, la demande échoue.",
+    "pourquoi": "Ce privilège donne accès aux identifiants enregistrés de tous les utilisateurs du poste. Aucun usage courant ne le justifie.",
+    "retenir": "Aucun compte ne doit détenir ce droit → le coffre à identifiants reste fermé.",
+    "simple": "Cette règle vérifie qu'aucun compte ne peut interroger le coffre à identifiants de Windows en se faisant passer pour un appelant de confiance."
+  },
+  "CIS-WIN-2.2.10": {
+    "audit": "Il lit le droit SeCreateTokenPrivilege et attend une liste vide.",
+    "exemple": "Un processus se fabrique un jeton d'administrateur et obtient tous les accès sans jamais s'authentifier.",
+    "pourquoi": "Un jeton d'accès est la preuve d'identité interne de Windows. Pouvoir en créer un revient à pouvoir devenir n'importe qui.",
+    "retenir": "Aucun compte ne doit détenir ce droit → impossible de se fabriquer une identité.",
+    "simple": "Cette règle vérifie qu'aucun compte ne peut fabriquer lui-même un jeton d'accès."
+  },
+  "CIS-WIN-2.2.12": {
+    "audit": "Il lit le droit SeCreatePermanentPrivilege pour savoir quels comptes en disposent.",
+    "exemple": "Un programme crée un objet système puis se ferme. Normalement l'objet disparaît avec lui ; avec ce privilège, il reste dans le système.",
+    "pourquoi": "Ces objets persistants consomment des ressources du noyau et peuvent servir à détourner des mécanismes système. Le privilège est rare et sans usage courant.",
+    "retenir": "Créer un objet qui survit au programme → privilège à limiter aux comptes autorisés.",
+    "simple": "Cette règle vérifie qui peut créer des objets système qui restent présents après la fermeture du programme qui les a créés."
+  },
+  "CIS-WIN-2.2.14": {
+    "audit": "Il lit le droit SeDebugPrivilege et attend le groupe Administrateurs (S-1-5-32-544) uniquement.",
+    "exemple": "Un débogueur attaché à un processus système permet de lire sa mémoire et d'y injecter du code.",
+    "pourquoi": "Le débogage donne un contrôle total sur le processus visé, y compris ceux qui manipulent des identifiants.",
+    "retenir": "Débogage réservé aux administrateurs → pas d'accès à la mémoire des processus système.",
+    "simple": "Cette règle réserve aux administrateurs le droit d'attacher un débogueur à n'importe quel programme."
+  },
+  "CIS-WIN-2.2.20": {
+    "audit": "Il lit le droit SeEnableDelegationPrivilege et attend une liste vide.",
+    "exemple": "Un compte marqué de confiance peut agir au nom de n'importe quel utilisateur qui s'y connecte, y compris un administrateur.",
+    "pourquoi": "La délégation permet d'usurper l'identité d'autres utilisateurs. Mal accordée, elle mène directement à une compromission complète du domaine.",
+    "retenir": "Aucun compte ne doit détenir ce droit → pas d'usurpation d'identité par délégation.",
+    "simple": "Cette règle vérifie qu'aucun compte ne peut marquer un autre compte comme « de confiance pour délégation »."
+  },
+  "CIS-WIN-2.3.17.1": {
+    "audit": "Il lit FilterAdministratorToken dans la stratégie système, qui doit valoir 1.",
+    "exemple": "Un programme lancé sous ce compte s'exécutait avec tous les droits, sans jamais rien demander.",
+    "pourquoi": "C'est le compte le plus visé sur un poste Windows. Sans ce réglage, un logiciel malveillant lancé sous ce compte obtient les pleins pouvoirs en silence.",
+    "retenir": "Le compte Administrateur intégré demande confirmation lui aussi → plus d'exception.",
+    "simple": "Cette règle applique la demande de confirmation au compte Administrateur intégré, celui qui en était exempté."
+  },
+  "CIS-WIN-2.3.17.2": {
+    "audit": "Il lit ConsentPromptBehaviorAdmin, qui doit valoir 1 ou 2.",
+    "exemple": "L'écran s'assombrit et seule la fenêtre de confirmation reste active : rien d'autre ne peut cliquer à votre place.",
+    "pourquoi": "Sur le bureau normal, un programme malveillant peut dessiner une fausse fenêtre ou cliquer automatiquement sur « Oui ». Le bureau sécurisé rend cela impossible.",
+    "retenir": "Confirmation sur bureau sécurisé → personne ne peut simuler ou intercepter votre accord.",
+    "simple": "Cette règle affiche la demande d'élévation sur un bureau isolé, où aucun autre programme ne peut intervenir."
+  },
+  "CIS-WIN-2.3.17.3": {
+    "audit": "Il lit ConsentPromptBehaviorUser, qui doit valoir 0 (refuser sans demander).",
+    "exemple": "Un programme réclame les droits administrateur. Au lieu d'une invite, la demande est simplement refusée.",
+    "pourquoi": "Si l'invite existe, un utilisateur peut être manipulé pour saisir des identifiants d'administration au profit d'un programme malveillant.",
+    "retenir": "Refus automatique pour les comptes standards → pas d'élévation possible par ingénierie sociale.",
+    "simple": "Cette règle empêche un utilisateur standard de saisir un mot de passe administrateur pour élever un programme."
+  },
+  "CIS-WIN-2.3.17.4": {
+    "audit": "Il lit EnableInstallerDetection, qui doit valoir 1.",
+    "exemple": "Un fichier téléchargé est en réalité un installateur. Windows le reconnaît et demande une confirmation explicite.",
+    "pourquoi": "Un logiciel malveillant cherche souvent à s'installer durablement après avoir été exécuté une fois. Cette détection ajoute un point d'arrêt.",
+    "retenir": "Toute installation demande confirmation → rien ne s'installe à votre insu.",
+    "simple": "Cette règle fait détecter à Windows les programmes d'installation et demande confirmation avant de les lancer."
+  },
+  "CIS-WIN-2.3.17.6": {
+    "audit": "Il lit EnableLUA dans la stratégie système, qui doit valoir 1.",
+    "exemple": "UAC désactivé : tous les autres réglages UAC de cette liste deviennent sans effet, quels que soient leurs paramètres.",
+    "pourquoi": "C'est la règle dont dépendent toutes les autres du même groupe. La vérifier en premier évite de croire à une protection qui n'existe pas.",
+    "retenir": "UAC activé → sans lui, aucune des protections d'élévation ne fonctionne.",
+    "simple": "Cette règle est l'interrupteur principal du contrôle de compte utilisateur (UAC)."
+  },
+  "CIS-WIN-5.10": {
+    "audit": "Il lit le type de démarrage du service FTPSVC, qui doit être désactivé ou absent.",
+    "exemple": "FTP transmet les identifiants et les fichiers en clair : n'importe qui sur le réseau peut les lire.",
+    "pourquoi": "FTP n'a aucune protection intégrée. S'il n'est pas nécessaire, le laisser actif ajoute une surface d'attaque gratuite.",
+    "retenir": "Service FTP désactivé → un protocole en clair de moins sur le réseau.",
+    "simple": "Cette règle vérifie que le service FTP de Windows est désactivé."
+  },
+  "CIS-WIN-5.12": {
+    "audit": "Il lit le type de démarrage du service sshd, qui doit être désactivé ou absent.",
+    "exemple": "Un serveur SSH actif et oublié offre un accès distant permanent au poste.",
+    "pourquoi": "SSH est un protocole sûr, mais un service d'accès distant non surveillé reste une porte d'entrée. S'il n'est pas utilisé, il ne doit pas tourner.",
+    "retenir": "Serveur SSH désactivé → pas d'accès distant oublié.",
+    "simple": "Cette règle vérifie que le serveur SSH de Windows est désactivé."
+  },
+  "CIS-WIN-5.24": {
+    "audit": "Il lit le type de démarrage du service RemoteRegistry, qui doit valoir 4.",
+    "exemple": "Un attaquant sur le réseau modifie à distance une clé de registre pour se donner un accès permanent.",
+    "pourquoi": "Le registre contient toute la configuration de sécurité du système. Y accéder à distance permet de la désactiver sans toucher au poste.",
+    "retenir": "Registre distant désactivé → la configuration du poste n'est pas modifiable depuis le réseau.",
+    "simple": "Cette règle désactive le service qui permet de modifier le registre du poste depuis une autre machine."
+  },
+  "CIS-WIN-5.40": {
+    "audit": "Il lit le type de démarrage du service W3SVC, qui doit être désactivé ou absent.",
+    "exemple": "Un serveur web actif sans le savoir expose des pages et des applications que personne ne surveille ni ne met à jour.",
+    "pourquoi": "Un poste de travail n'a pas vocation à héberger un site. Le service exposerait des vulnérabilités sans bénéfice.",
+    "retenir": "Serveur web désactivé → pas de service exposé et non maintenu.",
+    "simple": "Cette règle vérifie que le serveur web intégré à Windows est désactivé."
+  },
+  "CIS-WIN-5.7": {
+    "audit": "Il lit le type de démarrage du service IISADMIN, qui doit être désactivé ou absent.",
+    "exemple": "Ce service gère la configuration d'IIS. Actif sans raison, il ajoute une surface d'attaque au poste.",
+    "pourquoi": "Un composant serveur sur un poste de travail est un composant qu'on ne surveille pas et qu'on ne met pas à jour.",
+    "retenir": "Administration IIS désactivée → un composant serveur de moins sur un poste client.",
+    "simple": "Cette règle vérifie que le service d'administration du serveur web IIS est désactivé."
+  },
+  "CIS-WIN-9.2.1": {
+    "audit": "Il lit EnableFirewall dans la clé de registre du profil Privé, qui doit valoir 1.",
+    "exemple": "Vous branchez le poste au réseau du bureau. Sans pare-feu, tout autre machine du réseau peut atteindre directement ses services.",
+    "pourquoi": "Un réseau privé reste un réseau partagé. Si un poste y est compromis, le pare-feu empêche la contagion vers les autres.",
+    "retenir": "Pare-feu privé activé → les autres machines du réseau ne joignent pas librement le poste.",
+    "simple": "Cette règle vérifie que le pare-feu est actif sur les réseaux déclarés privés, comme votre réseau domestique ou d'entreprise."
+  },
+  "CIS-WIN-9.2.2": {
+    "audit": "Il lit DefaultInboundAction dans la clé du profil Privé, qui doit valoir 1 (bloquer).",
+    "exemple": "Un service inconnu écoute sur un port. Aucune règle ne le mentionne : la connexion est refusée par défaut.",
+    "pourquoi": "Deux philosophies s'opposent : tout autoriser sauf ce qu'on interdit, ou tout interdire sauf ce qu'on autorise. Seule la seconde protège de ce qu'on n'a pas anticipé.",
+    "retenir": "Blocage par défaut → ce qui n'est pas explicitement autorisé est refusé.",
+    "simple": "Cette règle vérifie ce que fait le pare-feu privé face à une connexion entrante qu'aucune règle ne prévoit."
+  },
+  "CIS-WIN-9.2.3": {
+    "audit": "Il lit DisableNotifications dans la clé du profil Privé, qui doit valoir 1.",
+    "exemple": "Une alerte demande « Autoriser ce programme à communiquer ? ». L'utilisateur, pressé, clique Autoriser sans savoir de quoi il s'agit.",
+    "pourquoi": "Ces notifications posent une question de sécurité à quelqu'un qui n'a pas les éléments pour y répondre. Le blocage reste actif, seule l'invite disparaît.",
+    "retenir": "Pas de notification → l'utilisateur ne peut pas ouvrir une brèche par erreur.",
+    "simple": "Cette règle supprime la fenêtre qui apparaît quand le pare-feu bloque un programme."
+  },
+  "CIS-WIN-9.3.1": {
+    "audit": "Il lit EnableFirewall dans la clé du profil Public, qui doit valoir 1.",
+    "exemple": "Vous vous connectez au Wi-Fi d'un aéroport. Toutes les machines présentes partagent ce réseau, et vous ne les contrôlez pas.",
+    "pourquoi": "C'est le profil où le risque est le plus élevé, parce que les autres machines du réseau sont totalement inconnues.",
+    "retenir": "Pare-feu public activé → protection maximale sur les réseaux non maîtrisés.",
+    "simple": "Cette règle vérifie que le pare-feu est actif sur les réseaux publics : hôtel, aéroport, café."
+  },
+  "CIS-WIN-9.3.2": {
+    "audit": "Il lit DefaultInboundAction dans la clé du profil Public, qui doit valoir 1.",
+    "exemple": "Sur le Wi-Fi d'un hôtel, une machine voisine tente d'atteindre un service de votre poste. La connexion est refusée sans avoir à l'anticiper.",
+    "pourquoi": "Sur un réseau public, aucune connexion entrante n'a de raison légitime d'être acceptée sans règle explicite.",
+    "retenir": "Blocage par défaut sur le profil public → le poste reste injoignable de l'extérieur.",
+    "simple": "Cette règle vérifie que le pare-feu public refuse par défaut toute connexion entrante non prévue."
+  }
+}
